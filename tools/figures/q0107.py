@@ -33,7 +33,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 RLM = "‏"
-NB = " "
+NB = "\u00a0"
 CAT = "‖"                     # concatenation, as the page writes it
 
 EXAMPLE = [3, 30, 34, 5, 9]          # the statement: 9534330

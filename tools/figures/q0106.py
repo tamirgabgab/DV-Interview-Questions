@@ -233,7 +233,7 @@ def fsm_legend() -> str:
     return ('<span class="viz-legend"><span><i class="m3-key-n0"></i>המצב 00 : הספירה של הביט היא 0, מודולו 3</span>'
             '<span><i class="m3-key-n1"></i>המצב 01 : ‏1 ב-ones, הספירה 1</span>'
             '<span><i class="m3-key-n2"></i>המצב 10 : ‏1 ב-twos, הספירה 2</span>'
-            '<span><i class="m3-key-one"></i>ביט 1 במספר שנכנס : למצב הבא</span>'
+            '<span><i class="m3-key-one"></i>ביט 1 במספר שנכנס : למצב הבא</span>'
             '<span><i class="m3-key-zero"></i>ביט 0 : נשארים</span>'
             '<span><i class="m3-key-n3"></i>המצב 11 : לא מגיעים אליו</span></span>').replace(" :", f"{NB}:")
 

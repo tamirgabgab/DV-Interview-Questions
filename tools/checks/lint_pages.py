@@ -25,7 +25,8 @@ Checks, per page:
   a code line, not a blank line, a comment alone or a bare ``end`` / ``endfunction``, so the
   highlights keep pointing at the code the explanation names after the block is edited.
 - Colons: a colon in Hebrew text has U+00A0 before it (CLAUDE.md), outside code, inline
-  code, math, comments and the generated blocks (``<!-- gen n -->``, the generator's job).
+  code, math and comments; in the generated blocks (``<!-- gen n -->``), where labels and
+  code share a line, a Hebrew letter then " :" (the generator's ``NB`` must be U+00A0).
 Once per run (when no page is named): every question is in a study path, and the explorer
 strings (``docs/javascripts/explorer/*.js``) keep the colon rule: ``const NB`` is U+00A0, and
 no Hebrew text has a plain space before a colon (a Hebrew letter, or a closing ``)`` / ``}``
@@ -346,14 +347,18 @@ PAGE_SKIP = re.compile(r"`[^`\n]*`|\\\(.*?\\\)|\\\[.*?\\\]|\$\$.*?\$\$|<!--.*?--
 
 
 GLUED_COLON = re.compile(r"(\\\)|\\\]|`):(?=\s|$)")
+# a generated block (an SVG, a legend) mixes code and labels on one line: there only a Hebrew
+# letter right before " :" counts (five generators had NB = " ", a plain space, until round 9)
+GEN_COLON = re.compile(r"[\u05d0-\u05ea] :(?=[\s<\"'])")
 HEBREW = re.compile(r"[\u05d0-\u05ea]")
 MATH = re.compile(r"\\\((.*?)\\\)|\\\[(.*?)\\\]|\$\$(.*?)\$\$", re.S)
 
 
 def lint_colons(text: str) -> list[str]:
     """A colon in Hebrew text has U+00A0 before it, so it never wraps to the start of a line
-    (CLAUDE.md). Code blocks, inline code, math, comments and the generated blocks (their
-    generator's job) are skipped; a line without a Hebrew letter is not Hebrew text. A colon
+    (CLAUDE.md). Code blocks, inline code, math and comments are skipped, and in the generated
+    blocks only a Hebrew letter before the colon counts; a line without a Hebrew letter is not
+    Hebrew text. A colon
     glued to math or inline code ("\\( 1/4 \\):") counts when its paragraph is Hebrew, and
     math may not hold Hebrew (MathJax lays it out reversed)."""
     out, fence, gen = [], None, False
@@ -375,6 +380,9 @@ def lint_colons(text: str) -> list[str]:
             continue
         prose.append("" if gen else line)
         if gen:
+            skip = [m.span() for m in PAGE_SKIP.finditer(line)]
+            if any(not any(a <= m.start() < b for a, b in skip) for m in GEN_COLON.finditer(line)):
+                out.append(f"line {n}: a plain space before a colon in a generated block (the generator's NB, U+00A0)")
             continue
         if GLUED_COLON.search(line):
             a = n - 1

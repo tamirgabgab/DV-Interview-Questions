@@ -36,7 +36,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from charts import Chart  # noqa: E402
 
 RLM = "‏"
-NB = " "
+NB = "\u00a0"
 MINUS = "−"
 
 # the inputs of the page and of the box: (target, positions, speeds)
@@ -281,12 +281,12 @@ def graph(pos, speed, target, label, t_max, y_min, y_max, *, x_step=1, y_step=1,
 
 
 def graph_legend(target=True, ghost=False, by_car=False) -> str:
-    whose = "של המכונית : קטע משותף בצבע של המכונית שבראש" if by_car else "של השיירה"
-    parts = ['<span><i class="cf-key-free"></i>הקו החופשי : המקום אילו המכונית נסעה לבד</span>',
+    whose = "של המכונית : קטע משותף בצבע של המכונית שבראש" if by_car else "של השיירה"
+    parts = ['<span><i class="cf-key-free"></i>הקו החופשי : המקום אילו המכונית נסעה לבד</span>',
              f'<span><i class="cf-key-path"></i>הדרך האמיתית, בצבע {whose}</span>',
              '<span><i class="cf-key-meet"></i>מפגש</span>']
     if ghost:
-        parts.append('<span><i class="cf-key-ghost"></i>קווים שנחתכים מאוחר מדי : המכונית שלפנים כבר האטה</span>')
+        parts.append('<span><i class="cf-key-ghost"></i>קווים שנחתכים מאוחר מדי : המכונית שלפנים כבר האטה</span>')
     if target:
         parts.append('<span><i class="cf-key-target"></i>היעד</span>')
     return '<span class="viz-legend">' + "".join(p.replace(" : ", f"{NB}: ") for p in parts) + "</span>"

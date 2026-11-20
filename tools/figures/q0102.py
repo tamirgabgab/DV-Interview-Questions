@@ -39,7 +39,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from charts import Chart  # noqa: E402
 
 RLM = "‏"
-NB = " "
+NB = "\u00a0"
 NAMES = "ABCDEFGH"
 A, B, C, D, E, F, G = range(7)
 N = 7
@@ -364,7 +364,7 @@ def indegrees(n, edges):
 
 
 def statement_figure() -> str:
-    return graph_svg(EDGES, "הדוגמה : שבע משימות A עד G. חץ מ-A ל-B אומר ש-B רצה אחרי A. ‏B ו-C אחרי A, ‏C גם אחרי E, ‏D אחרי B ו-C, ‏F אחרי D ו-G אחרי F")
+    return graph_svg(EDGES, "הדוגמה : שבע משימות A עד G. חץ מ-A ל-B אומר ש-B רצה אחרי A. ‏B ו-C אחרי A, ‏C גם אחרי E, ‏D אחרי B ו-C, ‏F אחרי D ו-G אחרי F")
 
 
 def tasks_table() -> str:
@@ -386,8 +386,8 @@ def levels_figure() -> str:
 
 def levels_legend() -> str:
     return ('<span class="viz-legend"><span><i class="ts-key-src"></i>דרגת כניסה 0 : אפשר להריץ מיד</span>'
-            '<span><i class="ts-key-badge"></i>דרגת הכניסה : כמה משימות עוד צריכות להסתיים לפניה</span>'
-            '<span><i class="ts-key-band"></i>סבב : המשימות שהדרגה שלהן מגיעה ל-0 יחד</span></span>')
+            '<span><i class="ts-key-badge"></i>דרגת הכניסה : כמה משימות עוד צריכות להסתיים לפניה</span>'
+            '<span><i class="ts-key-band"></i>סבב : המשימות שהדרגה שלהן מגיעה ל-0 יחד</span></span>')
 
 
 def kahn_table() -> str:
@@ -463,14 +463,14 @@ def back_figure() -> str:
             edge_cls[i] = "is-back"
         elif a in path and b in path and path.index(b) == path.index(a) + 1:
             edge_cls[i] = "is-path"
-    return graph_svg(CYCLE_EDGES, "החיפוש לעומק על הדוגמה עם המעגל : המסלול האפור A, B, D, E, C. ‏F ו-G כבר שחורות. מ-C החץ חוזר ל-D, שעדיין אפורה : קשת אחורה, והמעגל הוא D, E, C",
+    return graph_svg(CYCLE_EDGES, "החיפוש לעומק על הדוגמה עם המעגל : המסלול האפור A, B, D, E, C. ‏F ו-G כבר שחורות. מ-C החץ חוזר ל-D, שעדיין אפורה : קשת אחורה, והמעגל הוא D, E, C",
                      node_cls=node_cls, edge_cls=edge_cls, curves={7: (150, 222)}).replace(f'viewBox="0 0 {W} {H}"', f'viewBox="0 0 {W} {H + 18}"')
 
 
 def back_legend() -> str:
-    return ('<span class="viz-legend"><span><i class="ts-key-white"></i>לבנה : עוד לא נכנסנו</span>'
-            '<span><i class="ts-key-grey"></i>אפורה : על המסלול הנוכחי</span>'
-            '<span><i class="ts-key-black"></i>שחורה : יצאנו ממנה, כל מה שאחריה סגור</span>'
+    return ('<span class="viz-legend"><span><i class="ts-key-white"></i>לבנה : עוד לא נכנסנו</span>'
+            '<span><i class="ts-key-grey"></i>אפורה : על המסלול הנוכחי</span>'
+            '<span><i class="ts-key-black"></i>שחורה : יצאנו ממנה, כל מה שאחריה סגור</span>'
             '<span><i class="ts-key-path"></i>המסלול האפור</span>'
             '<span><i class="ts-key-back"></i>קשת אחורה, אל משימה אפורה</span></span>')
 
@@ -495,7 +495,7 @@ def diamond_svg() -> str:
 def gantt_svg() -> str:
     es, ef, late, slack, total = times(N, EDGES, DUR)
     rows = N
-    c = Chart(f"לוח הזמנים עם מספר לא מוגבל של מריצים : פס לכל משימה מההתחלה המוקדמת עד הסיום המוקדם. "
+    c = Chart(f"לוח הזמנים עם מספר לא מוגבל של מריצים : פס לכל משימה מההתחלה המוקדמת עד הסיום המוקדם. "
               f"הנתיב הקריטי E, C, D, F, G בלי מרווח, והכול נגמר בזמן {total}. ‏A ו-B יכולות להתאחר ב-2 וב-4 דקות",
               w=464, h=40 + rows * 26, x0=30, right=14, top=10, base=14 + rows * 26, x_max=16, y_max=rows, style="max-width:29rem")
     c.grid_x(range(0, 17), labels=[str(x) if x % 2 == 0 or x == total else "" for x in range(17)])
@@ -518,9 +518,9 @@ def gantt_svg() -> str:
 def gantt_legend() -> str:
     return ('<span class="viz-legend"><span><i class="ts-key-crit"></i>על הנתיב הקריטי, בלי מרווח</span>'
             '<span><i class="ts-key-bar"></i>משימה עם מרווח</span>'
-            '<span><i class="ts-key-slack"></i>המרווח : כמה אפשר לאחר בלי לאחר את הסוף</span>'
+            '<span><i class="ts-key-slack"></i>המרווח : כמה אפשר לאחר בלי לאחר את הסוף</span>'
             '<span><i class="ts-key-total"></i>הסוף, הזמן הכולל</span>'
-            '<span>המספר בפס : המשך בדקות</span></span>')
+            '<span>המספר בפס : המשך בדקות</span></span>')
 
 
 def times_table() -> str:

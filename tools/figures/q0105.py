@@ -310,7 +310,7 @@ def hash_svg(addr: int, p: int) -> str:
 
 def hash_legend(p: int) -> str:
     items = [("hll-key-idx", "הביטים שבוחרים את הרגיסטר")] if p else []
-    items += [("hll-key-zero", "האפסים המובילים"), ("hll-key-one", "ה-1 הראשון : הדרגה")]
+    items += [("hll-key-zero", "האפסים המובילים"), ("hll-key-one", "ה-1 הראשון : הדרגה")]
     return '<span class="viz-legend">' + "".join(f'<span><i class="{c}"></i>{t}</span>' for c, t in items) + "</span>"
 
 
@@ -333,7 +333,7 @@ def registers_svg() -> str:
                      + (f'<text x="{x + C / 2:.1f}" y="{y + C / 2 + 6}" text-anchor="middle">{v}</text>' if v else "")
                      + f'<title>רגיסטר {j} : {v if v else "ריק"}</title></g>'
                      f'<text class="hll-regno" x="{x + C / 2:.1f}" y="{y + C + 13}" text-anchor="middle">{j}</text>')
-    label = (f"16 הרגיסטרים אחרי {SMALL_N} הכתובות הראשונות של הזרם האקראי, לפי הסדר : "
+    label = (f"16 הרגיסטרים אחרי {SMALL_N} הכתובות הראשונות של הזרם האקראי, לפי הסדר : "
              + ", ".join(str(v) for v in R) + f". {R.count(0)} ריקים")
     return (f'<svg class="figure hll-regs" viewBox="0 0 {W} {H}" style="max-width:{W / 16:.3f}rem" direction="ltr" '
             f'role="img" aria-label="{label}">' + "".join(parts) + "</svg>")
@@ -426,7 +426,7 @@ def pipe_svg() -> str:
     p.append(f'<path class="hll-wire" d="M482,59 h8 v135 h-8" fill="none"/>' + head(482, 194))
     p.append(txt(490, 230, "write regs[j2]", "hll-pt-s", "end"))
     W, H = 508, 240
-    label = ("יחידת העדכון בשלושה שלבים : שלב 1 מחשב את ה-hash, שלב 2 מפצל אותו לרגיסטר ולדרגה וקורא את הרגיסטר, "
+    label = ("יחידת העדכון בשלושה שלבים : שלב 1 מחשב את ה-hash, שלב 2 מפצל אותו לרגיסטר ולדרגה וקורא את הרגיסטר, "
              "שלב 3 לוקח את המקסימום וכותב. דרך הקידום מחזירה את הכתיבה של השעון הקודם לבורר של שלב 3")
     return (f'<svg class="figure hll-pipe" viewBox="0 0 {W} {H}" style="max-width:{W / 16:.3f}rem" direction="ltr" '
             f'role="img" aria-label="{label}">' + "".join(p) + "</svg>")

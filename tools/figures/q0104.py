@@ -33,7 +33,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from charts import Chart  # noqa: E402
 
 RLM = "‏"
-NB = " "
+NB = "\u00a0"
 MINUS = "−"
 
 # the rings of the page and of the box: (gas, cost)

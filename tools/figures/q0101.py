@@ -336,7 +336,7 @@ def hue(s: int, n: int) -> str:
 
 def triangle_chart() -> str:
     """The distribution of the sum of two standard dice: the triangle of the statement."""
-    c = Chart("התפלגות הסכום של שתי קוביות רגילות : הסכומים 2 עד 12, ומספר ההטלות מתוך 36 שנותנות כל סכום, 1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1",
+    c = Chart("התפלגות הסכום של שתי קוביות רגילות : הסכומים 2 עד 12, ומספר ההטלות מתוך 36 שנותנות כל סכום, 1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1",
               w=420, h=196, x0=34, right=8, top=18, base=166, slots=11, y_max=6, style="max-width:26.25rem")
     c.grid_y([0, 2, 4, 6])
     cnt = sums(standard(6), standard(6))
@@ -374,7 +374,7 @@ def sum_table_svg(a, b, label) -> str:
 def sum_tables() -> str:
     std = standard(6)
     a, b = SICHERMAN
-    left = sum_table_svg(std, std, "טבלת הסכומים של שתי קוביות רגילות : שורה לכל פאה של A, עמודה לכל פאה של B. כל סכום יושב על אלכסון אחד, 7 על האלכסון הארוך")
+    left = sum_table_svg(std, std, "טבלת הסכומים של שתי קוביות רגילות : שורה לכל פאה של A, עמודה לכל פאה של B. כל סכום יושב על אלכסון אחד, 7 על האלכסון הארוך")
     right = sum_table_svg(a, b, "טבלת הסכומים של קוביות Sicherman, A עם הפאות 1, 2, 2, 3, 3, 4 ו-B עם 1, 3, 4, 5, 6, 8 : אותם 36 סכומים, מפוזרים אחרת, ושוב 7 שש פעמים")
     return ('<div class="sc-pair">'
             f'<figure class="sc-fig">{left}<figcaption>קוביות רגילות</figcaption></figure>'
@@ -423,10 +423,10 @@ def split_svg(split_a: dict[int, int], label: str) -> str:
 
 
 def split_figure() -> str:
-    std = split_svg({2: 1, 3: 1, 6: 1}, "הגורמים של הקוביות הרגילות : לכל קובייה x, ‏1 + x, ‏1 + x + x² ו-1 − x + x² אחד, והפאות 1 עד 6")
+    std = split_svg({2: 1, 3: 1, 6: 1}, "הגורמים של הקוביות הרגילות : לכל קובייה x, ‏1 + x, ‏1 + x + x² ו-1 − x + x² אחד, והפאות 1 עד 6")
     sic = split_svg({2: 1, 3: 1, 6: 0}, "הגורמים של קוביות Sicherman : ל-A רק x, ‏1 + x ו-1 + x + x², והפאות 1, 2, 2, 3, 3, 4. ל-B אותם שלושה ושני הגורמים 1 − x + x², והפאות 1, 3, 4, 5, 6, 8")
     return ('<div class="sc-pair">'
-            f'<figure class="sc-fig">{std}<figcaption>הזוג הרגיל : ‏{ltr("1 − x + x²")} אחד לכל קובייה</figcaption></figure>'
+            f'<figure class="sc-fig">{std}<figcaption>הזוג הרגיל : ‏{ltr("1 − x + x²")} אחד לכל קובייה</figcaption></figure>'
             f'<figure class="sc-fig">{sic}<figcaption>זוג Sicherman : שניהם לקובייה B</figcaption></figure>'
             '</div>')
 
@@ -466,7 +466,7 @@ def triple_chart() -> str:
     """The distribution of the sum of three standard dice: part c's target."""
     cnt = sums(sums(standard(6), standard(6)).elements(), standard(6))
     vals = [cnt[s] for s in range(3, 19)]
-    c = Chart("התפלגות הסכום של שלוש קוביות רגילות : הסכומים 3 עד 18, ומספר ההטלות מתוך 216 שנותנות כל סכום, "
+    c = Chart("התפלגות הסכום של שלוש קוביות רגילות : הסכומים 3 עד 18, ומספר ההטלות מתוך 216 שנותנות כל סכום, "
               + ", ".join(map(str, vals)),
               w=420, h=196, x0=34, right=8, top=18, base=166, slots=16, y_max=27, style="max-width:26.25rem")
     c.grid_y([0, 9, 18, 27])
@@ -500,7 +500,7 @@ def table_kinds() -> str:
         if min(p) >= 0:
             faces, tex = f"{RLM}{flist(faces_of(p))}", poly_tex(p)
         else:      # a die that is none: its first terms show the negative coefficient
-            faces, tex = "אין : המקדם של \\( x^2 \\) שלילי", poly_tex(p[:4]) + rf" + \dots + x^{{{len(p) - 1}}}"
+            faces, tex = "אין : המקדם של \\( x^2 \\) שלילי", poly_tex(p[:4]) + rf" + \dots + x^{{{len(p) - 1}}}"
         rows.append(f"| {e} | {KINDS[e]} | {RLM}\\( {tex} \\) | {faces} |")
     return "\n".join(rows)
 

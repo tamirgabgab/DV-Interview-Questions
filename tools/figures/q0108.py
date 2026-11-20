@@ -28,7 +28,7 @@ import math
 from itertools import product
 
 RLM = "‏"
-NB = " "
+NB = "\u00a0"
 
 # the arrays and grids of the page and of the boxes
 EXAMPLE = [0, 0, 0, 1, 0, 1, 1, 0]                        # k = 3: windows at 0, 4, 5
