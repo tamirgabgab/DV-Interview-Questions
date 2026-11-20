@@ -4,8 +4,8 @@ Written in session 35 (2026-11-19) from the review of the site. The tasks themse
 their measurements and file references, are in [`HANDOFF.md`](HANDOFF.md) under "Open
 items", "Next steps (session 35)", N1 to N8; this file only groups them into rounds, in
 the proposed order of work, so the owner and the session can go through them one at a
-time. Rounds 1 to 5 and 7 to 9 are done (session 35), and round 6 has a pilot of two
-questions.
+time. Rounds 1 to 5 and 7 to 10 are done (session 35), and round 6 has a pilot of two
+questions and four more in progress.
 Round 8 was split in two on 2026-11-20: 0036 alone is round 8, the rest round 9.
 
 How to use it: before a round, read its row and its section, answer the open questions,
@@ -31,6 +31,7 @@ high, xhigh, max); a cheaper model usually gets a higher effort to make up for i
 | 7. Grading and wording | re-grade the difficulty, reword the level cards, missing topic names | N4.2, N4.3, part of N7 | small | Sonnet 5.5, medium | Haiku 5.5, medium | front matter and text, once the owner sets the criteria |
 | 8. Question 0036 | the LFSR box taller than a screen and the page's deferred review items | the 0036 line of N7 | medium | Opus 5.5, xhigh | Opus 5.5, high | it already failed twice with agents, so not a cheaper model |
 | 9. Older items and CI time | boxes taller than a screen, small figure labels, a shorter CI, the rest of N7 | N7 (without 0036), N8 | medium | Opus 5.5, high | Sonnet 5.5, high | simpler, separate fixes; the checks catch most mistakes |
+| 10. Tall boxes and phone labels | a layout per box over 1000 px, legend labels at 11 px on a phone | N10 | medium | Opus 5.5, high | Sonnet 5.5, high | visual work per box, each measured; the checks catch regressions |
 
 Where not to save: rounds 6 and 4. In round 6 the content is the product; in round 4 one
 change reaches all 109 pages. Where saving is safe: rounds 1, 5 and 7, since
@@ -85,8 +86,10 @@ Round 8 (0036) stays on the recommended model; round 9 is safe on the cheaper on
   levels (student has 14 questions, junior 69, senior 26). The owner: "find the bug" and
   UVM, a pilot of two or three first, kind `dv` with the `debug` tag.
 - Status: a pilot of two in session 35 (2026-11-20), work log item 218 of `HANDOFF.md`:
-  0110 (RTL bugs, junior) and 0111 (a passing test over a broken DUT, senior). The rest
-  waits for the owner's look at the pilot.
+  0110 (RTL bugs, junior) and 0111 (a passing test over a broken DUT, senior). Then the
+  owner chose four of eleven proposals (2026-11-20): 0112 factory override, 0113 phases
+  and objections, 0114 virtual sequence, 0115 a monitor's sampling race, with the Python in
+  cocotb and pyuvm.
 
 ### Round 7. Grading and wording
 
@@ -110,3 +113,9 @@ Round 8 (0036) stays on the recommended model; round 9 is safe on the cheaper on
   explorer shards; the display fixes and the colons of the older pages, not the DV additions.
 - Status: done in session 35 (2026-11-20), work log item 220 of `HANDOFF.md`. Left as N10: 24
   older boxes still taller than one screen, a proposal for a later round.
+
+### Round 10. Tall boxes and phone labels
+
+- Open questions: none; the owner asked for a layout per box, as 0019 and 0048 got.
+- Status: done in session 35 (2026-11-20), work log item 221 of `HANDOFF.md`. Over 1000 px
+  still: 0064 (three boxes), 0024 and 0066 part c, unless content is cut.

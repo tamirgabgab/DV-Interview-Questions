@@ -587,6 +587,37 @@ redesign plan of 2026-10-16 and the proposal series six to eight, and items 112 
       twoheaps 1228 / 1213 / 1137, 0043 horses 1220 / 1186, 0065 islands 1186 / 1186 /
       1159, 0062 tagpool 1136 / 1054, 0047 rainwater 1083 / 1082 (N10).
 
+221. **Round 10, tall boxes and phone labels (session 35, 2026-11-20).** The owner: N10's
+    boxes each with a layout of its own, as 0019 and 0048 got in round 9, and the phone
+    labels other than the axes at 11 px.
+    - Phone labels (`reading-tools.js`): legend labels (a line's name, "T ≈ 0.333") grow to
+      TICK_PX like the axes; an axis's name at a corner of a chart hides the label it covers
+      (the 0 of the y axis). Room in the generators where labels then met: 0007 and 0011
+      captions on two lines, 0020's RCB bracket lower, 0024's rings lower, 0039's egg labels,
+      0041's median label left of its line (a new side for `vline` in charts.py).
+    - Boxes at 1920 x 1080 (check_heights, at the end of every box), before -> after:
+      0047 rainwater 1083 / 1082 -> under 1000 (bars or map beside the step and code);
+      0062 tagpool 1136 / 1054 -> under 1000 (no figure margins, an eight-line code window);
+      0065 islands 1186 / 1186 / 1159 -> under 1000 (queue beside the board);
+      0043 horses 1220 / 1186 -> under 1000 (a scrolling races table that follows the race);
+      0068 twoheaps 1228 / 1213 / 1137 -> under 1000 (heaps 14rem, legend beside);
+      0009 boxes 1240 -> 989 (ring, walk and formula beside the rounds and the proof);
+      0025 acknak 1250 -> 974 (event strip beside the notes; 26-unit rows, `waveStrip`
+      `rowH`); 0067 netdelay 1258 / 1258 / 1244 -> under 1000 (a scrolling links table);
+      0066 intervals 1140 / 1280 / 1479 -> 988 / 1002 / 1087 (the timeline at about its
+      drawn size beside the presets and legend, the explain panel at full width with the
+      steps beside the code; the box is a container of its own, it has no columns);
+      0024 credits 1352 -> 1131 (the circle beside the counters and the free events, the
+      random run beside the strip); 0064 weights 1182 / 1223 / 1322 -> 1092 / 1141 / 1210
+      (the scale beside its legend, a scrolling convolution table).
+    - Left over 1000: 0064 (the controls, the summary, the answer and the scale above the
+      columns take about 600 px), 0024 (the counters, the circle, the strip and the notes),
+      0066 part c (three heights and the threshold make the tallest timeline) and 0025 after
+      a random run (1064). Each would need content cut; offered to the owner.
+    - Markup moved into wrappers so a part can go in a column (TOP_PARTS never move):
+      `.bx-rounds` / `.bx-sum` (0009), `.an-notes` (0025, 0024), `.cr-top` / `.cr-free`
+      (0024), `.wt-top` (0064), `.iv-top` / `.iv-aside` (0066). The phone order is as before.
+
 ---
 
 ## In progress
@@ -595,8 +626,12 @@ redesign plan of 2026-10-16 and the proposal series six to eight, and items 112 
   212), then rounds 1 to 3 of the plan in [`ROUNDS.md`](ROUNDS.md): housekeeping (213),
   accessibility and speed (214), the phone header and layout shifts (215), round 5 and
   the first part of round 7 (216), round 4 (217) and a pilot of round 6 (218).
-  Round 8 is split in two (0036 alone, then the rest as round 9); round 8 (219) is on
-  `main`, round 9 (220) is done on the branch.
+  Round 8 is split in two (0036 alone, then the rest as round 9); rounds 8 (219) and 9
+  (220) are on `main`; round 10 (221, N10 and the phone labels) is on the branch. Round 6
+  goes on with four questions the owner chose (2, 3, 4 and 10 of the proposals): 0112
+  factory override, 0113 phases and objections, 0114 virtual sequence, 0115 a monitor's
+  sampling race. Their Python is cocotb with pyuvm on Verilator (`run_cocotb` in
+  `tools/page_tests.py`, the owner's suggestion); the UVM SystemVerilog is shown, not run.
 - **State:** `main` (5c71e11, deployed 2026-11-20 13:04 Israel time) has rounds 1 to 5 and
   7 and the pilot of round 6 (111 questions, 204 boxes); the live site was checked at 390
   and 1440 px in both schemes (built math, 0110, 0111, the home page). Next: the owner's
@@ -821,13 +856,13 @@ true, so CI never runs the motion paths or a box's first-visit guide.
   touched (the full set stays on `main`).
 
 **N10. Boxes still taller than one screen (found in round 9, a proposal for a later round):**
-- [ ] 24 boxes of 11 kinds are over 1000 px at 1920 x 1080 in check_heights' states (they
+- [x] (done, work log 221; 0064, 0024 and 0066 part c stay over 1000 px) 24 boxes of 11 kinds are over 1000 px at 1920 x 1080 in check_heights' states (they
   were before round 9 as well): 0066 intervals 1479 / 1280 / 1140, 0024 credits 1352, 0064
   weights 1322 / 1223 / 1182, 0067 netdelay 1258 / 1258 / 1244, 0025 acknak 1250, 0009
   boxes 1240, 0068 twoheaps 1228 / 1213 / 1137, 0043 horses 1220 / 1186, 0065 islands
   1186 / 1186 / 1159, 0062 tagpool 1136 / 1054, 0047 rainwater 1083 / 1082. Each needs
   its own layout (`cols` and its side blocks), as 0019 and 0048 got in round 9.
-- [ ] Phone labels other than the axes (a line's name, "T ≈ 0.333", "D = 5") keep the
+- [x] (done, work log 221) Phone labels other than the axes (a line's name, "T ≈ 0.333", "D = 5") keep the
   9.5 px floor; 11 px for them needs room per generator.
 
 ### Owner decisions
