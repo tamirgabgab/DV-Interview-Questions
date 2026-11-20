@@ -680,6 +680,33 @@ redesign plan of 2026-10-16 and the proposal series six to eight, and items 112 
       scheduling regions, SystemVerilog or cocotb; 32 of its SV choices run in Verilator as
       one parameterized bench, the two "DUT first" orders come from the model only), 780 px.
 
+225. **Skills: dv-question, webapp-testing, web-quality; a first weight audit (session 35,
+    2026-11-20).** The owner asked for a skill that turns a pasted conversation (a question
+    and its solution) into a page, and for two third-party skills. `.claude/skills/dv-question`
+    is the repository's own: twelve phases from the source check (mandatory, before writing)
+    and the level with its time budget to the box, the tests, the path and map, the checks,
+    the CI and the report. `webapp-testing` (anthropics/skills e4bb5d9, Apache 2.0) and the
+    six web-quality skills (addyosmani/web-quality-skills afa8da9, MIT: web-quality-audit,
+    performance, core-web-vitals, accessibility, seo, best-practices) were read in full and
+    copied as published; `.claude/skills/README.md` has their rows and notes for this
+    repository (the local server, the pinned Chromium, the CDN routes, Lighthouse as the
+    fallback for the DevTools MCP). Then a Lighthouse 13.6 lab run on six pages, mobile and
+    desktop, three runs each, median, served with gzip like GitHub Pages, Google Fonts and
+    the CDN scripts blocked (so their bytes are not counted):
+
+    | Page | Mobile perf | Mobile LCP | TBT | KB (gzip) | Elements |
+    |------|-------------|-----------|-----|-----------|----------|
+    | home | 88 | 2.3 s | 300 ms | 303 | 1465 |
+    | all | 91 | 2.7 s | 147 ms | 269 | 2421 |
+    | 0001 | 81 | 3.3 s | 258 ms | 332 | 1365 |
+    | 0115 | 80 | 3.2 s | 299 ms | 327 | 1933 |
+    | 0016 | 62 | 3.0 s | 1609 ms | 378 | 21265 |
+    | graph.html | 100 | 1.5 s | 0 | 26 | 27 |
+
+    Desktop: 85 to 100. Accessibility 96 to 100, best practices and SEO 100 on the site's own
+    pages. Every page is far under the skills' 1.5 MB budget. Findings, none fixed yet (N11
+    in Open items).
+
 ---
 
 ## In progress
@@ -695,6 +722,8 @@ redesign plan of 2026-10-16 and the proposal series six to eight, and items 112 
   sampling race. Their Python is cocotb with pyuvm on Verilator (`run_cocotb` in
   `tools/page_tests.py`, the owner's suggestion); the UVM SystemVerilog is shown, not run. Round 2 of the four (224) made
   them shorter and gave each a box.
+- **Skills (225):** `dv-question` (a pasted conversation to a page), `webapp-testing` and the
+  six web-quality skills are on the branch; the weight audit's proposals are N11.
 - **State:** `main` (f52c181, deployed 2026-11-20 19:34 Israel time) has rounds 1 to 10 and
   round 6's four DV questions 0112 to 0115 after their round 2 (115 questions); the CI ran
   every check on it. Next: the owner's look at 0112 to 0115 and their boxes.
@@ -709,6 +738,27 @@ redesign plan of 2026-10-16 and the proposal series six to eight, and items 112 
   later are in `HANDOFF-archive-2.md` ("In progress notes").
 
 ## Open items
+
+### N11, the weight audit's proposals (work log 225, waiting on the owner)
+
+1. **Big DOM from the math:** 0016 has 21,000 elements (623 formulas rendered at build time
+   as CHTML), 4 s of style and layout and 1.6 s of blocking on a simulated phone; 32 pages
+   are over 8,000 (0044, 0021, 0094, 0087, 0071, 0048, 0070 next). Options: numbers and
+   simple expressions as text instead of math, or `content-visibility: auto` on closed
+   solutions (check the jump and load-shift checks).
+2. **The question stylesheet:** `site-question.css` is 60 KB gzip and about 87% of it is
+   unused on a given page; a split by feature (code, figures, run panel, boxes) would save
+   about 50 KB on a first visit (it is cached after that).
+3. **Unminified own scripts:** `explorer/core.js`, `reading-tools.js`, `question-tools.js`
+   and the others, about 20 KB gzip to save with a minify step in the build.
+4. **Scripts at the end of the body delay the first paint** (Lighthouse counts about 1.8 s
+   on a simulated phone). `defer` would let parts move while loading, against the
+   "nothing moves" rule; only per script, with `check_jumps.py` and the load-shift check.
+5. **graph.html** (the map, written by graphify): text at 2.28:1 contrast in its side
+   panel, no `main` landmark, no meta description; a post-processing step in
+   `tools/build/graph.py` can fix all three.
+6. **Code blocks with line numbers** are tables without a caption (axe
+   `table-fake-caption`, Material's markup) and a target-size note on desktop: minor.
 
 ### Next steps (session 35, 2026-11-19)
 
