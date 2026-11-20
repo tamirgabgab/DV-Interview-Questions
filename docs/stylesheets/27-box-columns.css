@@ -192,7 +192,7 @@
    proof text comes after the proof chart, and it folds with the proof panel */
 @container (min-width: 600px) {
   .md-typeset .explorer .cake-pie { flex-basis: 9.5rem; }
-  .md-typeset .explorer .cake-scroll { max-height: 7.6rem; }
+  .md-typeset .explorer .cake-scroll { max-height: 6.7rem; }
   .md-typeset .explorer .cake-panel .cake-now { font-size: 0.7rem; }
   .md-typeset .explorer .ex-main > .cake-proof-text { margin: 0.5em 0 0; }
   .md-typeset .explorer .ex-side > .cake-proof { padding-top: 0; border-top: 0; }
