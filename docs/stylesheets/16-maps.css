@@ -138,23 +138,6 @@
 .metro.is-hl .mm-svg [data-line]:not(.is-on),
 .metro.is-hl .mm-svg .mm-st:not(.is-on) { opacity: 0.22; }
 
-/* the tooltip: the id and title of the station under the pointer or the focus */
-.md-typeset .mm-tip {
-  position: absolute;
-  z-index: 2;
-  max-width: min(22rem, calc(100% - 8px));
-  padding: var(--sp-1) var(--sp-2);
-  border-radius: var(--radius-s);
-  background: var(--md-primary-fg-color);
-  color: var(--md-primary-bg-color);
-  font-size: 0.68rem;
-  line-height: 1.4;
-  box-shadow: var(--shadow-2);
-  pointer-events: none;
-}
-
-.md-typeset .mm-tip[hidden] { display: none; }
-
 /* the legend: a line's badge, its name (the link to its page) and its count */
 .md-typeset ol.mm-legend {
   display: grid;
@@ -333,8 +316,7 @@
   outline-offset: 2px;
 }
 
-.md-typeset .tag-section[hidden],
-.md-typeset .tag-grid[hidden] { display: none; }
+.md-typeset .tag-section[hidden] { display: none; }
 
 @media (prefers-reduced-motion: reduce) {
   .mm-svg .mm-dot,

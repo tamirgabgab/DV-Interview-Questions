@@ -29,19 +29,11 @@
 
 /* W340: the three steps of "how it works". */
 .md-typeset ol.how-it-works { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-3); margin: var(--sp-3) 0 var(--sp-5); padding: 0; list-style: none; }
-.md-typeset ol.how-it-works > li.hw-step { position: relative; display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto 1fr; gap: var(--sp-1) var(--sp-3); margin: 0; padding: var(--sp-3); border: 1px solid var(--site-card-edge); border-radius: var(--radius-m); background: var(--site-surface); box-shadow: var(--shadow-1); }
-.md-typeset .hw-step .hw-ico { grid-row: 1 / 3; display: inline-flex; align-items: center; justify-content: center; width: 2.4rem; height: 2.4rem; border-radius: 50%; background: var(--site-primary-soft); color: var(--md-typeset-a-color); font-size: 1.1rem; }
-.md-typeset .hw-step .hw-num { position: absolute; top: var(--sp-2); inset-inline-end: var(--sp-3); color: var(--md-default-fg-color--lighter); font-size: 1.4rem; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
-.md-typeset .hw-step .hw-title { font-size: 0.85rem; }
-.md-typeset .hw-step .hw-text { color: var(--md-default-fg-color--light); font-size: 0.72rem; line-height: 1.6; }
 @media screen and (max-width: 44.9375em) {
   .md-typeset ol.how-it-works { grid-template-columns: 1fr; gap: var(--sp-2); }
 }
 
 /* W341: the way into the catalog page. */
-.md-typeset .catalog-link { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2) var(--sp-3); max-width: none; }
-.md-typeset .catalog-link .md-button { margin: 0; }
-.md-typeset .catalog-link span { color: var(--md-default-fg-color--light); font-size: 0.75rem; }
 
 /* W342: path cards with the title on one line, the count beside the difficulty chips, the
    same height in every row, and the "solved" bar only once something is solved. */
@@ -160,9 +152,8 @@
 /* W345: cards rise a little under the pointer, buttons press; only with a real hover and
    without reduced motion. */
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .md-typeset :is(a.level-card, .hw-step, .related-questions > li) { transition: transform var(--dur-1) var(--ease), box-shadow var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease); }
+  .md-typeset :is(a.level-card, .related-questions > li) { transition: transform var(--dur-1) var(--ease), box-shadow var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease); }
   .md-typeset a.level-card:hover { transform: translateY(-2px); }
-  .md-typeset .hw-step:hover { transform: translateY(-2px); box-shadow: var(--shadow-2); }
   .md-typeset .home-hero .hh-start::after { content: "←"; display: inline-block; margin-inline-start: 0.4em; transition: transform var(--dur-1) var(--ease); }
   .md-typeset .home-hero .hh-start:hover::after { transform: translateX(-0.25em); }
 }

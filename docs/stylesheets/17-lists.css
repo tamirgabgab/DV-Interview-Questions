@@ -101,9 +101,7 @@
 .md-typeset .questions-wrap tbody tr { position: relative; }
 .md-typeset .questions-wrap tbody td.q-id { box-shadow: inset -3px 0 0 var(--lst-diff, transparent); }
 .md-typeset .questions-wrap .q-line a::after { content: ""; position: absolute; inset: 0; }
-.md-typeset .questions-wrap :is(.q-topic, .q-more) { position: relative; z-index: 1; }
 .md-typeset .questions-wrap .q-kind { display: inline-grid; flex: none; place-items: center; width: 1.45rem; height: 1.45rem; border-radius: var(--radius-s); background: var(--site-primary-soft); color: var(--lst-kind-fg); font-size: 0.72rem; }
-.md-typeset .questions-wrap .q-meta .chip-kind .kind-ico { display: none; }   /* the tile shows it */
 .md-typeset .questions-wrap .q-marks { display: inline-flex; align-items: center; gap: 0.25rem; margin-inline-start: 0.1rem; }
 .md-typeset .questions-wrap .q-marks:empty { display: none; }
 .md-typeset .questions-wrap .q-mark { display: inline-grid; place-items: center; width: 1.05rem; height: 1.05rem; margin: 0; }

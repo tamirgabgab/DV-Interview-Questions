@@ -3,10 +3,6 @@
 
 /* The tags page (Y398): every tag as a chip with its count above the lists, and each
    tag's questions in columns on a wide screen. */
-.md-typeset .tag-grid { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: var(--sp-3) 0 var(--sp-5); }
-.md-typeset .tag-grid .tag-chip { display: inline-flex; align-items: center; gap: 0.4em; padding: 0.15rem 0.65rem; border: 1px solid var(--site-card-border); border-radius: 1rem; background: var(--site-surface); color: var(--md-default-fg-color); font-size: 0.7rem; line-height: 1.6; text-decoration: none; }
-.md-typeset .tag-grid .tag-chip:is(:hover, :focus-visible) { border-color: var(--md-typeset-a-color); color: var(--md-typeset-a-color); }
-.md-typeset .tag-grid .tag-count { color: var(--md-default-fg-color--light); font-variant-numeric: tabular-nums; }
 .md-typeset ul.tag-list { columns: 2 18rem; column-gap: var(--sp-5); margin-top: 0.2rem; }
 .md-typeset ul.tag-list li { margin-bottom: 0.3em; break-inside: avoid; }
 /* each tag's list folded under its name: a plain row with the count, no box */

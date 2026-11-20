@@ -188,6 +188,32 @@ WAVEDROM_INIT = "javascripts/wavedrom-init.js"
 WAVE_VIEWER = "javascripts/wave-viewer.js"     # measure and play under each diagram (session 31)
 WAVEDROM_BLOCK = '<pre class="wavedrom">'
 JOINED_CSS = "stylesheets/site.css"
+CSS_PIECE = re.compile(r'("(?:\\.|[^"\\\n])*"|\'(?:\\.|[^\'\\\n])*\')|/\*.*?\*/|\s+', re.S)
+CSS_PUNCT = re.compile(r" ?([{};,]) ?")
+
+
+def minify_css(css: str) -> str:
+    """The joined stylesheet without its comments and spare white space (N2.1): strings are
+    kept as written, every other run of white space or comment becomes one space, and the
+    spaces next to { } ; , go, as does the last ; of a block. Spaces around : > + - stay
+    (a descendant combinator, "a :hover", calc()), so the rules mean exactly what they did."""
+    pieces = []
+    for m in CSS_PIECE.finditer(css):
+        pieces.append((m.start(), m.end(), m.group(1)))
+    out, at, strings = [], 0, []
+    for start, end, string in pieces:
+        out.append(css[at:start])
+        if string is not None:
+            strings.append(string)
+            out.append(f"\0{len(strings) - 1}\0")
+        else:
+            out.append(" ")
+        at = end
+    out.append(css[at:])
+    text = CSS_PUNCT.sub(r"\1", re.sub(r" {2,}", " ", "".join(out))).replace(";}", "}").strip()
+    return re.sub(r"\0(\d+)\0", lambda m: strings[int(m.group(1))], text) + "\n"
+
+
 CSS_LINK = re.compile(r'<link rel="stylesheet" href="([^"]*?)stylesheets/(?:\d\d|questions/\d{4})-[\w-]+\.css">\n?')
 _css_parts: list[str] = []      # the parts of extra_css, in order; filled in on_config
 # The cost chips of a solution (A183): one comment line under its answer block,
@@ -2347,11 +2373,10 @@ def _question_docs(docs: list[dict], pages: dict) -> list[dict]:
 
 def on_post_build(config, **kwargs):
     site, docs = Path(config["site_dir"]), Path(config["docs_dir"])
-    joined = ("/* The site's styles: the parts of docs/stylesheets/ joined in this order at build time\n"
-              "   (hooks/questions.py); edit the parts, never this file. */\n")
-    for part in _css_parts:
-        joined += f"\n/* ---- {part} ---- */\n" + (docs / part).read_text(encoding="utf-8")
-    (site / JOINED_CSS).write_text(joined, encoding="utf-8")
+    joined = "".join((docs / part).read_text(encoding="utf-8") + "\n" for part in _css_parts)
+    (site / JOINED_CSS).write_text("/* The site's styles: the parts of docs/stylesheets/ joined in this order and "
+                                   "minified at build time (hooks/questions.py); edit the parts, never this file. */\n"
+                                   + minify_css(joined), encoding="utf-8")
     order = sorted(_questions.values(), key=lambda q: q["id"])
     index_data = {"levels": LEVELS, "diffs": DIFFICULTIES, "kinds": KINDS,
                   "qs": [[q["id"], str(q["title"]), q["level"], q["difficulty"], q["kind"],

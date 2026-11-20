@@ -83,6 +83,14 @@ def test_wavedrom_only_where_drawn():
     assert hook.wavedrom_scripts("<p>no diagram</p>", "questions/junior/0034-x/") == ""
 
 
+def test_minify_css_keeps_meaning():
+    css = ('/* a comment */\n.a  >  .b ,\n.c:hover {\n  color : red ;\n  content: "x  ;  {y}" ;\n}\n'
+           "@media (max-width: 40em) {\n  .d .e { margin: 0 calc(1rem - 2px); }\n}\n.f::after { content: '/* no */'; }\n")
+    assert hook.minify_css(css) == ('.a > .b,.c:hover{color : red;content: "x  ;  {y}"}'
+                                    "@media (max-width: 40em){.d .e{margin: 0 calc(1rem - 2px)}}"
+                                    ".f::after{content: '/* no */'}\n")
+
+
 def test_one_stylesheet_link():
     head = ('<link rel="stylesheet" href="../../assets/stylesheets/main.css">\n'
             '<link rel="stylesheet" href="../../stylesheets/01-base.css">\n'
