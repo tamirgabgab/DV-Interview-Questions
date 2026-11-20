@@ -49,9 +49,9 @@ LEVELS = {
 }
 
 LEVEL_DESC = {
-    "student": "יסודות לוגיקה ספרתית, HDL בסיסי, מתמטיקה, הסתברות וחידות היגיון",
-    "junior": "SystemVerilog, יסודות UVM, כתיבת טסטים ו-checkers, פרוטוקולים פשוטים",
-    "senior": "ארכיטקטורת סביבת אימות, UVM מתקדם, SVA, סגירת כיסוי, דיבאג",
+    "student": "יסודות לוגיקה ספרתית, HDL בסיסי, תכנות בסיסי, מתמטיקה וחידות היגיון",
+    "junior": "אלגוריתמים, מתמטיקה והוכחות, חידות, ויסודות תכן ואימות : FIFO, SVA, כיסוי ו-UVM",
+    "senior": "מודלי ייחוס לפרוטוקולים, scoreboard, תכן חומרה, ואלגוריתמים והוכחות מתקדמים",
 }
 
 DIFFICULTIES = {
@@ -96,6 +96,7 @@ TOPICS = {
     "fsm": "מכונת מצבים",
     "game-theory": "תורת המשחקים",
     "geometry": "גאומטריה",
+    "graphs": "גרפים",
     "gray-code": "קוד Gray",
     "greedy": "אלגוריתם חמדן",
     "heap": "ערימה",
@@ -123,6 +124,8 @@ TOPICS = {
     "stack": "מחסנית",
     "sva": "SVA",
     "systemverilog": "SystemVerilog",
+    "topological-sort": "מיון טופולוגי",
+    "trie": "עץ תחיליות",
     "two-pointers": "שני מצביעים",
     "usb4": "USB4",
     "uvm": "UVM",
@@ -196,6 +199,8 @@ _paths: list[dict] = []
 _comments: dict = {}
 _kind_files: dict[str, str] = {}   # explorer kind -> its file name in EXPLORER_DIR
 _statements: dict[str, list] = {}  # question page url -> its statement and parts (search)
+_page_dates: dict[str, str] = {}   # page source under docs/ -> date of its last commit (sitemap)
+_site_date = ""                    # the site's last commit date, for the pages that list questions
 
 
 def _load_questions(docs_dir: Path) -> dict[str, dict]:
@@ -294,8 +299,10 @@ def _load_kind_files(docs_dir: Path) -> dict[str, str]:
 
 
 def on_config(config, **kwargs):
-    global _questions, _paths, _comments, _kind_files, _css_parts
+    global _questions, _paths, _comments, _kind_files, _css_parts, _page_dates, _site_date
     _questions = _load_questions(Path(config["docs_dir"]))
+    _page_dates = _git_dates(Path(config["docs_dir"]))
+    _site_date = _revision_date(Path(config["docs_dir"])).isoformat()
     _css_parts = [str(c) for c in (config.get("extra_css") or [])]
     if any(not CSS_LINK.match(f'<link rel="stylesheet" href="{c}">') for c in _css_parts):
         raise PluginError(f"extra_css must be the parts stylesheets/NN-name.css or stylesheets/questions/<id>-name.css, got {_css_parts}")
@@ -344,6 +351,27 @@ def _revision_date(docs_dir: Path) -> dt.date:
         return dt.datetime.fromtimestamp(int(out), ZoneInfo("Asia/Jerusalem")).date()
     except (OSError, ValueError, subprocess.SubprocessError):
         return dt.date.today()
+
+
+def _git_dates(docs_dir: Path) -> dict[str, str]:
+    """The date in Israel of the last commit that touched each file under docs/, by its
+    path there ("questions/junior/0102-topological-sort.md"), for the sitemap's lastmod. One
+    `git log` over the whole history (the build job checks out all of it); empty when git
+    is not there, and in a shallow clone every file gets the one commit's date."""
+    try:
+        out = subprocess.run(["git", "-c", "core.quotepath=off", "log", "--format=@%ct", "--name-only",
+                              "--relative", "--", "."], cwd=docs_dir, capture_output=True, text=True,
+                             timeout=60, check=True).stdout
+    except (OSError, subprocess.SubprocessError):
+        return {}
+    dates: dict[str, str] = {}
+    day = ""
+    for line in out.splitlines():
+        if line.startswith("@"):
+            day = dt.datetime.fromtimestamp(int(line[1:]), ZoneInfo("Asia/Jerusalem")).date().isoformat()
+        elif line:
+            dates.setdefault(line, day)   # newest first: the first date seen is the last commit
+    return dates
 
 
 def _added_date(q: dict) -> dt.date | None:
@@ -1478,6 +1506,9 @@ def _cost_chips(m: re.Match) -> str:
 
 def on_page_markdown(markdown, page, config, files, **kwargs):
     q = _questions.get(page.file.src_uri)
+    # the sitemap's lastmod: a question's own last commit; a page that lists questions
+    # changes with them, so it gets the site's
+    page.update_date = (_page_dates.get(page.file.src_uri) if q else None) or _site_date or page.update_date
     if q:
         page.meta["tags"] = [LEVELS[q["level"]], DIFFICULTIES[q["difficulty"]], *q["tags"]]
         page.meta.setdefault("hide", []).append("tags")   # the header card shows them
@@ -2124,6 +2155,79 @@ def nav_fold(output: str, page) -> str:
     return NAV_SECTION.sub(lambda m: f'{m.group(1)} is-folded{m.group(2)}{button}<ul class="md-nav__list" id="dvq-level-list"', output, count=1)
 
 
+DESC_MAX = 155   # characters of a page's description: what a search result shows
+META_DESC = re.compile(r'(<meta (?:name="description"|property="(?:og|twitter):description") content=")[^"]*(")')
+
+
+def _description(sections: list) -> str:
+    """A question page's description for search engines and link previews: its statement
+    as plain text (math in plain symbols, search_text.py, kept in its LTR isolates), up to
+    DESC_MAX: whole sentences when they fill most of it, else cut at a word with "…"."""
+    text = next((t for _, title, t in sections if title == STATEMENT), "")
+    plain = html.unescape(re.sub(r"<[^>]+>", " ", text)).replace("‏", "").replace("‎", "")
+    plain = re.sub(r"[ \t\r\n]+", " ", plain).strip()          # NBSP before a colon stays
+    plain = re.sub(r" ([,.;?!)])", r"\1", plain).replace("( ", "(")
+    if len(plain) <= DESC_MAX:
+        return plain
+    ends = [m.end() for m in re.finditer(r"[.?!](?= )", plain[: DESC_MAX + 1])]
+    if ends and ends[-1] >= DESC_MAX * 0.6:
+        return plain[: ends[-1]]
+    cut = plain[: DESC_MAX - 1]
+    cut = cut[: cut.rfind(" ")] if " " in cut else cut
+    if cut.count("⁦") > cut.count("⁩"):               # never cut inside a math isolate
+        cut = cut[: cut.rfind("⁦")]
+    return cut.rstrip("  ,;:–-") + "…"
+
+
+def page_description(output: str, desc: str) -> str:
+    """The page's own description in the description, og:description and
+    twitter:description meta tags (the theme and the social plugin write the site's)."""
+    if not desc:
+        return output
+    return META_DESC.sub(lambda m: m.group(1) + html.escape(desc, quote=True) + m.group(2), output)
+
+
+def json_ld(output: str, q: dict, page, config) -> str:
+    """Structured data for search engines on a question page: a LearningResource (title,
+    description, level, topics, Hebrew, dates) and its breadcrumb (home, level, question)."""
+    site = config["site_url"] or ""
+    url = page.canonical_url or page.abs_url
+    desc = (META_DESC.search(output) or [None, ""])[0]
+    desc = html.unescape(re.search(r'content="([^"]*)"', desc).group(1)) if desc else ""
+    level_url = posixpath.join(site, QUESTIONS_DIR, q["level"], "")
+    resource = {
+        "@type": "LearningResource",
+        "@id": url + "#question",
+        "name": str(q["title"]),
+        "headline": f'{q["id"]} · {q["title"]}',
+        "description": desc,
+        "url": url,
+        "inLanguage": "he",
+        "learningResourceType": "שאלת ראיון עבודה",
+        "educationalLevel": LEVELS[q["level"]],
+        "keywords": ", ".join([KINDS[q["kind"]], DIFFICULTIES[q["difficulty"]], *[topic_name(t) for t in q["tags"]]]),
+        "isAccessibleForFree": True,
+        "isPartOf": {"@type": "WebSite", "name": config["site_name"], "url": site},
+    }
+    added = _added_date(q)
+    if added:
+        resource["datePublished"] = added.isoformat()
+    if page.update_date:
+        resource["dateModified"] = page.update_date
+    crumbs = {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {"@type": "ListItem", "position": i, "name": name, "item": item}
+            for i, (name, item) in enumerate([("ראשי", site), (LEVELS[q["level"]], level_url), (str(q["title"]), url)], 1)
+        ],
+    }
+    data = json.dumps({"@context": "https://schema.org", "@graph": [resource, crumbs]}, ensure_ascii=False,
+                      separators=(",", ":")).replace("</", "<\\/")
+    at = output.find("</head>")
+    tag = f'<script type="application/ld+json">{data}</script>\n'
+    return output[:at] + tag + output[at:] if at >= 0 else output
+
+
 def on_post_page(output, page, config, **kwargs):
     output = nav_fold(line_links(toc_colons(output)), page)
     if page.file.src_uri == "tags.md":
@@ -2138,6 +2242,11 @@ def on_post_page(output, page, config, **kwargs):
             raise RuntimeError(f"{page.file.src_uri}: the search text of the statement failed: {e!r}") from e
         output = qp_parts(video_links(part_row(output), _questions[page.file.src_uri]))
         output = box_teaser(solution_summaries(output))
+        output = page_description(output, _description(_statements[page.url]))
+        output = json_ld(output, _questions[page.file.src_uri], page, config)
+    elif page.file.src_uri.endswith("/index.md") and page.file.src_uri.split("/")[-2] in LEVEL_DESC:
+        level = page.file.src_uri.split("/")[-2]
+        output = page_description(output, f"שאלות ראיון ב־Design Verification ברמת {LEVELS[level]} : {LEVEL_DESC[level]}")
     output = one_stylesheet(output)
     scripts = wavedrom_scripts(output, page.url) + explorer_scripts(output, page.url)
     if not scripts:

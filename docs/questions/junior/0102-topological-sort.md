@@ -4,7 +4,7 @@ title: מיון טופולוגי – באיזה סדר להריץ משימות �
 level: junior
 difficulty: medium
 kind: code
-tags: [algorithms, sorting, bfs, python, systemverilog]
+tags: [algorithms, graphs, topological-sort, bfs, python, systemverilog]
 source: "LeetCode 207 ו-210 (Course Schedule), האלגוריתם של Kahn מ-1962, ושיטת הנתיב הקריטי (CPM) לתזמון פרויקטים"
 added: 2026-11-13
 ---

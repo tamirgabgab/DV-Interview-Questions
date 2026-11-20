@@ -4,7 +4,7 @@ title: הקידומת הארוכה ביותר – טבלת ניתוב, עץ בי
 level: senior
 difficulty: hard
 kind: code
-tags: [algorithms, bitwise, digital-design, protocols, python, systemverilog]
+tags: [algorithms, trie, bitwise, digital-design, protocols, python, systemverilog]
 source: "חיפוש הקידומת הארוכה ביותר (longest prefix match) של נתבי IP, מאז CIDR (RFC 4632)"
 added: 2026-11-13
 ---

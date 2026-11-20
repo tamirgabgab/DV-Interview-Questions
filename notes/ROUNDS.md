@@ -4,7 +4,8 @@ Written in session 35 (2026-11-19) from the review of the site. The tasks themse
 their measurements and file references, are in [`HANDOFF.md`](HANDOFF.md) under "Open
 items", "Next steps (session 35)", N1 to N8; this file only groups them into rounds, in
 the proposed order of work, so the owner and the session can go through them one at a
-time. Rounds 1 to 3 are done (session 35); rounds 4 to 8 are not started.
+time. Rounds 1 to 3 are done (session 35); rounds 4 to 9 are not started.
+Round 8 was split in two on 2026-11-20: 0036 alone is round 8, the rest round 9.
 
 How to use it: before a round, read its row and its section, answer the open questions,
 then tick the round's tasks in `HANDOFF.md` as they are done and write the outcome in the
@@ -27,12 +28,13 @@ high, xhigh, max); a cheaper model usually gets a higher effort to make up for i
 | 5. Search and sharing | a description per page, JSON-LD, sitemap dates, Search Console (owner) | N3.1 to N3.4 | small to medium | Sonnet 5.5, medium | Haiku 5.5, high | separate additions to the hook, easy to check in the built HTML |
 | 6. DV-core questions | about ten new questions: "find the bug", UVM, SVA, coverage, CDC | N4.1, N4.4 | very large | Fable 5.2, xhigh | Opus 5.5, xhigh | correct SystemVerilog, proofs and boxes; a mistake costs the most here |
 | 7. Grading and wording | re-grade the difficulty, reword the level cards, missing topic names | N4.2, N4.3, part of N7 | small | Sonnet 5.5, medium | Haiku 5.5, medium | front matter and text, once the owner sets the criteria |
-| 8. Older items and CI time | 0036, boxes taller than a screen, small figure labels, a shorter CI | N7, N8 | medium to large | Opus 5.5, high (xhigh for 0036) | Sonnet 5.5, high | 0036 already failed twice with agents; the rest is simpler |
+| 8. Question 0036 | the LFSR box taller than a screen and the page's deferred review items | the 0036 line of N7 | medium | Opus 5.5, xhigh | Opus 5.5, high | it already failed twice with agents, so not a cheaper model |
+| 9. Older items and CI time | boxes taller than a screen, small figure labels, a shorter CI, the rest of N7 | N7 (without 0036), N8 | medium | Opus 5.5, high | Sonnet 5.5, high | simpler, separate fixes; the checks catch most mistakes |
 
 Where not to save: rounds 6 and 4. In round 6 the content is the product; in round 4 one
 change reaches all 109 pages. Where saving is safe: rounds 1, 5 and 7, since
 `lint_pages.py`, `mkdocs build --strict` and `check_links.py` catch almost every mistake.
-Round 8 can be split: 0036 on the recommended model, the rest on the cheaper one.
+Round 8 (0036) stays on the recommended model; round 9 is safe on the cheaper one.
 
 ## Round by round
 
@@ -69,8 +71,10 @@ Round 8 can be split: 0036 on the recommended model, the rest on the cheaper one
 
 ### Round 5. Search and sharing
 
-- Open questions: does the owner want the site in Google Search Console (N3.4)?
-- Status: not started.
+- Open questions: does the owner want the site in Google Search Console (N3.4)? Yes; the
+  owner sends the verification code.
+- Status: done in session 35 (2026-11-20), work log item 216 of `HANDOFF.md`, except the
+  verification code.
 
 ### Round 6. DV-core questions
 
@@ -83,11 +87,17 @@ Round 8 can be split: 0036 on the recommended model, the rest on the cheaper one
 
 - 84 of 109 questions are "medium".
 - Open questions: the criteria for easy, medium and hard per level; reword the level
-  cards now, or after round 6 adds the questions they promise?
-- Status: not started.
+  cards now, or after round 6 adds the questions they promise? The owner: now, and the
+  session proposes the criteria.
+- Status: the level cards and the topic names done (work log 216); the re-grading is
+  proposed and waits for the owner.
 
-### Round 8. Older items and CI time
+### Round 8. Question 0036
 
 - Open questions: is 0036 worth a third attempt, or does its box get a simpler design?
-  Is a 34-minute full lane a problem for the owner at all?
+- Status: not started.
+
+### Round 9. Older items and CI time
+
+- Open questions: is a 34-minute full lane a problem for the owner at all?
 - Status: not started.

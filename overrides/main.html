@@ -18,6 +18,11 @@
 {% endblock %}
 {% block extrahead %}
   {{ super() }}
+  {#- Google Search Console's ownership check (extra.google_site_verification in mkdocs.yml):
+      only the home page needs the tag. -#}
+  {% if page and page.is_homepage and config.extra.google_site_verification %}
+    <meta name="google-site-verification" content="{{ config.extra.google_site_verification }}">
+  {% endif %}
   <link rel="manifest" href="{{ 'manifest.webmanifest' | url }}">
   <link rel="apple-touch-icon" href="{{ 'assets/icons/icon-180.png' | url }}">
   {#- .dvq-js from the first paint: a part that only a script can use (the home page's

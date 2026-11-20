@@ -1215,6 +1215,26 @@ Fonts into `.cache/plugin/social/` on the first build (CI caches that directory)
 network access, put any Hebrew-capable TTF there as `fonts/Rubik/Regular.ttf` and
 `Bold.ttf`. The cards are written to `site/assets/images/social/`.
 
+### Search engines
+
+- **Description.** Every question page gets its own `description`, `og:description` and
+  `twitter:description`: its statement as plain text (the search text of
+  `tools/build/search_text.py`), whole sentences up to 155 characters, or cut at a word
+  with "…" (`_description` and `page_description` in the hook, on_post_page). A level page
+  gets "שאלות ראיון … ברמת <level> : <LEVEL_DESC>". The social card keeps the site's
+  description: the hook writes the tags after the plugin, so the card image is not touched.
+- **Structured data.** A question page carries JSON-LD (`json_ld` in the hook): a
+  `LearningResource` (name, description, `inLanguage: he`, level, kind, difficulty and
+  topics as keywords, `datePublished` from `added`, `dateModified`) and a `BreadcrumbList`
+  (home, level, question). Google's Rich Results Test reads it from the live page.
+- **Sitemap dates.** `sitemap.xml` gives a question page the date of the last commit that
+  touched its file (`_git_dates`, one `git log` at on_config; the build job checks out the
+  whole history for it), and every other page the site's last commit date.
+- **Search Console.** The content of Google's verification tag goes in
+  `extra.google_site_verification` in `mkdocs.yml`; `overrides/main.html` puts the tag on
+  the home page only. Then submit `sitemap.xml` in Search Console. A project site cannot
+  serve its own `robots.txt`.
+
 ### The 404 page, the home-screen icon and printing
 
 `overrides/404.html` is the page GitHub Pages serves for a missing address: "הדף לא נמצא"

@@ -48,6 +48,9 @@ copyright: >
 
 extra:
   generator: false
+  # Google Search Console's HTML-tag check: the content of its meta tag (overrides/main.html
+  # puts it on the home page). Empty: no tag.
+  google_site_verification: ""
   # Questions moved to a new number: the 404 page sends an old address to the new one (the
   # same level and slug, the new id), and docs/javascripts/marks.js moves the marks saved in
   # the browser once (keep its RENUMBERED list in step with this one).

@@ -204,6 +204,8 @@ jobs:
     timeout-minutes: 25   # usually 5 min, about 9 with the dark phone check
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0   # the sitemap's lastmod is each page's last commit (hooks/questions.py)
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"

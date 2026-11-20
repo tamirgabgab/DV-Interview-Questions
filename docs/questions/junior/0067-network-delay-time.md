@@ -4,7 +4,7 @@ title: זמן השידור ברשת – BFS בלי משקלים, Dijkstra עם �
 level: junior
 difficulty: medium
 kind: code
-tags: [algorithms, bfs, dijkstra, python, systemverilog]
+tags: [algorithms, graphs, bfs, dijkstra, python, systemverilog]
 source: "LeetCode 743 (Network Delay Time) כסולם : סעיף א בלי משקלים, סעיף ב עם משקלים, וסעיף ג הוא השאלה המקורית"
 added: 2026-10-29
 ---

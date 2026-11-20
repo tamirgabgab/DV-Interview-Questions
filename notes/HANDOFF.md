@@ -442,6 +442,32 @@ redesign plan of 2026-10-16 and the proposal series six to eight, and items 112 
     - Tried and removed: fitting the path strip's titles in a script right after the strip.
       With MathJax cut off the strip's own shift is 0.0004 to 0.005; not worth the script.
     - Found, not fixed (N9 below): MathJax laying out inline math is now the one large shift.
+216. **Round 5 and the first part of round 7 (session 35, 2026-11-20).** The owner's
+    answers: the sitemap date is each page's last commit; the site goes into Search Console
+    (the owner sends the verification code); the level cards are reworded now, by what the
+    collection holds; the difficulty criteria are proposed by the session and approved by
+    the owner before any page changes.
+    - N3.1: every question page has its own description (its statement as plain text,
+      whole sentences up to 155 characters, 80 to 154 on the 109 pages), in the
+      description, og:description and twitter:description tags; the level pages get theirs
+      from `LEVEL_DESC`. The social card keeps the site's description (the hook writes the
+      tags after the plugin; setting `page.meta` would race with the card's thread).
+    - N3.2: JSON-LD on every question page, a `LearningResource` and a `BreadcrumbList`.
+    - N3.3: `sitemap.xml` lastmod is a question file's last commit (`_git_dates`); other
+      pages get the site's last commit. The build job checks out the whole history.
+    - N3.4 prepared: `extra.google_site_verification` in `mkdocs.yml` (empty) puts the tag
+      on the home page; waits for the owner's code.
+    - Round 7: the level cards, the level pages' first lines and the home page's "which
+      level" answer describe what is there (algorithms, math and proofs, puzzles and the
+      basics of design and DV for junior; reference models of protocols, scoreboard and
+      hardware design for senior). New topics: `graphs` (0065, 0067, 0070, 0102),
+      `topological-sort` (0102, instead of `sorting`) and `trie` (0103).
+    - N4.3, the re-grading: three read-only subagents graded the 109 pages against a rubric
+      (easy: one textbook idea, 10 to 15 minutes; medium: one key observation or two known
+      ideas, 20 to 30; hard: a non-obvious insight or several demanding parts, 40 or more;
+      relative to the page's level). 52 changes proposed; shown to the owner with four
+      recommended exceptions (0068, 0096, 0098 stay medium; 0050 hard to medium, not easy).
+      Not applied until the owner approves.
 
 ---
 
@@ -449,12 +475,14 @@ redesign plan of 2026-10-16 and the proposal series six to eight, and items 112 
 
 - **Session 35 (2026-11-19 and 20):** a review of the site and of this file (work log
   212), then rounds 1 to 3 of the plan in [`ROUNDS.md`](ROUNDS.md): housekeeping (213),
-  accessibility and speed (214), the phone header and layout shifts (215). Rounds 4 to 8
-  are not started; each has open questions for the owner in `ROUNDS.md`.
+  accessibility and speed (214), the phone header and layout shifts (215), then round 5 and
+  the first part of round 7 (216). Round 8 is split in two (0036 alone, then the rest as
+  round 9); rounds 4, 6, 8 and 9 are not started.
 - **State:** rounds 1 to 3 are on `main` (b2ca207, 2026-11-20; the branch run 44636412910
   passed every check, the phone check with a touch screen included, and the `main` run
   44641556678 deployed). The site has 109 questions (ids 0001 to 0109, no gap) and 202 boxes.
-- **Waiting on the owner:** a try of a box's number field and of the lists' filter on an
+- **Waiting on the owner:** the approval of the re-grading (N4.3, work log 216); the
+  Search Console verification code (N3.4); a try of a box's number field and of the lists' filter on an
   iPhone (the page must not zoom on focus, N6.8); YouTube links of the videos made in the owner's other project
   (add them as `video:`, notes/VIDEOS.md); the giscus ids (README, Comments) in `extra.comments` of `mkdocs.yml`; checks of
   the live site at 390 px and on a desktop, light and dark (github.io is not reachable
@@ -525,14 +553,14 @@ with the owner before each; go through it with the owner round by round.
   fetched per page, a warning over the number N2.1 to N2.3 reach.
 
 **N3. Found by a search engine and shared (S to M):**
-- [ ] N3.1 All 109 question pages carry the same `<meta name="description">` (the site's).
+- [x] N3.1 (done, work log 216) All 109 question pages carry the same `<meta name="description">` (the site's).
   Write it per page from the statement's first sentence (the search text the hook already
   builds, TeX removed), about 150 characters.
-- [ ] N3.2 No structured data. Add JSON-LD per question (`LearningResource` with the level,
+- [x] N3.2 (done, work log 216) No structured data. Add JSON-LD per question (`LearningResource` with the level,
   the topics and `inLanguage: he`, and a `BreadcrumbList`), written by the hook.
-- [ ] N3.3 `sitemap.xml` gives every page the build date as `lastmod`; use the page's
+- [x] N3.3 (done, work log 216) `sitemap.xml` gives every page the build date as `lastmod`; use the page's
   `added` date or its last commit date.
-- [ ] N3.4 Owner: register the site in Google Search Console (a verification meta tag in
+- [ ] N3.4 (prepared, work log 216: `extra.google_site_verification`) Owner: register the site in Google Search Console (a verification meta tag in
   `overrides/main.html`) and submit the sitemap; a project site cannot serve its own
   `robots.txt`. Then check on the live site that the social cards (`og:image`) are there:
   local builds switch them off.
@@ -551,8 +579,8 @@ with the owner before each; go through it with the owner round by round.
   implication, `$past`, `disable iff`, a liveness bound); coverage (crosses, `ignore_bins`,
   transition bins); CDC (two-flop, pulse and handshake synchronizers); a verification plan
   for a small block (FIFO, arbiter). Ask the owner which, as always.
-- [ ] N4.2 Or, and at least: reword the level cards so they describe what is there.
-- [ ] N4.3 Difficulty tells little: 84 of 109 are "medium" (junior: 1 easy, 64 medium,
+- [x] N4.2 (done, work log 216) Or, and at least: reword the level cards so they describe what is there.
+- [ ] N4.3 (proposed, work log 216; waits for the owner) Difficulty tells little: 84 of 109 are "medium" (junior: 1 easy, 64 medium,
   4 hard), so the difficulty filter, the interview builder and the lists' dots barely
   separate questions. Proposal: a re-grading pass with the owner's criteria (front matter
   only; the lists and the catalog follow).
@@ -658,7 +686,7 @@ true, so CI never runs the motion paths or a box's first-visit guide.
 - [ ] Figure labels under 11 px on a phone (0028, 0044 first).
 - [ ] The NBSP before a colon on the older pages (round 5, R0), and a lint rule for it.
 - [ ] 0087: the rim of a lit bulb in the dark scheme (1.3:1).
-- [ ] Topic names for graphs, topological sort, trie and LPM in TOPICS (0102, 0103).
+- [x] (done, work log 216: graphs, topological-sort, trie; LPM is the question itself) Topic names for graphs, topological sort, trie and LPM in TOPICS (0102, 0103).
 - [ ] 0004's Mermaid flowchart shows "?" first in two labels.
 - [ ] Hardware and DV additions not done by the owner's choice in round 8: 0014 a
   covergroup, 0012 an exhaustive BCD check, 0044 and 0002 per-clock tables and SVA.

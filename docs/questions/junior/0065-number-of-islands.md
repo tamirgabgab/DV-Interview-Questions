@@ -4,7 +4,7 @@ title: כמה איים – ארבעה כיוונים, שמונה כיוונים,
 level: junior
 difficulty: medium
 kind: code
-tags: [algorithms, bfs, python, systemverilog]
+tags: [algorithms, graphs, bfs, python, systemverilog]
 source: "שאלה קלאסית (Number of Islands, LeetCode 200); סעיף ג מכליל את Max Area of Island"
 added: 2026-10-29
 ---

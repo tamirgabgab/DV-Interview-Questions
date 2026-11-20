@@ -4,7 +4,7 @@ title: המסלול הקצר ביותר בלוח – BFS, שבירת עד k קי
 level: junior
 difficulty: medium
 kind: code
-tags: [algorithms, bfs, dijkstra, python, systemverilog]
+tags: [algorithms, graphs, bfs, dijkstra, python, systemverilog]
 source: "שאלה קלאסית (Shortest Path in Binary Matrix, LeetCode 1091); סעיף ב הוא LeetCode 1293, וסעיף ג מכליל ל-Dijkstra על לוח"
 added: 2026-10-29
 ---
