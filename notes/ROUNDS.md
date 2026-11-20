@@ -4,8 +4,8 @@ Written in session 35 (2026-11-19) from the review of the site. The tasks themse
 their measurements and file references, are in [`HANDOFF.md`](HANDOFF.md) under "Open
 items", "Next steps (session 35)", N1 to N8; this file only groups them into rounds, in
 the proposed order of work, so the owner and the session can go through them one at a
-time. Rounds 1 to 5, 7 and 8 are done (session 35), round 6 has a pilot of two questions,
-and round 9 is in progress.
+time. Rounds 1 to 5 and 7 to 9 are done (session 35), and round 6 has a pilot of two
+questions.
 Round 8 was split in two on 2026-11-20: 0036 alone is round 8, the rest round 9.
 
 How to use it: before a round, read its row and its section, answer the open questions,
@@ -106,5 +106,7 @@ Round 8 (0036) stays on the recommended model; round 9 is safe on the cheaper on
 
 ### Round 9. Older items and CI time
 
-- Open questions: is a 34-minute full lane a problem for the owner at all?
-- Status: not started.
+- Open questions: is a 34-minute full lane a problem for the owner at all? The owner: eight
+  explorer shards; the display fixes and the colons of the older pages, not the DV additions.
+- Status: done in session 35 (2026-11-20), work log item 220 of `HANDOFF.md`. Left as N10: 24
+  older boxes still taller than one screen, a proposal for a later round.

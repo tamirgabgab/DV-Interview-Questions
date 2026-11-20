@@ -555,6 +555,38 @@ redesign plan of 2026-10-16 and the proposal series six to eight, and items 112 
       `test_section_b_algebra` checks each claim over GF(2).
     - Contrast pairs for the picture's states and rims (620 pairs in all).
 
+220. **Round 9, older items and CI time (session 35, 2026-11-20).** The owner: the display
+    fixes and the colons of the older pages, eight explorer shards.
+    - CI: the explorer checks (clicks, jumps, inputs) run on eight runners, `--shard K/8`.
+    - Boxes on one screen (1920 x 1080): 0019's hourglass 1201 -> 999 px (the fork toggle in
+      the play row, the fork text after the comparison, the proof in the side column, the
+      live figure at most 40rem); 0048's farm box with the reflections 1197 -> 865 px at
+      most (the lengths table under the legend in the side column, a 1.4fr picture column,
+      560 drawing units across in a wide box so the text keeps its size); the cake table
+      in two columns 7.6rem -> 6.7rem. 0012's kapbase boxes were already 869 px at most
+      (base 16, x = 100), fixed in session 34.
+    - Phone figures (`reading-tools.js`): tick and coord labels render at 11 px at least
+      (other labels keep the 9.5 px floor); a column of y-axis labels is thinned like a row,
+      and a lone tick label that overlaps another (a bar's value) is hidden, the higher one
+      kept. 0028's bar values no longer overlap.
+    - 0004's Mermaid labels that mix Hebrew and Latin, and the "?" of the question, are
+      right-to-left isolates (U+2067 ... U+2069); no other page has Hebrew in a diagram.
+    - 0087: the rim of a lit bulb is `--lo-rim`, the brand navy in the dark scheme (8.8:1
+      on the amber); check_contrast takes a foreground per scheme (621 pairs).
+    - Short LTR spans of the prose (24 characters or fewer, with a space: 1,239 of them)
+      get the class `ltr-nw` in the hook and stay on one line outside table cells.
+    - Colons: five generators (0102, 0104, 0107, 0108, 0109) had `NB = " "`, a plain space;
+      they and the literal " :" of 0101 to 0109 are U+00A0 now, the pages refilled.
+      `lint_pages.py` checks the generated blocks too (a Hebrew letter, then " :"). The
+      pages' prose was done in ae7b115 (2026-11-09).
+    - The slider width item was no conflict: 10rem is 220 px at the 22 px rem of a 1920 px
+      screen.
+    - Still taller than 1000 px at 1920 x 1080 (check_heights, before this round as well):
+      0066 intervals 1479 / 1280 / 1140, 0024 credits 1352, 0064 weights 1322 / 1223 /
+      1182, 0067 netdelay 1258 / 1258 / 1244, 0025 acknak 1250, 0009 boxes 1240, 0068
+      twoheaps 1228 / 1213 / 1137, 0043 horses 1220 / 1186, 0065 islands 1186 / 1186 /
+      1159, 0062 tagpool 1136 / 1054, 0047 rainwater 1083 / 1082 (N10).
+
 ---
 
 ## In progress
@@ -563,8 +595,8 @@ redesign plan of 2026-10-16 and the proposal series six to eight, and items 112 
   212), then rounds 1 to 3 of the plan in [`ROUNDS.md`](ROUNDS.md): housekeeping (213),
   accessibility and speed (214), the phone header and layout shifts (215), round 5 and
   the first part of round 7 (216), round 4 (217) and a pilot of round 6 (218).
-  Round 8 is split in two (0036 alone, then the rest as round 9); round 8 is done on the
-  branch (219), round 9 is next.
+  Round 8 is split in two (0036 alone, then the rest as round 9); round 8 (219) is on
+  `main`, round 9 (220) is done on the branch.
 - **State:** `main` (5c71e11, deployed 2026-11-20 13:04 Israel time) has rounds 1 to 5 and
   7 and the pilot of round 6 (111 questions, 204 boxes); the live site was checked at 390
   and 1440 px in both schemes (built math, 0110, 0111, the home page). Next: the owner's
@@ -768,31 +800,42 @@ true, so CI never runs the motion paths or a box's first-visit guide.
 - [x] (done, work log 219) 0036: the LFSR box is 1508 px at 1920 x 1080 and the page's review
   items (part b step 3 reduces modulo the wrong polynomial, hint 2, the proof's bit order).
   The RTL module, SVA and state coverpoint were left out by the owner's choice (round 8).
-- [ ] Boxes taller than one screen: 0019 (1201 px), 0048 with the reflection on (1120,
+- [x] (done, work log 220) Boxes taller than one screen: 0019 (1201 px), 0048 with the reflection on (1120,
   1221 in free-stops mode), 0012's kapbase boxes (1091, 1093); the cake boxes have 7 px of
-  margin.
-- [ ] Figure labels under 11 px on a phone (0028, 0044 first).
-- [ ] The NBSP before a colon on the older pages (round 5, R0), and a lint rule for it.
-- [ ] 0087: the rim of a lit bulb in the dark scheme (1.3:1).
+  margin. The 24 other boxes over 1000 px are N10.
+- [x] (done, work log 220: the axes) Figure labels under 11 px on a phone (0028, 0044 first).
+  Other labels (legends, a line's name) keep the 9.5 px floor.
+- [x] (done, work log 220) The NBSP before a colon on the older pages (round 5, R0), and a lint rule for it.
+- [x] (done, work log 220) 0087: the rim of a lit bulb in the dark scheme (1.3:1).
 - [x] (done, work log 216: graphs, topological-sort, trie; LPM is the question itself) Topic names for graphs, topological sort, trie and LPM in TOPICS (0102, 0103).
-- [ ] 0004's Mermaid flowchart shows "?" first in two labels.
+- [x] (done, work log 220) 0004's Mermaid flowchart shows "?" first in two labels.
 - [ ] Hardware and DV additions not done by the owner's choice in round 8: 0014 a
   covergroup, 0012 an exhaustive BCD check, 0044 and 0002 per-clock tables and SVA.
 - [ ] Flaky: check_inputs on 0101 (once, 2026-11-14).
 - [ ] Owner: the giscus ids, the YouTube links of the videos.
 
 **N8. CI time (optional, M):**
-- [ ] The full lane takes 34 minutes (run 43644406759): tests 11, the phone check 12, and
+- [x] (done, work log 220: eight shards) The full lane takes 34 minutes (run 43644406759): tests 11, the phone check 12, and
   four explorer shards of about 22 each (clicks 10 to 12, jumps 4, inputs 5), which set the
   total. Options: eight shards, or on a branch run only the boxes of the kinds a push
   touched (the full set stays on `main`).
+
+**N10. Boxes still taller than one screen (found in round 9, a proposal for a later round):**
+- [ ] 24 boxes of 11 kinds are over 1000 px at 1920 x 1080 in check_heights' states (they
+  were before round 9 as well): 0066 intervals 1479 / 1280 / 1140, 0024 credits 1352, 0064
+  weights 1322 / 1223 / 1182, 0067 netdelay 1258 / 1258 / 1244, 0025 acknak 1250, 0009
+  boxes 1240, 0068 twoheaps 1228 / 1213 / 1137, 0043 horses 1220 / 1186, 0065 islands
+  1186 / 1186 / 1159, 0062 tagpool 1136 / 1054, 0047 rainwater 1083 / 1082. Each needs
+  its own layout (`cols` and its side blocks), as 0019 and 0048 got in round 9.
+- [ ] Phone labels other than the axes (a line's name, "T ≈ 0.333", "D = 5") keep the
+  9.5 px floor; 11 px for them needs room per generator.
 
 ### Owner decisions
 
 - [x] Staff level removed (session 19, owner's call). Senior has nine questions (0007, 0011, 0019, 0020, 0021, 0023, 0024, 0025, 0037).
 - [ ] Fifth series: W1 to W4 done on the branch (W348's drawn check mark not picked); W5 not picked; `main` when the owner asks.
 - [ ] Pick rounds from the proposals (now in `HANDOFF-archive-2.md`): the owner's current direction is the eighth series, S1 to S6 (improve what exists, no new questions); the question proposals X360 to X410 wait; the older proposals are in the archive.
-- [ ] Colons: many pages and explorer strings put a plain space before a colon in Hebrew text (0065 to 0067 and their boxes have no NBSP at all), and the linter does not check it. The owner chose not to fix it for now (2026-10-30). The explorers were fixed and linted in round 4 (session 34); the pages remain (round 5, R0).
+- [x] (done: the pages in ae7b115, the generated figures in work log 220) Colons: many pages and explorer strings put a plain space before a colon in Hebrew text (0065 to 0067 and their boxes have no NBSP at all), and the linter does not check it. The owner chose not to fix it for now (2026-10-30). The explorers were fixed and linted in round 4 (session 34); the pages remain (round 5, R0).
 - [ ] Comments: enable Discussions, install the giscus app and paste the two ids into `mkdocs.yml` (README, Comments); until then question pages have no discussion section.
 
 ### Audit findings (ponytail-audit, session 34, 2026-11-14)
@@ -874,7 +917,7 @@ Nice to have:
 - [ ] Algorithms proposals not chosen (2026-11-13): LRU cache in O(1) (hash + doubly linked
   list; true LRU needs ceil(log2 N!) bits: 5 for 4 ways, 16 for 8; matrix vs tree PLRU) and
   Bloom filter (m/n = 8, 10, 16 give k = 6, 7, 11 and false positives 2.2%, 0.82%, 0.05%).
-- [ ] 0087 lights out: the dark rim (--viz-ink) of a light that is on is 1.3:1 against the
+- [x] (done, work log 220) 0087 lights out: the dark rim (--viz-ink) of a light that is on is 1.3:1 against the
   amber bulb in the dark scheme (found when check_contrast began testing the fills after
   CARD, PAGE). The bulb still shows by its amber fill on the dark card; a darker rim in the
   slate scheme would fix it. Not changed without the owner.
@@ -897,7 +940,7 @@ Nice to have:
 - [x] ~~Re-run the 0007, 0011 and 0014 constraints in a simulator with full constraint support~~ — done in session 5 (Verilator snapshot + z3 in CI).
 - [x] ~~Wide data tables still scroll sideways on phones~~: tables of five or more columns that do not fit become cards on phones (C192, session 22).
 - [x] ~~0038: the checker missed an ack in the rise cycle~~ (fixed, work log item 151).
-- [ ] Figure labels under 11 px on phones (work log item 148): the D194 fit raises them to 9.5 px only; 11 px needs fewer value labels and more room in `charts.py`'s `tick` and `legend` and per generator (0028, 0044 first).
+- [x] (the axes at 11 px, work log 220; the other labels keep 9.5 px) Figure labels under 11 px on phones (work log item 148): the D194 fit raises them to 9.5 px only; 11 px needs fewer value labels and more room in `charts.py`'s `tick` and `legend` and per generator (0028, 0044 first).
 - [x] ~~When a Verilator release newer than 5.052 is out, bump `VERILATOR_REF`~~ (v5.054, session 35, work log 213).
 
 ### Still open from the review rounds (session 34)
@@ -905,12 +948,12 @@ Nice to have:
 The eight review rounds are in `HANDOFF-archive-3.md`; these are their items that were
 still open when they moved (session 35), each marked with its round.
 
-- [ ] (round 4) 0019's hourglass box is 1201 px at 1920 x 1080 (it shares 0018's stylesheet now).
-- [ ] (round 4) 0048's farm box with "הצגת השיקוף" on is 1120 px (1221 in free-stops mode); check_heights
+- [x] (done, work log 220) (round 4) 0019's hourglass box is 1201 px at 1920 x 1080 (it shares 0018's stylesheet now).
+- [x] (done, work log 220) (round 4) 0048's farm box with "הצגת השיקוף" on is 1120 px (1221 in free-stops mode); check_heights
   measures the default state only.
-- [ ] (round 4) 0004's mermaid flowchart: "איזה צבע יצא?" renders with "?" first, and "צבע הכדור עובר
+- [x] (done, work log 220) (round 4) 0004's mermaid flowchart: "איזה צבע יצא?" renders with "?" first, and "צבע הכדור עובר
   ל-k" breaks around "-k" (Mermaid's RTL layout).
-- [ ] (round 4) stylesheets/27-box-columns.css sets `max-width: 10rem` on `.ex-controls input[type=range]`,
+- [x] (no conflict: 10rem is 220 px at the 22 px rem of 1920 px) (round 4) stylesheets/27-box-columns.css sets `max-width: 10rem` on `.ex-controls input[type=range]`,
   but the motorcycle box's sliders measure 220 px: check which rule wins.
 - [ ] (round 5) Not done by the owner's choice (R3): 0038 bind / cover / req at reset release, 0058's
   per-clock table and end-of-test check, 0059's parity assertion, 0070's Lee router, 0087's
@@ -936,13 +979,13 @@ still open when they moved (session 35), each marked with its round.
   the polynomial", the XNOR trap; the box 1508 / 1612 px; the RTL module, SVA and coverage).
   Two agents reached 1003 to 1129 px with one ring in cycle order and the table scrolling;
   their work is in b6aeb23 and the handoff notes of the session scratchpad (lost with it).
-- [ ] (round 7) 0012's kapbase boxes are 1091 and 1093 px (not part of this round).
+- [x] (already fixed in session 34: 869 px at most) (round 7) 0012's kapbase boxes are 1091 and 1093 px (not part of this round).
 - [ ] (round 7) check_heights.py should click `.wj-best` before "סוף" (0083) and cannot reach the
   extreme states (a long game, help open, a law select used); the agents measured those with
   their own scripts.
-- [ ] (round 7) Site-wide: an LTR tuple "(a, b)" in prose can break after the comma (0013 got U+00A0);
+- [x] (done, work log 220: `ltr-nw`) (round 7) Site-wide: an LTR tuple "(a, b)" in prose can break after the comma (0013 got U+00A0);
   a shared nowrap rule for short LTR spans would fix it everywhere.
-- [ ] (round 7) The cake boxes' worst state is 993 px (7 px margin): `.cake-scroll` max-height 7.6rem
+- [x] (done, work log 220) (round 7) The cake boxes' worst state is 993 px (7 px margin): `.cake-scroll` max-height 7.6rem
   -> 6.7rem would save about 20 px.
 - [ ] (round 8) 0014: a covergroup on n, the side and the pair relation (apart, edge, corner).
 - [ ] (round 8) 0012: an exhaustive 1,000-input BCD check, two assertions, coverage on d and d -> d'.
