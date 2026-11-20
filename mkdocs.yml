@@ -211,6 +211,8 @@ extra_css:   # the site's styles in parts, in this order (see docs/stylesheets/R
   - stylesheets/questions/0109-carfleet.css    # 0109: car fleets, the road, the position-time graphs and the box
   - stylesheets/questions/0110-rtlbug.css      # 0110: three RTL bugs, the box of the strip, the lines and the bits
   - stylesheets/questions/0111-falsepass.css   # 0111: the passing test, the register slice's testbench box
+  - stylesheets/questions/0112-factory.css     # 0112: the factory override, the component tree box
+  - stylesheets/questions/0113-objrun.css      # 0113: the test that ends at time 0, the box of the run and its objections
   - stylesheets/questions/0114-seqarb.css      # 0114: the sequencer arbitration box (lock, grab, the modes)
   - stylesheets/questions/0044-kapn.css        # 0012, 0044: the kapn, kapgraph and kapbase boxes on one screen (session 34)
   - stylesheets/questions/0014-shapes.css      # 0014: the shapes box on one screen, the heat map beside the board (session 34)

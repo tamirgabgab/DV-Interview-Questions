@@ -1,0 +1,38 @@
+/* Question 0113, the test that ends at time 0: the box of explorer/objrun.js (or-*). The
+   waveform is core.js's strip, the time after the end of the run shaded grey, under it the
+   line of the edge under the cursor and the lines the run ends with; beside them on a
+   computer (cols: main and side), three cards: the pipeline's four stages, the objections
+   held, the scoreboard's two lists (an item that went in and never out tinted magenta-red,
+   as 0111's chips). Colours from the palette only. */
+
+.md-typeset .explorer .or-pos { display: inline-block; min-width: 9.5rem; }
+.md-typeset .explorer .or-switches label { white-space: normal; }
+.md-typeset .explorer .or-drainlab output { display: inline-block; min-width: 3rem; font-family: var(--md-code-font-family); }
+.md-typeset .explorer .or-drainlab.is-off { opacity: 0.55; }
+.md-typeset .explorer .or-sum :is(.wv-ok, .wv-bad) { white-space: nowrap; }
+
+/* --- the strip ---------------------------------------------------------------------------- */
+.md-typeset .explorer .or-strip svg .wv-mark { fill: var(--viz-text); fill-opacity: 0.16; }
+.md-typeset .explorer .or-strip svg { cursor: pointer; }
+.md-typeset .viz-legend .or-key-after { background: color-mix(in srgb, var(--viz-text) 16%, var(--md-default-bg-color)); outline: 1px solid var(--viz-text); outline-offset: -1px; }
+.md-typeset .viz-legend .or-key-now { background: color-mix(in srgb, var(--viz-s2) 10%, var(--md-default-bg-color)); outline: 1.5px dashed var(--viz-s2); outline-offset: -1.5px; }
+
+/* --- the cards ---------------------------------------------------------------------------- */
+.md-typeset .explorer .or-cards { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.45rem; margin-top: 0.4rem; }
+.md-typeset .explorer .or-logcard { margin-top: 0.4rem; }
+.md-typeset .explorer .or-card { border: 1px solid var(--site-card-border); border-radius: 0.3rem; padding: 0.35rem 0.55rem; min-width: 0; font-size: 0.68rem; }
+.md-typeset .explorer .or-card p { margin: 0.2em 0; }
+.md-typeset .explorer .or-card p code { white-space: nowrap; }
+.md-typeset .explorer .or-ctitle { font-weight: 700; }
+.md-typeset .explorer .or-pipe { display: flex; gap: 0.3rem; }
+.md-typeset .explorer .or-stage { display: inline-flex; flex-direction: column; align-items: center; min-width: 2.4rem; padding: 0.1rem 0.3rem; border: 1px solid var(--site-card-border); border-radius: 0.25rem; font-family: var(--md-code-font-family); line-height: 1.2; color: var(--viz-ink); }
+.md-typeset .explorer .or-stage b { font-size: 0.8rem; }
+.md-typeset .explorer .or-stage small { font-size: 0.6rem; color: var(--viz-text); }
+.md-typeset .explorer .or-stage.is-after { background: color-mix(in srgb, var(--viz-text) 16%, var(--md-default-bg-color)); }
+.md-typeset .explorer .or-stage.is-after small { color: var(--viz-ink); }
+.md-typeset .explorer .or-chips { display: inline-flex; flex-wrap: wrap; gap: 0.2rem; vertical-align: middle; }
+.md-typeset .explorer .or-chip { display: inline-block; min-width: 1.2rem; padding: 0 0.2rem; border: 1px solid var(--site-card-border); border-radius: 0.25rem; text-align: center; font-family: var(--md-code-font-family); color: var(--viz-ink); }
+.md-typeset .explorer .or-chip.is-lost { background: color-mix(in srgb, var(--viz-s5) 24%, var(--md-default-bg-color)); border-color: var(--viz-s5); }
+.md-typeset .explorer .or-empty { font-family: var(--md-code-font-family); color: var(--viz-text); }
+.md-typeset .explorer pre.or-log { margin: 0.3em 0 0; padding: 0.3rem 0.45rem; min-height: 3.2em; overflow-x: auto; background: var(--md-code-bg-color); color: var(--md-code-fg-color); font-size: 0.6rem; line-height: 1.45; white-space: pre-wrap; overflow-wrap: anywhere; border-radius: 0.2rem; }
+.md-typeset .explorer pre.or-log:focus-visible { outline: 2px solid var(--site-focus-ring); outline-offset: 2px; }

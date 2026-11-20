@@ -1,9 +1,9 @@
 """Question 0113: run the page's pyuvm testbench on Verilator (helpers of test_0113_sim.py).
 
-Every scenario is a module made of the page's own Python blocks, in page order, plus a few
-test-only lines; each runs in its own simulation (run_cocotb with tests=[...]), so every run
-starts at time 0 with a fresh DUT. The build is shared: the SystemVerilog is the page's
-module pipe, the same for every run."""
+Every scenario is a module made of the environment the page describes in words
+(tests/0113/env.py), then the page's own Python blocks in page order, plus a few test-only
+lines; each runs in its own simulation (run_cocotb with tests=[...]), so every run starts at
+time 0 with a fresh DUT. The build is shared: the DUT is module pipe of tests/0113/tb.sv."""
 
 from __future__ import annotations
 
@@ -15,24 +15,52 @@ from functools import lru_cache
 from extract_code import ROOT, pick
 from page_tests import run_cocotb
 
+HERE = ROOT / "tests" / "0113"
+
 MARKERS = {
-    "env": "class PipeEnv(uvm_env)",
     "smoke": "class SmokeTest(uvm_test)",
     "objection": "class ObjectionTest(SmokeTest)",
     "drain": "class DrainTest(SmokeTest)",
-    "colleague": "await super().run_phase()",
-    "timeout": "with_timeout(uvm_root().run_test",
+}
+
+# The page's first follow-up in code: an output monitor that holds an objection around its
+# endless loop, and a run() bounded by a global timeout that logs who still holds one.
+TEST_ONLY = {
+    "colleague": '''
+class OutMonitor(InMonitor):
+    PINS = ("out_valid", "out_data")
+
+    async def run_phase(self):
+        self.raise_objection()
+        await super().run_phase()
+        self.drop_objection()
+''',
+    "timeout": '''
+async def run(dut, test, limit_us=100):
+    cocotb.start_soon(Clock(dut.clk, 10, "ns").start(start_high=False))
+    try:
+        await with_timeout(uvm_root().run_test(test), limit_us, "us")
+    except SimTimeoutError:
+        dut._log.critical(f"timeout at {get_sim_time('ns'):g} ns\\n{ObjectionHandler()}")
+        raise
+''',
 }
 
 LINE = re.compile(r"^\s*(?P<t>[\d.]+)ns (?P<lvl>[A-Z]+)\s+(?P<src>\S+)(?: \[(?P<who>[^\]]*)\]:)?\s+(?P<msg>.*)$")
 
 
 def page(*parts: str) -> str:
-    return "\n\n".join(pick(113, "python", MARKERS[p]) for p in parts)
+    """env.py, then the page's blocks (or a test-only block) that `parts` name."""
+    blocks = [(HERE / "env.py").read_text()]
+    blocks += [TEST_ONLY[p] if p in TEST_ONLY else pick(113, "python", MARKERS[p]) for p in parts]
+    return "\n\n".join(blocks)
 
 
 def dut() -> dict[str, str]:
-    return {"pipe.sv": pick(113, "systemverilog", "module pipe #(")}
+    """module pipe of tb.sv, the DUT's own testbench."""
+    tb = (HERE / "tb.sv").read_text()
+    start = tb.index("module pipe #(")
+    return {"pipe.sv": tb[start:tb.index("endmodule", start) + len("endmodule")] + "\n"}
 
 
 # Test-only cocotb tests: the traps of the page, each with its numbers printed as JSON.
