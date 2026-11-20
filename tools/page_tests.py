@@ -90,6 +90,9 @@ def run_cocotb(name: str, module: str, sources: dict[str, str], toplevel: str, t
             path.write_text(text, encoding="utf-8")
     mod = f"{name}_tb"
     (work / f"{mod}.py").write_text(module, encoding="utf-8")
+    # the module is rewritten in place, maybe at the same size within the same second: a
+    # cached bytecode file would then be taken for it
+    shutil.rmtree(work / "__pycache__", ignore_errors=True)
     key = hashlib.sha256("".join(f + t for f, t in sorted(sources.items())).encode()).hexdigest()[:16]
     stamp = work / "build" / "sources.sha"
     fresh = not (stamp.exists() and stamp.read_text() == key)
@@ -107,7 +110,7 @@ def run_cocotb(name: str, module: str, sources: dict[str, str], toplevel: str, t
             xml.unlink(missing_ok=True)
             try:    # the runner exits when a test fails; the results file still says which
                 runner.test(hdl_toplevel=toplevel, test_module=mod, testcase=tests, build_dir=work / "build",
-                            test_dir=work, results_xml=str(xml))
+                            test_dir=work, results_xml=str(xml), extra_env={"PYTHONDONTWRITEBYTECODE": "1"})
             except SystemExit:
                 pass
         finally:
