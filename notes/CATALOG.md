@@ -118,5 +118,5 @@ All 115 questions, with links to their pages on the [live site](https://tamirgab
 | 0111 | [הטסט עובר וה-DUT שבור – שלושה באגים בסביבת הבדיקה](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0111-passing-test-broken-dut/) | senior (סניור) |
 | 0112 | [ה-override שלא נכנס לתוקף](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0112-uvm-factory-override/) | junior (ג'וניור) |
 | 0113 | [הטסט שנגמר בזמן 0](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/0113-phases-and-objections/) | junior (ג'וניור) |
-| 0114 | [virtual sequence לשני agents](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0114-virtual-sequence/) | senior (סניור) |
+| 0114 | [סנכרון שני agents ב-virtual sequence](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0114-virtual-sequence/) | senior (סניור) |
 | 0115 | [ה-monitor שרואה שגיאות שלא קיימות](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/0115-monitor-sampling-race/) | senior (סניור) |
