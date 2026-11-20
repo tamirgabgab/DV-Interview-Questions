@@ -340,9 +340,13 @@
   // figure's units) that renders at FIT_PX, at most MAX_GROW times its own (a label marked
   // data-fit-drop that still renders under MIN_PX is hidden, its tooltip stays); a row of tick
   // labels (class tick or coord) that then overlaps is thinned, every k-th label kept (the first and the last
-  // always), the smallest k with no overlap. Redone when a figure comes into view, on
-  // resize, and when an explorer box redraws; the lightbox copy gets the original sizes.
-  const MIN_PX = 9, FIT_PX = 9.5, MAX_GROW = 2;
+  // always), the smallest k with no overlap, and so is a column of them (a y axis, labels
+  // anchored at their end). Tick and coord labels, which thinning keeps apart, render at
+  // TICK_PX at least (round 9: the axes of 0028 and 0044 read at 11 px on a phone); a lone
+  // one that then overlaps another (the values over a bar chart's bars) is hidden, the
+  // higher kept. Redone when a figure comes into view, on resize, and when an explorer box
+  // redraws; the lightbox copy gets the original sizes.
+  const MIN_PX = 9, FIT_PX = 9.5, TICK_PX = 11, MAX_GROW = 2;
   const FIT_SVGS = ".md-content svg:not(mjx-container svg):not(.mermaid svg)";
 
   const unfit = (root) => {
@@ -375,9 +379,11 @@
     t.dataset.fitShift = "";
   };
 
-  const thinRow = (row) => {
-    row.sort((a, b) => a.box.x - b.box.x);
-    const overlaps = (keep) => keep.some((t, i) => i && t.box.x < keep[i - 1].box.x + keep[i - 1].box.width + 2);
+  // a row along x, or with col a column along y (a digit fills about 0.7 of its box's height)
+  const thinRow = (row, col = false) => {
+    const lo = (b) => (col ? b.y : b.x), end = (b) => (col ? b.y + 0.7 * b.height : b.x + b.width + 2);
+    row.sort((a, b) => lo(a.box) - lo(b.box));
+    const overlaps = (keep) => keep.some((t, i) => i && lo(t.box) < end(keep[i - 1].box));
     for (let k = 1; k <= row.length; k++) {
       const keep = row.filter((t, i) => i % k === 0 || i === row.length - 1);
       if (k > 1 && keep.length > 1 && (row.length - 1) % k !== 0) keep.splice(-2, 1);   // the last kept, its left neighbour not
@@ -397,20 +403,32 @@
       const scale = m ? Math.hypot(m.a, m.b) : 0;
       if (!scale || !t.textContent.trim()) continue;
       const size = parseFloat(getComputedStyle(t).fontSize);
-      if (size * scale >= MIN_PX) continue;
+      const tick = t.matches(".tick, .coord"), min = tick ? TICK_PX : MIN_PX;
+      if (size * scale >= min) continue;
       t.dataset.fitBase = t.style.fontSize;
-      const grown = Math.min(FIT_PX / scale, size * MAX_GROW);
+      const grown = Math.min((tick ? TICK_PX : FIT_PX) / scale, size * MAX_GROW);
       t.style.fontSize = `${grown.toFixed(2)}px`;
       if (t.hasAttribute("data-fit-drop") && grown * scale < MIN_PX) t.classList.add("fit-hidden");
     }
-    const rows = new Map();
-    for (const t of svg.querySelectorAll("text.tick, text.coord")) {
-      if (t.getAttribute("text-anchor") !== "middle" || !t.textContent.trim()) continue;
-      const key = `${t.getAttribute("class")}|${t.parentNode === svg ? "" : "g"}${Math.round(parseFloat(t.getAttribute("y")) || 0)}`;
-      if (!rows.has(key)) rows.set(key, []);
-      rows.get(key).push({ el: t, box: t.getBBox() });
-    }
+    const rows = new Map(), cols = new Map();
+    const group = (map, key, t) => { if (!map.has(key)) map.set(key, []); map.get(key).push({ el: t, box: t.getBBox() }); };
+    const at = (t, k) => `${t.getAttribute("class")}|${t.parentNode === svg ? "" : "g"}${Math.round(parseFloat(t.getAttribute(k)) || 0)}`;
+    const labels = [...svg.querySelectorAll("text.tick, text.coord")].filter((t) => t.textContent.trim());
+    labels.forEach((t) => { if (t.getAttribute("text-anchor") === "middle") group(rows, at(t, "y"), t); });
+    // a column: labels anchored at their end on one x, but for one on an x axis's row (the axis's name)
+    const axisRows = new Set([...rows].filter(([, r]) => r.length > 2).map(([k]) => k.split("|").pop()));
+    labels.forEach((t) => {
+      if (t.getAttribute("text-anchor") === "end" && !axisRows.has(at(t, "y").split("|").pop())) group(cols, at(t, "x"), t);
+    });
     rows.forEach((row) => { if (row.length > 2) thinRow(row); });
+    cols.forEach((col) => { if (col.length > 2) thinRow(col, true); });
+    // the lone ones (a bar's value): the highest first, each hidden when it overlaps one kept
+    const lone = [...rows.values()].filter((r) => r.length <= 2).flat().sort((a, b) => a.box.y - b.box.y), kept = [];
+    lone.forEach((t) => {
+      const b = t.box, hit = kept.some((k) => b.x < k.x + k.width && k.x < b.x + b.width && b.y < k.y + 0.7 * k.height && k.y < b.y + 0.7 * b.height);
+      t.el.classList.toggle("fit-hidden", hit);
+      if (!hit) kept.push(b);
+    });
     svg.querySelectorAll("text[data-fit-base]:not(.fit-hidden)").forEach((t) => keepInside(svg, t));
     const wrap = svg.parentElement;
     if (wrap && wrap.classList.contains("fig-wrap")) decide(wrap);   // the enlarged text may reach the button
