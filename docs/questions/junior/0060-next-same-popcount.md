@@ -2,7 +2,7 @@
 id: 60
 title: המספר הבא עם אותו מספר של אחדות – Gosper, הקודם, ואפסים
 level: junior
-difficulty: medium
+difficulty: hard
 kind: code
 tags: [bitwise, combinatorics, algorithms, systemverilog, python]
 source: "טריק ביטים קלאסי (Gosper's hack, ‏HAKMEM 175), שאלה מוכרת בראיונות"

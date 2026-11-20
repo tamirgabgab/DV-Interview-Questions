@@ -2,7 +2,7 @@
 id: 48
 title: החוואי, האוכל והמים
 level: student
-difficulty: medium
+difficulty: hard
 kind: math
 tags: [math, geometry, logic-puzzles, python, systemverilog]
 source: ""

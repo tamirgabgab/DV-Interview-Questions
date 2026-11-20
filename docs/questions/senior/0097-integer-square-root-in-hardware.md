@@ -2,7 +2,7 @@
 id: 97
 title: שורש ריבועי בחומרה, ביט אחרי ביט
 level: senior
-difficulty: hard
+difficulty: medium
 kind: design
 tags: [digital-design, bitwise, algorithms, proof, python, systemverilog]
 source: "השיטה הספרתית (digit-by-digit) לשורש, כמו בעט ונייר"

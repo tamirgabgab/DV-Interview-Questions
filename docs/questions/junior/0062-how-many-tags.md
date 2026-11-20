@@ -2,7 +2,7 @@
 id: 62
 title: כמה tags צריך – טרנזקציות חופפות, ומאגר אחד מול שניים
 level: junior
-difficulty: medium
+difficulty: easy
 kind: code
 tags: [algorithms, sorting, protocols, python, systemverilog]
 source: "Google ו-Meta (Meeting Rooms II), בלבוש של tags לטרנזקציות"

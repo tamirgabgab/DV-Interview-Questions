@@ -2,7 +2,7 @@
 id: 71
 title: דו-קרב שלושה קוסמים – איזה שרביט ואיזה תור לבחור
 level: senior
-difficulty: medium
+difficulty: hard
 kind: math
 tags: [probability, game-theory, optimization]
 source: "חידת הדו-קרב המשולש (truel), בגרסה עם חוק החתולים ושרביט לבחירה"

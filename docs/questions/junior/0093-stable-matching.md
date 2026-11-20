@@ -2,7 +2,7 @@
 id: 93
 title: שידוך יציב – 6 מועמדים ו-6 משרות, האלגוריתם של Gale–Shapley, וכל השידוכים היציבים
 level: junior
-difficulty: medium
+difficulty: hard
 kind: code
 tags: [algorithms, proof, permutations, python, systemverilog]
 source: "Gale ו-Shapley, College Admissions and the Stability of Marriage (1962); על האלגוריתם הזה Roth ו-Shapley קיבלו את פרס נובל בכלכלה ב-2012"

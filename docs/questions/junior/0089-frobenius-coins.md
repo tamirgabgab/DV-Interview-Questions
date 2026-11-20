@@ -2,7 +2,7 @@
 id: 89
 title: מטבעות שאי אפשר להרכיב – 3 ו-5, כל זוג מטבעות, ו-6, 9 ו-20
 level: junior
-difficulty: medium
+difficulty: hard
 kind: math
 tags: [number-theory, dijkstra, dynamic-programming, math, python, systemverilog]
 source: "בעיית המטבעות של Frobenius; הנוסחה לשני מטבעות והספירה מופיעות אצל Sylvester (1884); 6, 9 ו-20 הן חידת ה-McNuggets הידועה"

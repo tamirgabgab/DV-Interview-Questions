@@ -2,7 +2,7 @@
 id: 35
 title: חלוקת שעון ב-3 עם duty cycle של 50%
 level: junior
-difficulty: medium
+difficulty: easy
 kind: design
 tags: [digital-design, clocks, systemverilog, python]
 source: ""

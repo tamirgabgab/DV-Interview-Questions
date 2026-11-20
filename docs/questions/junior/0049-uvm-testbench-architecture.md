@@ -2,7 +2,7 @@
 id: 49
 title: ארכיטקטורה של סביבת UVM – הרכיבים ומסלול הטרנזקציה
 level: junior
-difficulty: medium
+difficulty: easy
 kind: dv
 tags: [uvm, methodology, systemverilog]
 source: "שאלת פתיחה נפוצה בראיונות אימות"

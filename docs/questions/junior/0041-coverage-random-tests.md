@@ -2,7 +2,7 @@
 id: 41
 title: כמה טסטים אקראיים סוגרים כיסוי – אספן הקופונים
 level: junior
-difficulty: medium
+difficulty: hard
 kind: dv
 tags: [probability, coverage, math, python, systemverilog]
 source: "בעיית אספן הקופונים בלבוש DV; ההכללה דרך הטבעה בתהליך פואסון"

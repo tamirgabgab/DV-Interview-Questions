@@ -467,7 +467,8 @@ redesign plan of 2026-10-16 and the proposal series six to eight, and items 112 
       ideas, 20 to 30; hard: a non-obvious insight or several demanding parts, 40 or more;
       relative to the page's level). 52 changes proposed; shown to the owner with four
       recommended exceptions (0068, 0096, 0098 stay medium; 0050 hard to medium, not easy).
-      Not applied until the owner approves.
+      The owner approved with the four exceptions (2026-11-20): 49 pages changed; student
+      5 easy, 6 medium, 3 hard; junior 11, 36, 22; senior 1, 17, 8.
 
 ---
 
@@ -481,7 +482,7 @@ redesign plan of 2026-10-16 and the proposal series six to eight, and items 112 
 - **State:** rounds 1 to 3 are on `main` (b2ca207, 2026-11-20; the branch run 44636412910
   passed every check, the phone check with a touch screen included, and the `main` run
   44641556678 deployed). The site has 109 questions (ids 0001 to 0109, no gap) and 202 boxes.
-- **Waiting on the owner:** the approval of the re-grading (N4.3, work log 216); the
+- **Waiting on the owner:** the
   Search Console verification code (N3.4); a try of a box's number field and of the lists' filter on an
   iPhone (the page must not zoom on focus, N6.8); YouTube links of the videos made in the owner's other project
   (add them as `video:`, notes/VIDEOS.md); the giscus ids (README, Comments) in `extra.comments` of `mkdocs.yml`; checks of
@@ -580,7 +581,7 @@ with the owner before each; go through it with the owner round by round.
   transition bins); CDC (two-flop, pulse and handshake synchronizers); a verification plan
   for a small block (FIFO, arbiter). Ask the owner which, as always.
 - [x] N4.2 (done, work log 216) Or, and at least: reword the level cards so they describe what is there.
-- [ ] N4.3 (proposed, work log 216; waits for the owner) Difficulty tells little: 84 of 109 are "medium" (junior: 1 easy, 64 medium,
+- [x] N4.3 (done, work log 216) Difficulty tells little: 84 of 109 are "medium" (junior: 1 easy, 64 medium,
   4 hard), so the difficulty filter, the interview builder and the lists' dots barely
   separate questions. Proposal: a re-grading pass with the owner's criteria (front matter
   only; the lists and the catalog follow).

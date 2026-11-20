@@ -2,7 +2,7 @@
 id: 20
 title: פיצול Completions ב-PCIe – כל הדרכים להחזיר קריאה אחת
 level: senior
-difficulty: medium
+difficulty: easy
 kind: dv
 tags: [protocols, pcie, algorithms, recursion, python, systemverilog]
 source: ""

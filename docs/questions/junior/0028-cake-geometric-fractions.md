@@ -2,7 +2,7 @@
 id: 28
 title: חלוקת עוגה בסדרה הנדסית – מי מקבל הכי הרבה?
 level: junior
-difficulty: medium
+difficulty: easy
 kind: math
 tags: [math, sequences]
 source: ""

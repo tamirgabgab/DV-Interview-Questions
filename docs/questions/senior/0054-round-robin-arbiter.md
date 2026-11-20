@@ -2,7 +2,7 @@
 id: 54
 title: Arbiter סבבי – הרעבה, טריק שני ה-encoders, SVA ומשקלים
 level: senior
-difficulty: hard
+difficulty: medium
 kind: design
 tags: [digital-logic, sva, systemverilog, python]
 source: "שאלת ראיון קלאסית ל-RTL ול-DV (arbiters, fairness)"

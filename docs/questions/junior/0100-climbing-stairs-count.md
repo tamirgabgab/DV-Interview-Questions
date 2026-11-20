@@ -2,7 +2,7 @@
 id: 100
 title: כמה דרכים לעלות במדרגות – קפיצות מקבוצה, מדרגות שבורות, בלי סדר ובדיוק t קפיצות
 level: junior
-difficulty: medium
+difficulty: easy
 kind: code
 tags: [algorithms, combinatorics, dynamic-programming, sequences, proof, python, systemverilog]
 source: "שאלה קלאסית (Climbing Stairs, LeetCode 70); ההכללות לקבוצת קפיצות, למדרגות שבורות ולספירה בלי סדר מופיעות בגרסאות רבות שלה (Coin Change II, LeetCode 518)"

@@ -2,7 +2,7 @@
 id: 13
 title: ממיינים ספרות ומחסרים – ארבע ספרות
 level: junior
-difficulty: medium
+difficulty: hard
 kind: math
 tags: [math, digits, sorting, number-bases, python, systemverilog]
 source: "Kaprekar's routine (4 digits)"

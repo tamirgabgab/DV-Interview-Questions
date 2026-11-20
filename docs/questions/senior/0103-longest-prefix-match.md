@@ -2,7 +2,7 @@
 id: 103
 title: הקידומת הארוכה ביותר – טבלת ניתוב, עץ ביטים וחיפוש בצנרת
 level: senior
-difficulty: hard
+difficulty: medium
 kind: code
 tags: [algorithms, trie, bitwise, digital-design, protocols, python, systemverilog]
 source: "חיפוש הקידומת הארוכה ביותר (longest prefix match) של נתבי IP, מאז CIDR (RFC 4632)"

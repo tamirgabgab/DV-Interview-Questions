@@ -89,8 +89,8 @@ Round 8 (0036) stays on the recommended model; round 9 is safe on the cheaper on
 - Open questions: the criteria for easy, medium and hard per level; reword the level
   cards now, or after round 6 adds the questions they promise? The owner: now, and the
   session proposes the criteria.
-- Status: the level cards and the topic names done (work log 216); the re-grading is
-  proposed and waits for the owner.
+- Status: done in session 35 (2026-11-20), work log item 216 of `HANDOFF.md`: the level
+  cards, the topic names, and the re-grading approved by the owner (49 pages).
 
 ### Round 8. Question 0036
 

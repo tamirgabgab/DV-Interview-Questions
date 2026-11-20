@@ -2,7 +2,7 @@
 id: 90
 title: מיון פנקייקים – הפיכות מלמעלה, המקרה הגרוע ופנקייקים שרופים
 level: senior
-difficulty: hard
+difficulty: medium
 kind: code
 tags: [algorithms, sorting, permutations, bfs, proof, python, systemverilog]
 source: "בעיה קלאסית (Jacob Goodman, 1975); החסם הראשון של Gates ו-Papadimitriou (1979), הפנקייקים השרופים של Cohen ו-Blum (1995)"

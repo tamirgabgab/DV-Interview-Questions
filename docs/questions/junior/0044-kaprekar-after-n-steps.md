@@ -2,7 +2,7 @@
 id: 44
 title: צעד קפרקר, hash והספרות אחרי n פעולות
 level: junior
-difficulty: hard
+difficulty: medium
 kind: code
 tags: [math, digits, number-bases, sequences, sorting, python, systemverilog]
 source: "Kaprekar's routine (3 digits), a closed form for the digits"

@@ -2,7 +2,7 @@
 id: 92
 title: נקודות על מעגל – לכמה חלקים מתחלק העיגול
 level: student
-difficulty: medium
+difficulty: hard
 kind: math
 tags: [geometry, combinatorics, proof, logic-puzzles, python, systemverilog]
 source: "בעיית העיגול של Moser, הדוגמה הקלאסית לדפוס שנשבר"

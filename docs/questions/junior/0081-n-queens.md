@@ -2,7 +2,7 @@
 id: 81
 title: N מלכות – ספירה בביטים, סימטריות ובנייה לכל N
 level: junior
-difficulty: medium
+difficulty: hard
 kind: code
 tags: [recursion, bitwise, combinatorics, algorithms, python, systemverilog]
 source: "חידה קלאסית (בצל, 1848); הבנייה המפורשת לכל N לפי N mod 6"

@@ -2,7 +2,7 @@
 id: 88
 title: הפרשים במעגל – מתי הכל מתאפס ומתי יש מחזור
 level: junior
-difficulty: medium
+difficulty: hard
 kind: math
 tags: [logic-puzzles, sequences, number-theory, bitwise, proof, python, systemverilog]
 source: "סדרת Ducci (המשחק של n מספרים), חידה קלאסית של אינווריאנטות"

@@ -2,7 +2,7 @@
 id: 73
 title: ערבוב מושלם של חפיסה – כמה ערבובים עד שהיא חוזרת, ושילוב במקום
 level: junior
-difficulty: medium
+difficulty: hard
 kind: code
 tags: [permutations, number-theory, algorithms, python, systemverilog]
 source: "חידת הקלפים של ה-faro shuffle, עם הכללה לכל גודל ושאלת קוד על שילוב במקום"

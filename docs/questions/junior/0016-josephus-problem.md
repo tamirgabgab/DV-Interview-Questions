@@ -2,7 +2,7 @@
 id: 16
 title: בעיית יוספוס – אחד נשאר, אחד או שניים יוצאים
 level: junior
-difficulty: medium
+difficulty: hard
 kind: math
 tags: [math, algorithms, bitwise]
 source: ""

@@ -2,7 +2,7 @@
 id: 101
 title: קוביות Sicherman – מספרים אחרים על הפאות, אותה התפלגות של הסכום
 level: junior
-difficulty: medium
+difficulty: hard
 kind: math
 tags: [probability, combinatorics, coverage, math, proof, python, systemverilog]
 source: "קוביות Sicherman, על שם George Sicherman, שפרסם Martin Gardner ב-Scientific American ב-1978"

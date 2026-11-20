@@ -2,7 +2,7 @@
 id: 76
 title: פונקציה עולה עם f(f(n)) = 3n
 level: junior
-difficulty: medium
+difficulty: hard
 kind: math
 tags: [math, number-theory, number-bases, proof]
 source: ""

@@ -2,7 +2,7 @@
 id: 69
 title: עקיפות בזרם תשובות – כמה עקפו כל בקשה, כמה היא עקפה, וסך העקיפות
 level: senior
-difficulty: hard
+difficulty: medium
 kind: code
 tags: [algorithms, sorting, protocols, python, systemverilog]
 source: "סעיף א הוא Count of Smaller Numbers After Self (Google, Amazon), והסעיפים הבאים הם ההכללה שלו לזרם תשובות שלא לפי הסדר"

@@ -2,7 +2,7 @@
 id: 12
 title: ממיינים ספרות ומחסרים
 level: student
-difficulty: medium
+difficulty: hard
 kind: math
 tags: [math, digits, sorting, number-bases, python, systemverilog]
 source: "Kaprekar's routine (3 digits)"

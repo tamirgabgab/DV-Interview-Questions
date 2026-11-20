@@ -2,7 +2,7 @@
 id: 52
 title: HH מול HT – כמה הטלות מטבע עד שהרצף מופיע
 level: senior
-difficulty: medium
+difficulty: hard
 kind: math
 tags: [probability, fsm, sequences, systemverilog, python]
 source: "שאלת ראיון קלאסית בהסתברות; ההכללה של Conway ומשחק Penney"

@@ -2,7 +2,7 @@
 id: 109
 title: שיירות של מכוניות – כמה מגיעות ליעד, ומתי כל מכונית משיגה
 level: junior
-difficulty: medium
+difficulty: hard
 kind: code
 tags: [algorithms, sorting, stack, python, systemverilog]
 source: "LeetCode 853 (Car Fleet) ו-LeetCode 1776 (Car Fleet II)"

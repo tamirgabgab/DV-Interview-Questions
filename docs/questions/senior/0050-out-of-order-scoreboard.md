@@ -2,7 +2,7 @@
 id: 50
 title: Scoreboard לתשובות שלא לפי הסדר – תורים לפי ID
 level: senior
-difficulty: hard
+difficulty: medium
 kind: dv
 tags: [uvm, methodology, systemverilog, python, protocols]
 source: "שאלת ראיון לתפקידי אימות (ממשקים עם ID כמו AXI ו-PCIe tags)"

@@ -2,7 +2,7 @@
 id: 63
 title: המקסימום בחלון נע – deque, החלון הארוך עם max − min ≤ limit, ובחומרה
 level: junior
-difficulty: medium
+difficulty: hard
 kind: code
 tags: [algorithms, sliding-window, python, systemverilog]
 source: "שאלה קלאסית (Sliding Window Maximum), וסעיף ב הוא Longest Continuous Subarray With Absolute Diff Less Than or Equal to Limit"
