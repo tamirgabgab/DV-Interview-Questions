@@ -42,6 +42,14 @@ page whose styles and scripts together are over --code-warn KB (1400, a little a
 round 4 left: about 535 KB of styles and 800 KB of scripts on the heaviest question page)
 gets a warning, so a rule or a script that starts loading everywhere is seen.
 
+The line also gives the page's elements once it has loaded (before any block is opened), as
+Lighthouse counts its DOM size: every script that walks the page, and every layout, costs in
+proportion, about 4 s of style and layout at 21,000 elements on a slow phone (N11.1). A page
+over --dom-warn (8,000) gets a warning and one over --dom-fail (12,000) fails; most of a
+heavy page is its math (each formula is several elements per symbol), its tables and its
+figures, so a page that grows past the line gets fewer formulas (a plain number or a single
+letter as text), shorter tables or a smaller example.
+
 --axe PATH runs axe-core (its axe.min.js, e.g. from npm) on every page and warns about
 serious and critical violations without failing: the count per page is printed with the
 rule id and the first element, so the next accessibility regression is visible in the CI
@@ -93,8 +101,7 @@ WIDE_MATH = """async () => {
     const box = el.parentElement;            // div.arithmatex, the width of the column
     const over = el.getBoundingClientRect().width - box.clientWidth;
     if (box.clientWidth === 0 || over <= 1) continue;
-    const mml = el.querySelector("mjx-assistive-mml");
-    const text = (mml ? mml.textContent : el.textContent).replace(/\\s+/g, " ").trim();
+    const text = (el.getAttribute("aria-label") || el.textContent).replace(/\\s+/g, " ").trim();
     out.push(`+${Math.round(over)} px: ${text.slice(0, 60)}`);
   }
   return out;
@@ -247,6 +254,8 @@ def main(argv: list[str]) -> int:
     ap.add_argument("--local-cdn", action="store_true",
                     help="--offline with the CDN copies of .cache/cdn (tools/dev_setup.sh), axe-core included")
     ap.add_argument("--weight-warn", type=int, default=400, metavar="KB", help="warn about a page whose HTML is heavier than this (400)")
+    ap.add_argument("--dom-warn", type=int, default=8000, metavar="N", help="warn about a page with more elements than this once loaded (8000)")
+    ap.add_argument("--dom-fail", type=int, default=12000, metavar="N", help="fail a page with more elements than this once loaded (12000)")
     ap.add_argument("--code-warn", type=int, default=1400, metavar="KB",
                     help="warn about a page whose own styles and scripts together are heavier than this (1400)")
     ap.add_argument("--touch", action="store_true",
@@ -272,7 +281,8 @@ def main(argv: list[str]) -> int:
     shots.mkdir(parents=True, exist_ok=True)
     server, base = serve(site)
 
-    failures = warned = axe_pages = small_pages = heavy = heavy_code = 0
+    failures = warned = axe_pages = small_pages = heavy = heavy_code = dom_warned = 0
+    doms: list[tuple[int, str]] = []
     weights: list[tuple[float, str]] = []
     with sync_playwright() as pw:
         browser = pw.chromium.launch(executable_path=args.browser) if args.browser else pw.chromium.launch()
@@ -300,6 +310,7 @@ def main(argv: list[str]) -> int:
                 page.goto(url, wait_until="networkidle", timeout=60_000)
             except Exception as e:   # a CDN that never answers: check what has loaded
                 errors.append(f"load: {e}")
+            elements = page.evaluate("document.getElementsByTagName('*').length")
             page.evaluate(OPEN_ALL)
             page.wait_for_timeout(800)
             info = page.evaluate(INSPECT, WIDTH)
@@ -330,7 +341,8 @@ def main(argv: list[str]) -> int:
             page.close()
 
             too_big = big is not None and big["scrollWidth"] > WIDTH + 1
-            bad = info["scrollWidth"] > WIDTH + 1 or too_big or errors or covered or split or (args.axe_fail and axe) or (args.small_fail and small_text)
+            too_many = elements > args.dom_fail
+            bad = too_many or info["scrollWidth"] > WIDTH + 1 or too_big or errors or covered or split or (args.axe_fail and axe) or (args.small_fail and small_text)
             failures += bool(bad)
             status = "FAIL" if bad else "ok"
             html = (site / rel).read_text(encoding="utf-8")
@@ -343,7 +355,13 @@ def main(argv: list[str]) -> int:
             print(f"{status:4}  {rel[: -len('index.html')] or '/'}  width {info['scrollWidth']}  "
                   f"{html_kb:.0f} KB html{f' (+{math_kb:.0f} KB math)' if math_kb else ''}, "
                   f"{sum(n for _, n in fetched) / 1024:.0f} KB in {len(fetched)} requests "
-                  f"(styles {css_kb:.0f} KB, scripts {js_kb:.0f} KB)")
+                  f"(styles {css_kb:.0f} KB, scripts {js_kb:.0f} KB), {elements} elements")
+            doms.append((elements, rel[: -len("/index.html")] or "/"))
+            if too_many:
+                print(f"        too many elements: {elements}, over {args.dom_fail} (fewer formulas, shorter tables)")
+            elif elements > args.dom_warn:
+                dom_warned += 1
+                print(f"        warn many elements: {elements}, over {args.dom_warn}")
             if html_kb > args.weight_warn:
                 heavy += 1
                 print(f"        warn heavy page: {html_kb:.0f} KB of HTML, over {args.weight_warn} KB")
@@ -378,7 +396,8 @@ def main(argv: list[str]) -> int:
     print(f"{len(pages)} pages checked at {WIDTH} px ({args.scheme}), {failures} with problems, "
           f"{warned} with wide math warnings, {small_pages} with text under {MIN_TEXT} px, {axe_pages} with axe violations, "
           f"{heavy} over {args.weight_warn} KB of HTML (the heaviest: {heaviest}), "
-          f"{heavy_code} over {args.code_warn} KB of styles and scripts; screenshots in {shots}")
+          f"{heavy_code} over {args.code_warn} KB of styles and scripts, {dom_warned} over {args.dom_warn} elements "
+          f"(the most: {', '.join(f'{name} ({n})' for n, name in sorted(doms, reverse=True)[:3])}); screenshots in {shots}")
     return 1 if failures else 0
 
 

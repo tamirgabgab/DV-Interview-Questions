@@ -30,6 +30,7 @@ from __future__ import annotations
 import datetime as dt
 import html
 import json
+import os
 import posixpath
 import re
 import subprocess
@@ -206,6 +207,13 @@ CSS_BUNDLES = {True: "stylesheets/site-question.css", False: "stylesheets/site.c
 # the pages need no MathJax at all. The fonts still come from the CDN, as before.
 MATH_RENDER = Path(__file__).resolve().parent.parent / "tools" / "build" / "mathjax" / "render.js"
 MATH_CSS = "stylesheets/math.css"
+# The site's own scripts are minified in the built site (N11.3): esbuild (pinned in
+# tools/build/mathjax/package.json, installed by the same npm ci) rewrites every script of
+# site/javascripts/ in place, whitespace and comments only (no renaming), and leaves the
+# vendored and already minified files alone. docs/javascripts/ stays readable, and the Node
+# tests run the sources; the browser checks run the minified copies. Without esbuild (a
+# local build without npm ci) the scripts stay as written; in CI that is an error.
+ESBUILD = Path(__file__).resolve().parent.parent / "tools" / "build" / "mathjax" / "node_modules" / ".bin" / "esbuild"
 MATH_SPAN = re.compile(r'<(span|div) class="arithmatex">(.*?)</\1>', re.S)
 PAGE_SCRIPTS = {   # script -> the class names (or data- attributes) it acts on; it does nothing elsewhere
     "javascripts/question-filter.js": ("question-filter",),
@@ -2745,6 +2753,26 @@ def write_bundles(site: Path, docs: Path, site_path: str) -> None:
         (site / sheet).write_text(minify_css((docs / sheet).read_text(encoding="utf-8")), encoding="utf-8")
 
 
+def minify_scripts(site: Path) -> None:
+    """Minify the site's own scripts in place with esbuild (see ESBUILD)."""
+    root = site / "javascripts"
+    files = sorted(str(f.relative_to(root)) for f in root.rglob("*.js")
+                   if "vendor" not in f.relative_to(root).parts and not f.name.endswith(".min.js"))
+    if not files:
+        return
+    if not ESBUILD.exists():
+        if os.environ.get("CI"):
+            raise PluginError("esbuild is missing: run npm ci --prefix tools/build/mathjax")
+        print("questions hook: esbuild is not installed (npm ci --prefix tools/build/mathjax);"
+              " the scripts are not minified", file=sys.stderr)
+        return
+    run = subprocess.run([str(ESBUILD), *files, f"--outdir={root}", "--allow-overwrite", "--minify-whitespace",
+                          "--charset=utf8", "--legal-comments=none", "--log-level=error"],
+                         cwd=root, capture_output=True, text=True, encoding="utf-8", check=False)
+    if run.returncode:
+        raise PluginError(f"esbuild failed on the site's scripts: {run.stderr.strip()[-600:]}")
+
+
 def on_post_build(config, **kwargs):
     site, docs = Path(config["site_dir"]), Path(config["docs_dir"])
     not_found = site / "404.html"
@@ -2754,6 +2782,7 @@ def on_post_build(config, **kwargs):
         not_found.write_text(page_styles(output, False, marks, prefixes), encoding="utf-8")
     write_math(site, _site_path(config))
     write_bundles(site, docs, _site_path(config))
+    minify_scripts(site)
     order = sorted(_questions.values(), key=lambda q: q["id"])
     index_data = {"levels": LEVELS, "diffs": DIFFICULTIES, "kinds": KINDS,
                   "qs": [[q["id"], str(q["title"]), q["level"], q["difficulty"], q["kind"],

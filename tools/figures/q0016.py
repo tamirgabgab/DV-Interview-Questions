@@ -167,25 +167,26 @@ def rounds_table(n, L=2):
 # --- tables ------------------------------------------------------------------------------
 
 def survivors_table(N=16):
-    """L = 2: N, its binary form, N = 2^m + r and the survivor."""
-    lines = ["| ‏\\( N \\) | בבינארי | ‏\\( 2^m + r \\) | ‏\\( F(N) \\) |", "|---|---|---|---|"]
+    """L = 2: N, its binary form, N = 2^m + r (two plain columns, N11.1) and the survivor."""
+    lines = ["| ‏\\( N \\) | בבינארי | ‏\\( 2^m \\) | ‏\\( r \\) | ‏\\( F(N) \\) |", "|---|---|---|---|---|"]
     for n in range(1, N + 1):
         top = 1 << (n.bit_length() - 1)
-        lines.append(f"| {n} | ‏`{n:b}` | ‏\\( {top} + {n - top} \\) | **{survivor(n)}** |")
+        lines.append(f"| {n} | {n:b} | {top} | {n - top} | **{survivor(n)}** |")
     return "\n".join(lines)
 
 
 def values_table(L, ns, with_residue=False):
-    """L >= 3: N, (its residue,) the zero point M below it, the formula and the simulation,
-    for every N in ns (an int: 1 .. ns)."""
+    """L >= 3: N, (its residue,) the zero point M below it, N - M and the simulation, for
+    every N in ns (an int: 1 .. ns). The formula is the survivor times L / (L - 1), checked
+    here; plain numbers, not a formula per row (N11.1: the page's weight)."""
     ns = range(1, ns + 1) if isinstance(ns, int) else ns
-    frac = f"\\tfrac{{{L}}}{{{L - 1}}}"
-    head = ["‏\\( N \\)"] + (["‏\\( r \\)"] if with_residue else []) + ["‏\\( M \\)", f"‏\\( {frac}(N - M) \\)", "השורד"]
+    head = ["‏\\( N \\)"] + (["‏\\( r \\)"] if with_residue else []) + ["‏\\( M \\)", "‏\\( N - M \\)", "השורד"]
     lines = ["| " + " | ".join(head) + " |", "|" + "---|" * len(head)]
     for n in ns:
         M = zero_below(n, L)
+        assert formula(n, L) == survivor(n, L) == L * (n - M) // (L - 1)
         cells = [str(n)] + ([str(residue(n, L))] if with_residue else []) + \
-                [str(M), f"‏\\( {frac} \\cdot {n - M} = {formula(n, L)} \\)", f"**{survivor(n, L)}**"]
+                [str(M), str(n - M), f"**{survivor(n, L)}**"]
         lines.append("| " + " | ".join(cells) + " |")
     return "\n".join(lines)
 
@@ -224,10 +225,10 @@ def half_rule(n):
 
 
 def values3_table(N=20):
-    """L = 3, the table of part b: N, the zero point M below it on N's chain, the formula
-    and the simulation, then the digit rule: floor(N/2) in base 3, the digits subtracted
+    """L = 3, the table of part b: N, the zero point M below it on N's chain, N - M (the
+    survivor is 3/2 of it) and the simulation, then the digit rule: floor(N/2) in base 3, the digits subtracted
     (floor(M/2): 10..0 or 11..1) and the survivor in base 3 (the difference and a 0)."""
-    head = ["‏\\( N \\)", "‏\\( M \\)", "‏\\( \\tfrac{3}{2}(N - M) \\)", "השורד",
+    head = ["‏\\( N \\)", "‏\\( M \\)", "‏\\( N - M \\)", "השורד",
             "‏\\( \\lfloor N/2 \\rfloor \\) בבסיס 3", "מחסרים", "השורד בבסיס 3"]
     lines = ["| " + " | ".join(head) + " |", "|" + "---|" * len(head)]
     for n in range(1, N + 1):
@@ -235,8 +236,8 @@ def values3_table(N=20):
         half, c, diff = half_rule(n)
         F = formula(n, 3)
         assert F == survivor(n, 3)
-        lines.append(f"| {n} | {M} | ‏\\( \\tfrac{{3}}{{2}} \\cdot {n - M} = {F} \\) | **{F}** | "
-                     f"‏`{base3(half)}` | ‏`{base3(c)}` | ‏`{base3(F)}` |")
+        lines.append(f"| {n} | {M} | {n - M} | **{F}** | "
+                     f"{base3(half)} | {base3(c)} | {base3(F)} |")
     return "\n".join(lines)
 
 
@@ -258,12 +259,20 @@ def chart(L=2, N=40, step=4):
     p.append(f'<line class="ink-line" x1="{X(0.5):.1f}" y1="{Y(0):.1f}" x2="{X(N + 0.5):.1f}" y2="{Y(N):.1f}" '
              'stroke-width="1.2" stroke-dasharray="5 4"/>')
     vals = {n: survivor(n, L) for n in range(1, N + 1)}
-    for n in range(L, N + 1):                 # segments along a chain, except the drops
-        m = n - (L - 1)
-        if vals[n] > vals[m]:
-            cls = f"s{residue(n, L)}-line"
-            p.append(f'<line class="{cls}" x1="{X(m):.1f}" y1="{Y(vals[m]):.1f}" '
-                     f'x2="{X(n):.1f}" y2="{Y(vals[n]):.1f}" stroke-width="1.5"/>')
+    # One line from each zero point to the last N before the next drop: along a chain the
+    # survivor grows by L for every L - 1 people, so the points between are on it (one
+    # element instead of one per step, N11.1).
+    for r in range(1, L):
+        chain = list(range(r, N + 1, L - 1))
+        start = chain[0]
+        for a, b in zip(chain, chain[1:] + [None]):
+            if b is None or vals[b] <= vals[a]:
+                if a > start:
+                    p.append(f'<line class="s{r}-line" x1="{X(start):.1f}" y1="{Y(vals[start]):.1f}" '
+                             f'x2="{X(a):.1f}" y2="{Y(vals[a]):.1f}" stroke-width="1.5"/>')
+                start = b
+            else:
+                assert vals[b] - vals[a] == L     # the points between are on the line
     for n in range(1, N + 1):
         cls = "ink-dot" if vals[n] == 0 else f"s{residue(n, L)}-dot"
         p.append(f'<circle class="{cls}" cx="{X(n):.1f}" cy="{Y(vals[n]):.1f}" r="4.5"><title>N = {n}: {vals[n]}</title></circle>')

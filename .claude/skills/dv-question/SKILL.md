@@ -58,6 +58,12 @@ Propose, from `CONTRIBUTING.md` "How questions are organized":
 - **Time budget** (the owner's rule, 2026-11-20): easy 20 minutes, medium 40, hard 60. That
   sets the size: easy has one part, medium up to two, hard up to three; less code, and a
   secondary part is cut or moved to a follow-up rather than kept.
+- **Element budget** (the owner's rule, 2026-11-20): the built page stays under 8,000
+  elements once loaded; `check_phone.py` warns over 8,000 and fails over 12,000. Plan for it
+  from the start, since the heavy part is the math: a formula is about fifteen elements, a
+  fraction or a subscript twenty to thirty. Keep the parameters small (a table of 10 to 16
+  rows, not 40; a chart to 40 or 60, not 200; examples by hand of 5 to 20 people, cells or
+  bits), give a proof's check two or three examples, and see phase 5 for the writing.
 - **Slug** (lower-case English words joined by hyphens) and the **Hebrew title** (a title
   with " – " shows the rest as a subtitle).
 - **Code:** Python and SystemVerilog as linked tabs, Python first; pure RTL design may be
@@ -121,6 +127,18 @@ What makes the page good to study, not only valid:
   counterexample is best). **Follow-ups** are what the interviewer asks next, with short
   answers.
 
+Writing to the element budget (`CONTRIBUTING.md`, the weight paragraph of the phone check):
+
+- A single letter or a plain number that reads well as text stays text: "1, 2, 4, 8", a
+  digit string in a table cell, a list of zero points. Math is for expressions.
+- A table column of computed values holds the numbers, and the formula appears once, in
+  the column's header or in the sentence before the table, not as `\( \tfrac{3}{2} \cdot 4 = 6 \)`
+  in every row.
+- A display formula that only repeats the previous line, or a chain `a = b = \cdots = c`
+  whose middle the reader does not need, is shortened to its two ends.
+- A stepper's later frames are templates and cost nothing; a chart draws one line per
+  straight run, not one per step.
+
 RTL and typography rules that the checks enforce (all of them are in `CLAUDE.md`):
 
 - Every paragraph, heading, list item and table cell starts with a Hebrew word; a line that
@@ -182,6 +200,9 @@ Run, on the new page (`--only <id>` where the tool takes it), the checks of `CLA
 `check_jumps.py`, `check_inputs.py`, `check_keyboard.py`, `check_heights.py`, and
 `check_contrast.py` when colours were added. In the cloud sandbox pass
 `--browser <the pinned Chromium>` and `--local-cdn`.
+
+Read the element count on the page's line of the phone check: over 8,000, cut before the
+commit (phase 5's list); over 12,000 the CI fails.
 
 Then look at the page yourself (the `webapp-testing` skill's notes in
 `.claude/skills/README.md`): screenshots at 390 px and 1920 x 1080, light and dark, of the

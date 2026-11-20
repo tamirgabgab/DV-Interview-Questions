@@ -76,9 +76,13 @@ LINK_JS = ("html += n.file_type === 'document'"
            "לעמוד השאלה</a></div>`"
            " : `<div class=\"field\">${esc(n.source_file || '-')}</div>`;")
 
-# Hebrew labels: the canvas draws right to left, and every text in the side panel takes
+# Contrast (WCAG AA, 4.5:1): graphify's muted greys (#555 and #666 on the dark panel, #888
+# and #777 on the light one) are raised to #9a9ab0 (6.2:1 on #1a1a2e) and #5f6670 (5.6:1 on
+# #f8f9fa). Hebrew labels: the canvas draws right to left, and every text in the side panel takes
 # its direction from its first letter. Below 700 px the side panel moves under the graph.
 EXTRA_CSS = """
+  :root { --muted: #9a9ab0; --count: #9a9ab0; }
+  [data-theme="light"] { --muted: #5f6670; --count: #5f6670; }
   #graph { direction: rtl; }
   #info-content .field, .neighbor-link, .search-item, .legend-label { unicode-bidi: plaintext; text-align: start; }
   #map-head { padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 12px; color: var(--text-2); line-height: 1.5; direction: rtl; }
@@ -92,6 +96,8 @@ EXTRA_CSS = """
 """
 HEADER = ('<div id="map-head"><b>מפת השאלות</b>כל שאלה מחוברת לטכניקות שהפתרון שלה משתמש בהן.'
           ' לחיצה על שאלה מראה קישור לעמוד שלה. <a href="./">חזרה לאתר</a></div>')
+DESCRIPTION = ('\n<meta name="description" content="מפת השאלות של DV Interview Questions : כל שאלה'
+               ' מחוברת לטכניקות שהפתרון שלה משתמש בהן.">')
 
 
 def main() -> int:
@@ -110,7 +116,9 @@ def main() -> int:
     html = html.replace(SOURCE_JS, LINK_JS)
     html = html.replace("</style>", EXTRA_CSS + "</style>", 1)
     html = html.replace('<div id="sidebar">', '<div id="sidebar">' + HEADER, 1)
-    html = re.sub(r"<title>.*?</title>", "<title>מפת השאלות – DV Interview Questions</title>", html, count=1)
+    html = re.sub(r"<title>.*?</title>", "<title>מפת השאלות – DV Interview Questions</title>" + DESCRIPTION, html, count=1)
+    # The graph is the page's main content: a landmark for screen readers.
+    html = html.replace('<div id="graph"', '<div id="graph" role="main" aria-label="מפת השאלות"', 1)
     OUT.write_text(html, encoding="utf-8")
     print(f"{OUT.relative_to(ROOT)}: {G.number_of_nodes()} nodes, {G.number_of_edges()} edges,"
           f" {len(communities)} groups")

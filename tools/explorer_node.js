@@ -3,7 +3,8 @@
 const fs = require("fs");
 const path = require("path");
 
-const dir = path.join(__dirname, "..", "docs", "javascripts", "explorer");
+// DVQ_EXPLORER_DIR points the tests at another copy (the minified one in site/, N11.3).
+const dir = process.env.DVQ_EXPLORER_DIR || path.join(__dirname, "..", "docs", "javascripts", "explorer");
 require(path.join(dir, "core.js"));
 for (const file of fs.readdirSync(dir).sort()) {
   if (file.endsWith(".js") && file !== "core.js") require(path.join(dir, file));

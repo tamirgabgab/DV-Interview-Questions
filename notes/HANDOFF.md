@@ -707,6 +707,35 @@ redesign plan of 2026-10-16 and the proposal series six to eight, and items 112 
     pages. Every page is far under the skills' 1.5 MB budget. Findings, none fixed yet (N11
     in Open items).
 
+226. **N11 round 1: lighter pages, an element budget (session 35, 2026-11-20).** The owner
+    chose fixes 2, 3 and 1 of N11, all three ways for the big pages (scripts, content, the
+    hidden MathML), and a budget of 8,000 elements (warning) and 12,000 (failure), in the CI
+    and in the `dv-question` skill.
+    - **graph.html (N11.5):** `tools/build/graph.py` darkens the side panel's muted text
+      (6.2:1 dark, 5.6:1 light), gives the graph `role="main"` and adds a description.
+    - **Minified scripts (N11.3):** the hook runs esbuild 0.25.12 (pinned in
+      `tools/build/mathjax/package.json`) on `site/javascripts`, whitespace only (rjsmin
+      broke template literals); core.js 84 to 49 KB. The 1,070 explorer tests pass on the
+      built copies (`DVQ_EXPLORER_DIR`), and `check_explorers.py` on the minified site.
+    - **No hidden MathML (N11.1):** a formula was a CHTML drawing plus a MathML copy for
+      screen readers, about a quarter of a math page's elements. `render.js` now gives it
+      `role="img"` and a spoken `aria-label` (`speak()`), and finds an unknown macro by its
+      red text. Fixed on the way: a backslash before a line break crashed `speak()`.
+    - **Scripts (N11.1):** a trace of 0016 on a 4x slower CPU put most of its 4 to 5 s of
+      style and layout in scripts that measure between two changes: `layout()` of
+      reading-tools.js and `scrollableTables` of question-tools.js now measure everything
+      first and change after.
+    - **Steppers:** only the first frame is in the page, the later ones are `<template>`
+      elements that question-tools.js swaps in (12 pages regenerated; 0016's two circles
+      were 3,000 elements).
+    - **0016 content:** the tables show N − M (and 2^m, r) as numbers with the formula
+      once in the text, digits without code marks, shorter checks in two proofs, one chart
+      line per straight run. From 21,265 elements (16,080 without the MathML) to 11,889.
+    - **The budget:** `check_phone.py` counts each page's elements once loaded (before the
+      folds open): over `--dom-warn` 8000 a warning, over `--dom-fail` 12000 a failure,
+      the top three in the summary. `CONTRIBUTING.md` (the weight paragraph, the math
+      paragraph) and the skill's phases 3, 5 and 10 say how to write within it.
+
 ---
 
 ## In progress
@@ -723,7 +752,8 @@ redesign plan of 2026-10-16 and the proposal series six to eight, and items 112 
   `tools/page_tests.py`, the owner's suggestion); the UVM SystemVerilog is shown, not run. Round 2 of the four (224) made
   them shorter and gave each a box.
 - **Skills (225):** `dv-question` (a pasted conversation to a page), `webapp-testing` and the
-  six web-quality skills are on the branch; the weight audit's proposals are N11.
+  six web-quality skills are on the branch; the weight audit's proposals are N11, of which
+  1, 3 and 5 are done on the branch (226) with an element budget in the phone check.
 - **State:** `main` (f52c181, deployed 2026-11-20 19:34 Israel time) has rounds 1 to 10 and
   round 6's four DV questions 0112 to 0115 after their round 2 (115 questions); the CI ran
   every check on it. Next: the owner's look at 0112 to 0115 and their boxes.
@@ -739,22 +769,21 @@ redesign plan of 2026-10-16 and the proposal series six to eight, and items 112 
 
 ## Open items
 
-### N11, the weight audit's proposals (work log 225, waiting on the owner)
+### N11, the weight audit's proposals (work log 225; 1, 3 and 5 done in 226)
 
-1. **Big DOM from the math:** 0016 has 21,000 elements (623 formulas rendered at build time
-   as CHTML), 4 s of style and layout and 1.6 s of blocking on a simulated phone; 32 pages
-   are over 8,000 (0044, 0021, 0094, 0087, 0071, 0048, 0070 next). Options: numbers and
-   simple expressions as text instead of math, or `content-visibility: auto` on closed
-   solutions (check the jump and load-shift checks).
+1. **Big DOM from the math (done, 226):** every page is under 12,000 elements; 0016 is
+   11,889. Left: 14 pages between 8,000 and 10,450 (0094, 0044, 0087, 0021, 0070, 0069,
+   0071, 0101, 0068, 0013, 0048, 0052, 0096, 0095) warn; cut them when they are next
+   edited, with the rules of the weight paragraph in `CONTRIBUTING.md`.
 2. **The question stylesheet:** `site-question.css` is 60 KB gzip and about 87% of it is
    unused on a given page; a split by feature (code, figures, run panel, boxes) would save
    about 50 KB on a first visit (it is cached after that).
-3. **Unminified own scripts:** `explorer/core.js`, `reading-tools.js`, `question-tools.js`
+3. **Unminified own scripts (done, 226):** `explorer/core.js`, `reading-tools.js`, `question-tools.js`
    and the others, about 20 KB gzip to save with a minify step in the build.
 4. **Scripts at the end of the body delay the first paint** (Lighthouse counts about 1.8 s
    on a simulated phone). `defer` would let parts move while loading, against the
    "nothing moves" rule; only per script, with `check_jumps.py` and the load-shift check.
-5. **graph.html** (the map, written by graphify): text at 2.28:1 contrast in its side
+5. **graph.html (done, 226)** (the map, written by graphify): text at 2.28:1 contrast in its side
    panel, no `main` landmark, no meta description; a post-processing step in
    `tools/build/graph.py` can fix all three.
 6. **Code blocks with line numbers** are tables without a caption (axe

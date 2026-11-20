@@ -713,7 +713,10 @@ def test_render_math_with_mathjax():
         pytest.skip("no node or no mathjax@3.2.2 (npm ci --prefix tools/build/mathjax)")
     html, css = hook.render_math([("x_1^2 + \\sum_{i=1}^{n} i", False), ("\\frac{a}{b}", True)])
     assert len(html) == 2 and all(h.startswith('<mjx-container class="MathJax" jax="CHTML"') for h in html)
-    assert 'display="true"' in html[1] and "<mjx-assistive-mml" in html[0]
+    assert 'display="true"' in html[1] and "<mjx-assistive-mml" not in html[0]
+    # one image with a spoken label for screen readers, the glyphs hidden (N11.1)
+    assert 'role="img" aria-label="x_1^2 + sum _(i=1)^n i"' in html[0] and '<mjx-math class=" MJX-TEX" aria-hidden="true">' in html[0]
+    assert 'aria-label="a / b"' in html[1]
     assert "font-size: 123.4%" in css                     # the scale MathJax measured in the browser
     assert "\nmjx-msubsup > mjx-script, mjx-munderover > mjx-script {" in css and "\nmjx-script {" not in css
     assert "cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2/" in css

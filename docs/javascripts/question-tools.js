@@ -472,8 +472,14 @@
   // copies a deep link to the current step (#stepper-2-step-5 opens that step), and a swipe
   // on touch screens (left = forward on this RTL page, like the arrow keys).
   const STEP_HASH = /^#(stepper-\d+)-step-(\d+)$/;
+  // Only the first frame is in the page; the later ones wait in <template> elements (N11.1)
+  // and one frame at a time takes the place of the shown one.
   const stepper = (box, index) => {
-    const frames = Array.from(box.querySelectorAll(".stepper-frame"));
+    const frames = Array.from(box.querySelectorAll(".stepper-frame, template.stepper-later"))
+      .map((f) => (f.tagName === "TEMPLATE" ? f.content.firstElementChild : f));
+    box.querySelectorAll("template.stepper-later").forEach((t) => t.remove());
+    frames.slice(1).forEach((f) => f.remove());
+    let shown = frames[0];
     const prev = box.querySelector(".stepper-prev");
     const next = box.querySelector(".stepper-next");
     const pos = box.querySelector(".stepper-pos");
@@ -481,7 +487,13 @@
     let i = 0;
     const show = (k) => {
       i = Math.max(0, Math.min(frames.length - 1, k));
-      frames.forEach((f, j) => f.classList.toggle("is-active", j === i));
+      if (frames[i] !== shown) {
+        shown.classList.remove("is-active");
+        frames[i].classList.add("is-active");
+        shown.replaceWith(frames[i]);
+        shown = frames[i];
+        if (window.dvqDecorate) window.dvqDecorate(shown);   // the enlarge button of its figure
+      }
       prev.disabled = i === 0;
       next.disabled = i === frames.length - 1;
       pos.textContent = `צעד ${i + 1} מתוך ${frames.length}`;
@@ -543,27 +555,34 @@
   // more to scroll towards its start (right) or end (left) edge. Measured without the
   // class, as the plain table; a table shown as cards on a phone (data-cards) never
   // overflows. Wide code keeps its keyboard stop as before.
-  const tableFades = (w) => {
+  const fadesOf = (w) => {
     const max = w.scrollWidth - w.clientWidth, pos = Math.abs(w.scrollLeft);
-    w.classList.toggle("fade-s", max > 1 && pos > 1);
-    w.classList.toggle("fade-e", max > 1 && pos < max - 1);
+    return [max > 1 && pos > 1, max > 1 && pos < max - 1];
   };
+  const setFades = (w, [s, e]) => {
+    w.classList.toggle("fade-s", s);
+    w.classList.toggle("fade-e", e);
+  };
+  const tableFades = (w) => setFades(w, fadesOf(w));
+  // Every measure first, then every change, in rounds (N11.1): a measure between two changes
+  // makes the browser lay out the whole page again, once per table or code block on a long
+  // page.
   const scrollableTables = (article) => {
-    article.querySelectorAll(".md-typeset__scrollwrap, pre > code").forEach((w) => {
-      const code = w.tagName === "CODE";
-      if (code) {
-        if (w.scrollWidth > w.clientWidth + 1 && !w.hasAttribute("tabindex")) {
-          w.setAttribute("tabindex", "0");
-          w.setAttribute("role", "region");
-          w.setAttribute("aria-label", "קוד רחב, גלילה לרוחב");
-        }
-        return;
-      }
-      if (w.closest(".questions-wrap, .explorer") || !w.clientWidth) return;   // not shown: measured when its block opens
-      w.classList.remove("is-wide");
-      const wide = w.scrollWidth > w.clientWidth + 1;
-      w.classList.toggle("is-wide", wide);
-      if (wide) {
+    const all = Array.from(article.querySelectorAll(".md-typeset__scrollwrap, pre > code"));
+    const codes = all.filter((w) => w.tagName === "CODE" && !w.hasAttribute("tabindex"));
+    const wideCode = codes.filter((w) => w.scrollWidth > w.clientWidth + 1);
+    // not shown: measured when its block opens
+    const wraps = all.filter((w) => w.tagName !== "CODE" && !w.closest(".questions-wrap, .explorer") && w.clientWidth);
+    wideCode.forEach((w) => {
+      w.setAttribute("tabindex", "0");
+      w.setAttribute("role", "region");
+      w.setAttribute("aria-label", "קוד רחב, גלילה לרוחב");
+    });
+    wraps.forEach((w) => w.classList.remove("is-wide"));
+    const wide = wraps.map((w) => w.scrollWidth > w.clientWidth + 1);
+    wraps.forEach((w, i) => {
+      w.classList.toggle("is-wide", wide[i]);
+      if (wide[i]) {
         w.setAttribute("tabindex", "0");
         w.setAttribute("role", "region");
         w.setAttribute("aria-label", "טבלה רחבה, גלילה לרוחב");
@@ -574,8 +593,8 @@
       } else if (w.dataset.fades) {
         ["tabindex", "role", "aria-label"].forEach((at) => w.removeAttribute(at));
       }
-      tableFades(w);
     });
+    wraps.map(fadesOf).forEach((f, i) => setFades(wraps[i], f));
   };
 
   // Comments (giscus): follow the site's light / dark toggle.

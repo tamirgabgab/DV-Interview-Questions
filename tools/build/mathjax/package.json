@@ -3,6 +3,7 @@
   "private": true,
   "description": "MathJax for rendering the site's math at build time (render.js, called by hooks/questions.py)",
   "dependencies": {
+    "esbuild": "0.25.12",
     "mathjax": "3.2.2"
   }
 }

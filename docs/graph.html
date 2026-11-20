@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>מפת השאלות – DV Interview Questions</title>
+<meta name="description" content="מפת השאלות של DV Interview Questions : כל שאלה מחוברת לטכניקות שהפתרון שלה משתמש בהן.">
 <script src="https://unpkg.com/vis-network@9.1.6/standalone/umd/vis-network.min.js"
         integrity="sha384-Ux6phic9PEHJ38YtrijhkzyJ8yQlH8i/+buBR8s3mAZOJrP1gwyvAcIYl3GWtpX1"
         crossorigin="anonymous"></script>
@@ -58,6 +59,8 @@
   #theme-wrap button:hover { color: var(--text); }
   #theme-wrap button[aria-pressed="true"] { background: #4E79A7; border-color: #4E79A7; color: #fff; }
 
+  :root { --muted: #9a9ab0; --count: #9a9ab0; }
+  [data-theme="light"] { --muted: #5f6670; --count: #5f6670; }
   #graph { direction: rtl; }
   #info-content .field, .neighbor-link, .search-item, .legend-label { unicode-bidi: plaintext; text-align: start; }
   #map-head { padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 12px; color: var(--text-2); line-height: 1.5; direction: rtl; }
@@ -83,7 +86,7 @@
 </script>
 </head>
 <body>
-<div id="graph"></div>
+<div id="graph" role="main" aria-label="מפת השאלות"></div>
 <div id="sidebar"><div id="map-head"><b>מפת השאלות</b>כל שאלה מחוברת לטכניקות שהפתרון שלה משתמש בהן. לחיצה על שאלה מראה קישור לעמוד שלה. <a href="./">חזרה לאתר</a></div>
   <div id="theme-wrap" role="group" aria-label="Theme">
     <button type="button" data-theme-choice="light">Light</button>

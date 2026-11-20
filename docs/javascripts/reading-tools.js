@@ -511,21 +511,20 @@
     // counts the theme's padding around the table (a table 1 px narrower than the box
     // could still stick out by that padding), measured again once the fonts are in.
     const overflows = (wrap) => wrap && wrap.clientWidth && wrap.scrollWidth > wrap.clientWidth + 1;
+    // Each group is reset, then measured, then marked (N11.1): a measure between two changes
+    // makes the browser lay out the whole page again, once per table on a long page.
+    const wrapOf = (table) => table.closest(".md-typeset__scrollwrap");
     const layout = () => {
-      grids.forEach((table) => {
-        delete table.dataset.scrolls;
-        if (overflows(table.closest(".md-typeset__scrollwrap"))) table.dataset.scrolls = "";
-      });
-      wide.forEach((table) => {
-        delete table.dataset.cards;
-        if (overflows(table.closest(".md-typeset__scrollwrap"))) table.dataset.cards = "";
-      });
-      long.forEach((table) => {
-        const wrap = table.closest(".md-typeset__scrollwrap");
-        if (!wrap) return;
-        wrap.classList.remove("table-fits");
-        wrap.classList.toggle("table-fits", "cards" in table.dataset ? false : !overflows(wrap));
-      });
+      grids.forEach((table) => { delete table.dataset.scrolls; });
+      grids.map((table) => overflows(wrapOf(table)))
+        .forEach((over, i) => { if (over) grids[i].dataset.scrolls = ""; });
+      wide.forEach((table) => { delete table.dataset.cards; });
+      wide.map((table) => overflows(wrapOf(table)))
+        .forEach((over, i) => { if (over) wide[i].dataset.cards = ""; });
+      const wraps = long.map(wrapOf);
+      wraps.forEach((wrap) => { if (wrap) wrap.classList.remove("table-fits"); });
+      wraps.map((wrap, i) => wrap && ("cards" in long[i].dataset ? false : !overflows(wrap)))
+        .forEach((fits, i) => { if (wraps[i]) wraps[i].classList.toggle("table-fits", fits); });
     };
     layout();
     if (document.fonts) document.fonts.ready.then(layout);
