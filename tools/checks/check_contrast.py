@@ -650,6 +650,12 @@ PAIRS = [
     ("0108 kflip, the outline of a bit left 0", "var(--viz-s5)", [CARD, PAGE], UI),
     ("0108 kflip, the current cell, a hovered bit", "var(--viz-ink)", [CARD, PAGE], UI),
     ("0108 kflip, a closed or other window, the arrows", "var(--viz-text)", [CARD, PAGE], UI),
+    # 0111 falsepass (stylesheets/questions/0111-falsepass.css): the box's strip, the scoreboard's chips and the cards
+    ("0111 falsepass, a chip's item and cycle (an overwritten or a late item tinted), a value of out_data over an overwritten item's shade", "var(--viz-ink)", [CARD, PAGE] + [f"color-mix(in srgb, var(--viz-{h}) {k}%, var(--md-default-bg-color))" for h, k in (("s5", 24), ("s2", 16))], TEXT),
+    ("0111 falsepass, a chip's cycle, the empty list, the frame of the seed field", "var(--viz-text)", [CARD, PAGE], TEXT),
+    ("0111 falsepass, the error in the verdict and on the cards", "var(--diff-hard)", [CARD, PAGE], TEXT),
+    ("0111 falsepass, the frame of an overwritten item's chip and of its key", "var(--viz-s5)", [CARD, PAGE], UI),
+    ("0111 falsepass, the frame of a late item's chip, the cursor's key", "var(--viz-s2)", [CARD, PAGE], UI),
     # the question page of the UX round (session 34, 29-question-ux.css)
     ("box chip in the question header", "var(--act-line)", ["var(--act-tint)", CARD, PAGE], TEXT),
     ("box teaser, its note", "var(--md-default-fg-color--light)", [CARD, PAGE], TEXT),

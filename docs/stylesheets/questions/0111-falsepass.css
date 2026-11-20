@@ -1,0 +1,45 @@
+/* Question 0111, the passing test: the box of explorer/falsepass.js (fp-*). The waveform is
+   core.js's strip; an item that the broken slice overwrites is shaded on out_data in the
+   magenta-red of the palette, an error the bench prints is the strip's ✗, the cycle of the
+   cards is the strip's cursor. Under it, three cards: the scoreboard's list as chips (an item
+   that was overwritten tinted magenta-red, one past its bound orange), the assertion with
+   its cover and the stall cover, and the log so far. Colours from the palette only. */
+
+.md-typeset .explorer .fp-pos { display: inline-block; min-width: 7.5rem; }
+.md-typeset .explorer .fp-switches label { white-space: normal; }
+.md-typeset .explorer input.fp-seed { width: 4.8rem; margin-inline-start: 0.3rem; font: inherit; font-family: var(--md-code-font-family); font-size: 0.7rem; padding: 0 0.3rem; border: 1px solid var(--viz-text); border-radius: 0.2rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); }
+
+/* --- the strip ---------------------------------------------------------------------------- */
+.md-typeset .explorer .fp-strip svg .wv-mark { fill: var(--viz-s5); fill-opacity: 0.24; }
+.md-typeset .explorer .fp-strip svg { cursor: pointer; }
+.md-typeset .viz-legend .fp-key-lost { background: color-mix(in srgb, var(--viz-s5) 24%, var(--md-default-bg-color)); outline: 1px solid var(--viz-s5); outline-offset: -1px; }
+.md-typeset .viz-legend .fp-key-fail { background: var(--diff-hard-bg); outline: 2px solid var(--diff-hard); outline-offset: -2px; border-radius: 50%; }
+.md-typeset .viz-legend .fp-key-now { background: color-mix(in srgb, var(--viz-s2) 10%, var(--md-default-bg-color)); outline: 1.5px dashed var(--viz-s2); outline-offset: -1.5px; }
+
+/* --- the cards ---------------------------------------------------------------------------- */
+/* one column on a phone; two (the log under them, across) on a medium box; three on a wide
+   box, so the box fits one screen at 1920 x 1080 (the box's own width decides, not the window's) */
+.md-typeset .explorer[data-kind="falsepass"] { container-type: inline-size; }
+.md-typeset .explorer .fp-cards { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.5rem; margin-top: 0.5rem; }
+@container (min-width: 500px) {
+  .md-typeset .explorer .fp-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .md-typeset .explorer .fp-logcard { grid-column: 1 / -1; }
+}
+@container (min-width: 740px) {
+  .md-typeset .explorer .fp-cards { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1.1fr) minmax(0, 1fr); }
+  .md-typeset .explorer .fp-logcard { grid-column: auto; }
+}
+.md-typeset .explorer .fp-card { border: 1px solid var(--site-card-border); border-radius: 0.3rem; padding: 0.35rem 0.55rem; min-width: 0; font-size: 0.68rem; }
+.md-typeset .explorer .fp-card p { margin: 0.2em 0; }
+.md-typeset .explorer .fp-card p code { white-space: nowrap; }
+.md-typeset .explorer .fp-ctitle { font-weight: 700; }
+.md-typeset .explorer .fp-list { display: flex; flex-wrap: wrap; gap: 0.25rem; min-height: 2.1rem; align-content: flex-start; }
+.md-typeset .explorer .fp-item { display: inline-flex; flex-direction: column; align-items: center; min-width: 1.7rem; padding: 0.05rem 0.25rem; border: 1px solid var(--site-card-border); border-radius: 0.25rem; font-family: var(--md-code-font-family); line-height: 1.15; color: var(--viz-ink); }
+.md-typeset .explorer .fp-item b { font-size: 0.75rem; }
+.md-typeset .explorer .fp-item small { font-size: 0.6rem; color: var(--viz-text); }
+.md-typeset .explorer .fp-item.is-late { background: color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color)); border-color: var(--viz-s2); }
+.md-typeset .explorer .fp-item.is-lost { background: color-mix(in srgb, var(--viz-s5) 24%, var(--md-default-bg-color)); border-color: var(--viz-s5); }
+.md-typeset .explorer .fp-item:is(.is-late, .is-lost) small { color: var(--viz-ink); }
+.md-typeset .explorer .fp-empty { font-family: var(--md-code-font-family); color: var(--viz-text); align-self: center; }
+.md-typeset .explorer pre.fp-log { margin: 0.2em 0 0; padding: 0.3rem 0.45rem; max-height: 10em; overflow: auto; background: var(--md-code-bg-color); color: var(--md-code-fg-color); font-size: 0.62rem; line-height: 1.45; white-space: pre-wrap; overflow-wrap: anywhere; border-radius: 0.2rem; }
+.md-typeset .explorer pre.fp-log:focus-visible { outline: 2px solid var(--site-focus-ring); outline-offset: 2px; }
