@@ -664,6 +664,13 @@ PAIRS = [
     ("0111 falsepass, the error in the verdict and on the cards", "var(--diff-hard)", [CARD, PAGE], TEXT),
     ("0111 falsepass, the frame of an overwritten item's chip and of its key", "var(--viz-s5)", [CARD, PAGE], UI),
     ("0111 falsepass, the frame of a late item's chip, the cursor's key", "var(--viz-s2)", [CARD, PAGE], UI),
+    # 0114 seqarb (stylesheets/questions/0114-seqarb.css): the slot line, the queue card and the why line
+    ("0114 seqarb, an item of I in the slot line, the chosen request in the queue", "var(--viz-ink)", [CARD, PAGE] + [f"color-mix(in srgb, var(--viz-{h}) {k}%, var(--md-default-bg-color))" for h, k in (("s5", 24), ("s2", 16))], TEXT),
+    ("0114 seqarb, an empty slot, the lock holder's line", "var(--viz-text)", [CARD, PAGE], TEXT),
+    ("0114 seqarb, I's items apart or in a row in the summary", "var(--diff-hard)", [CARD, PAGE], TEXT),
+    ("0114 seqarb, I's items in a row in the summary", "var(--diff-easy)", [CARD, PAGE], TEXT),
+    ("0114 seqarb, the frame of a lock or grab request, a request blocked by the lock", "var(--viz-s5)", [CARD, PAGE], UI),
+    ("0114 seqarb, the frame of the current slot", "var(--viz-s2)", [CARD, PAGE], UI),
     # the question page of the UX round (session 34, 29-question-ux.css)
     ("box chip in the question header", "var(--act-line)", ["var(--act-tint)", CARD, PAGE], TEXT),
     ("box teaser, its note", "var(--md-default-fg-color--light)", [CARD, PAGE], TEXT),
