@@ -695,10 +695,9 @@ redesign plan of 2026-10-16 and the proposal series six to eight, and items 112 
   sampling race. Their Python is cocotb with pyuvm on Verilator (`run_cocotb` in
   `tools/page_tests.py`, the owner's suggestion); the UVM SystemVerilog is shown, not run. Round 2 of the four (224) made
   them shorter and gave each a box.
-- **State:** `main` (5c71e11, deployed 2026-11-20 13:04 Israel time) has rounds 1 to 5 and
-  7 and the pilot of round 6 (111 questions, 204 boxes); the live site was checked at 390
-  and 1440 px in both schemes (built math, 0110, 0111, the home page). Next: the owner's
-  look at 0110 and 0111 before the rest of round 6, then rounds 8 and 9.
+- **State:** `main` (f52c181, deployed 2026-11-20 19:34 Israel time) has rounds 1 to 10 and
+  round 6's four DV questions 0112 to 0115 after their round 2 (115 questions); the CI ran
+  every check on it. Next: the owner's look at 0112 to 0115 and their boxes.
 - **Waiting on the owner:** the
   Search Console verification code (N3.4); a try of a box's number field and of the lists' filter on an
   iPhone (the page must not zoom on focus, N6.8); YouTube links of the videos made in the owner's other project
