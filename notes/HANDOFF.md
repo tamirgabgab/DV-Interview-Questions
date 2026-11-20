@@ -759,9 +759,10 @@ redesign plan of 2026-10-16 and the proposal series six to eight, and items 112 
 - **Skills (225):** `dv-question` (a pasted conversation to a page), `webapp-testing` and the
   six web-quality skills are on the branch; the weight audit's proposals are N11, of which
   1, 3 and 5 are done on the branch (226) with an element budget in the phone check.
-- **State:** `main` (f52c181, deployed 2026-11-20 19:34 Israel time) has rounds 1 to 10 and
-  round 6's four DV questions 0112 to 0115 after their round 2 (115 questions); the CI ran
-  every check on it. Next: the owner's look at 0112 to 0115 and their boxes.
+- **State:** `main` (fd1ec26, deployed 2026-11-20 23:00 Israel time) has rounds 1 to 10,
+  round 6's four DV questions 0112 to 0115 after their round 2 (115 questions), the skills
+  (225), N11 round 1 (226, deployed 22:47 after a full CI run on `main`) and the
+  full-width solution button; the CI ran every check on it. Next: the owner's look at 0112 to 0115 and their boxes.
 - **Waiting on the owner:** the
   Search Console verification code (N3.4); a try of a box's number field and of the lists' filter on an
   iPhone (the page must not zoom on focus, N6.8); YouTube links of the videos made in the owner's other project
