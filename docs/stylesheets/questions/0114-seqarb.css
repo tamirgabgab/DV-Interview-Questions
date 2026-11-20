@@ -1,0 +1,34 @@
+/* Question 0114, the sequencer's arbitration: the box of explorer/seqarb.js (sa-*). A line of
+   slots, left to right, with the item the driver got in each (I's items tinted in the
+   magenta-red of the palette, the slot of the card outlined in orange, the slots not reached
+   yet empty); a card with the queue before the choice as chips (the chosen request tinted
+   orange, a request a lock holds back dashed and dim, a lock or grab request outlined in
+   magenta-red) and the lock; the slot's explanation under it. Colours from the palette only. */
+
+.md-typeset .explorer .sa-pos { display: inline-block; min-width: 7.5rem; }
+.md-typeset .explorer .sa-set select { font: inherit; font-size: 0.7rem; }
+
+/* --- the line of slots -------------------------------------------------------------------- */
+.md-typeset .explorer .sa-line { display: grid; grid-template-columns: repeat(var(--sa-slots, 17), minmax(0, 1fr)); gap: 0.15rem; margin: 0.5rem 0 0.3rem; cursor: pointer; }
+.md-typeset .explorer .sa-cell { display: flex; flex-direction: column; align-items: center; min-width: 0; padding: 0.1rem 0; border: 1px solid var(--site-card-border); border-radius: 0.2rem; font-family: var(--md-code-font-family); line-height: 1.2; color: var(--viz-ink); }
+.md-typeset .explorer .sa-cell small { font-size: 0.55rem; color: var(--viz-text); }
+.md-typeset .explorer .sa-cell b { font-size: 0.66rem; min-height: 1.2em; }
+.md-typeset .explorer .sa-cell.is-future b { visibility: hidden; }
+.md-typeset .explorer .sa-cell.is-i { background: color-mix(in srgb, var(--viz-s5) 24%, var(--md-default-bg-color)); border-color: var(--viz-s5); }
+.md-typeset .explorer .sa-cell.is-i small { color: var(--viz-ink); }
+.md-typeset .explorer .sa-cell.is-now { outline: 2px solid var(--viz-s2); outline-offset: -1px; }
+.md-typeset .viz-legend .sa-key-i { background: color-mix(in srgb, var(--viz-s5) 24%, var(--md-default-bg-color)); outline: 1px solid var(--viz-s5); outline-offset: -1px; }
+.md-typeset .viz-legend .sa-key-now { background: var(--md-default-bg-color); outline: 2px solid var(--viz-s2); outline-offset: -2px; }
+
+/* --- the card of the queue ---------------------------------------------------------------- */
+.md-typeset .explorer .sa-card { border: 1px solid var(--site-card-border); border-radius: 0.3rem; padding: 0.35rem 0.55rem; margin-top: 0.5rem; min-width: 0; font-size: 0.68rem; }
+.md-typeset .explorer .sa-card p { margin: 0.2em 0; }
+.md-typeset .explorer .sa-ctitle { font-weight: 700; }
+.md-typeset .explorer .sa-queue { display: flex; flex-wrap: wrap; gap: 0.25rem; min-height: 1.7rem; align-content: flex-start; }
+.md-typeset .explorer .sa-req { display: inline-flex; align-items: baseline; gap: 0.15rem; padding: 0.1rem 0.35rem; border: 1px solid var(--site-card-border); border-radius: 0.25rem; font-family: var(--md-code-font-family); font-size: 0.72rem; color: var(--viz-ink); }
+.md-typeset .explorer .sa-req small { font-size: 0.58rem; color: var(--viz-text); }
+.md-typeset .explorer .sa-req.is-pick { background: color-mix(in srgb, var(--viz-s2) 16%, var(--md-default-bg-color)); border-color: var(--viz-s2); font-weight: 700; }
+.md-typeset .explorer .sa-req.is-pick small { color: var(--viz-ink); }
+.md-typeset .explorer .sa-req.is-blocked { border-style: dashed; color: var(--viz-text); }
+.md-typeset .explorer .sa-req.is-lockreq { border-color: var(--viz-s5); border-width: 1.5px; }
+.md-typeset .explorer .sa-empty { font-family: var(--md-code-font-family); color: var(--viz-text); align-self: center; }
