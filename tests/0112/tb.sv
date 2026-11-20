@@ -1,8 +1,22 @@
 //@flags --timing
-// Question 0112: the page's DUT on its own, without cocotb: items with a right and a wrong
-// parity bit on both channels, and items with valid low (never counted). The counters must
-// count exactly the valid items whose bit was wrong, each channel on its own.
-//@page module parity_rx (
+// Question 0112: the DUT the page describes (test_0112.py takes it from here for the pyuvm
+// runs) and a test of it on its own, without cocotb: items with a right and a wrong parity
+// bit on both channels, and items with valid low (never counted). The counters must count
+// exactly the valid items whose bit was wrong, each channel on its own.
+
+module parity_rx (
+  input  logic       clk,
+  input  logic       valid0, valid1,
+  input  logic [7:0] data0, data1,
+  input  logic       par0, par1,      // even parity: ^data
+  output logic [7:0] errs0 = 0,       // items whose parity bit was wrong
+  output logic [7:0] errs1 = 0
+);
+  always_ff @(posedge clk) begin
+    if (valid0 && par0 != ^data0) errs0 <= errs0 + 1;
+    if (valid1 && par1 != ^data1) errs1 <= errs1 + 1;
+  end
+endmodule
 
 module tb;
   logic       clk = 0, valid0 = 0, valid1 = 0, par0 = 0, par1 = 0;

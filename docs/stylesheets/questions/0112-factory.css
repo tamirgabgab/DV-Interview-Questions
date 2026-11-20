@@ -1,0 +1,43 @@
+/* Question 0112, the factory override that did not take: the box of explorer/factory.js
+   (fo-*). The component tree is drawn as the page's UVM figures are: containers for the
+   test, env and the agents, boxes for the sequencers and the drivers; a component built as
+   ErrDriver is filled as the DUT of those figures, one built with new has a dashed border,
+   one not built yet a dashed grid-coloured one, and the component of the step is outlined
+   in the first series colour. Beside the tree (under it on a phone): the step's line and a
+   card with the factory's table, what it checked, and the log. Colours from the palette only. */
+
+.md-typeset .explorer .fo-lines label, .md-typeset .explorer .fo-ovr label { white-space: nowrap; }
+.md-typeset .explorer input.fo-path { width: 11rem; max-width: 100%; margin-inline-start: 0.3rem; font: inherit; font-family: var(--md-code-font-family); font-size: 0.7rem; padding: 0 0.3rem; border: 1px solid var(--viz-text); border-radius: 0.2rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); }
+.md-typeset .explorer input.fo-path:disabled { border-style: dashed; color: var(--viz-text); }
+.md-typeset .explorer .fo-bad { color: var(--diff-hard); font-size: 0.68rem; }
+.md-typeset .explorer .fo-pos { display: inline-block; min-width: 5.5rem; }
+.md-typeset .explorer .fo-mono { font-family: var(--md-code-font-family); font-size: 0.92em; unicode-bidi: isolate; overflow-wrap: anywhere; }
+
+/* --- the tree ------------------------------------------------------------------------------ */
+.md-typeset .explorer .fo-fig svg.fo-tree { display: block; width: 100%; max-width: 27rem; height: auto; margin: 0.3rem auto 0; }
+.md-typeset .explorer svg.fo-tree .fo-node rect { fill: var(--md-default-bg-color); stroke: var(--viz-ink); stroke-width: 1.6; }
+.md-typeset .explorer svg.fo-tree .fo-node.is-cont rect { fill: none; stroke: var(--viz-grid); stroke-width: 1.5; }
+.md-typeset .explorer svg.fo-tree .fo-node.is-todo rect { stroke: var(--viz-grid); stroke-dasharray: 3 3; }
+.md-typeset .explorer svg.fo-tree .fo-node.is-new rect { stroke-dasharray: 7 4; }
+.md-typeset .explorer svg.fo-tree .fo-node.is-err rect { fill: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); stroke: var(--viz-s2); stroke-width: 2.5; }
+.md-typeset .explorer svg.fo-tree .fo-node.is-now rect { stroke: var(--viz-s1); stroke-width: 3.5; }
+.md-typeset .explorer svg.fo-tree .fo-node.is-cont.is-now rect { stroke-width: 2.5; }
+.md-typeset .explorer svg.fo-tree text { font-family: var(--md-code-font-family); }
+.md-typeset .explorer svg.fo-tree .fo-name { fill: var(--viz-text); font-size: 12px; }
+.md-typeset .explorer svg.fo-tree .is-leaf .fo-name { fill: var(--viz-ink); font-size: 13px; }
+.md-typeset .explorer svg.fo-tree .fo-cls { fill: var(--viz-ink); font-size: 13px; font-weight: 700; }
+.md-typeset .explorer svg.fo-tree .is-cont .fo-cls { font-size: 12px; }
+.md-typeset .viz-legend .fo-key-err { background: color-mix(in srgb, var(--viz-s2) 22%, var(--md-default-bg-color)); outline: 2px solid var(--viz-s2); outline-offset: -2px; }
+.md-typeset .viz-legend .fo-key-new { background: transparent; outline: 1.5px dashed var(--viz-ink); outline-offset: -1.5px; }
+.md-typeset .viz-legend .fo-key-now { background: transparent; outline: 2.5px solid var(--viz-s1); outline-offset: -2.5px; }
+.md-typeset .viz-legend .fo-key-todo { background: transparent; outline: 1.5px dashed var(--viz-grid); outline-offset: -1.5px; }
+
+/* --- the step and the card ----------------------------------------------------------------- */
+.md-typeset .explorer .fo-now { margin: 0.4em 0; }
+.md-typeset .explorer .fo-card { border: 1px solid var(--site-card-border); border-radius: 0.3rem; padding: 0.35rem 0.55rem; min-width: 0; font-size: 0.68rem; }
+.md-typeset .explorer .fo-card p { margin: 0.2em 0; }
+.md-typeset .explorer .fo-ctitle { font-weight: 700; }
+.md-typeset .explorer .fo-ctitle:not(:first-child) { margin-top: 0.5em; }
+.md-typeset .explorer .fo-checks { min-height: 4.2em; }
+.md-typeset .explorer pre.fo-log { margin: 0.2em 0 0; padding: 0.3rem 0.45rem; background: var(--md-code-bg-color); color: var(--md-code-fg-color); font-size: 0.62rem; line-height: 1.45; white-space: pre-wrap; overflow-wrap: anywhere; border-radius: 0.2rem; }
+.md-typeset .explorer pre.fo-log:focus-visible { outline: 2px solid var(--site-focus-ring); outline-offset: 2px; }
