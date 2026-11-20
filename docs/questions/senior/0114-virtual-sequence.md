@@ -259,94 +259,54 @@ FAIL   AssertionError: packets were lost or changed
 
     #### הקוד { .sol-code }
 
-    === "Python"
-        ```python title="Pause, PausableTraffic, RekeyVseqFixed" linenums="1" hl_lines="7 8 9 12 14 28 38 40"
-        class Pause:
-            """A stop between two packets, asked for by the virtual sequence."""
-            def __init__(self):
-                self.requested, self.stopped, self.resumed = False, Event(), Event()
+    ```python title="Pause, PausableTraffic, RekeyVseqFixed" linenums="1" hl_lines="7 8 9 12 14 28 38 40"
+    class Pause:
+        """A stop between two packets, asked for by the virtual sequence."""
+        def __init__(self):
+            self.requested, self.stopped, self.resumed = False, Event(), Event()
 
-            async def boundary(self):          # the traffic, before each packet
-                if self.requested:
-                    self.stopped.set()
-                    await self.resumed.wait()
+        async def boundary(self):          # the traffic, before each packet
+            if self.requested:
+                self.stopped.set()
+                await self.resumed.wait()
 
-            async def request(self):           # returns when the traffic stopped
-                self.requested = True
-                self.resumed.clear()
-                await self.stopped.wait()
+        async def request(self):           # returns when the traffic stopped
+            self.requested = True
+            self.resumed.clear()
+            await self.stopped.wait()
 
-            def resume(self):
-                self.requested = False
-                self.stopped.clear()
-                self.resumed.set()
-
-
-        class PausableTraffic(TrafficSeq):
-            def __init__(self, name, pause):
-                super().__init__(name)
-                self.pause = pause
-
-            async def send(self, k):
-                await self.pause.boundary()
-                await super().send(k)
+        def resume(self):
+            self.requested = False
+            self.stopped.clear()
+            self.resumed.set()
 
 
-        class RekeyVseqFixed(uvm_sequence):
-            async def body(self):
-                seqr, pause = self.sequencer, Pause()
-                await ConfigSeq("boot").start(seqr.reg_seqr)
-                traffic = cocotb.start_soon(PausableTraffic("traffic", pause).start(seqr.pkt_seqr))
-                await ClockCycles(cocotb.top.clk, REKEY_AT)
-                await pause.request()                    # (1)!
-                await ConfigSeq("rekey", [(KEY, 0xC3)]).start(seqr.reg_seqr)
-                pause.resume()
-                await traffic
-        ```
+    class PausableTraffic(TrafficSeq):
+        def __init__(self, name, pause):
+            super().__init__(name)
+            self.pause = pause
 
-        1. הבקשה במחזור 16. חבילה 3 עוד באמצע, והקריאה חוזרת רק אחרי הבייט האחרון שלה.
+        async def send(self, k):
+            await self.pause.boundary()
+            await super().send(k)
 
-    === "SystemVerilog"
-        ```systemverilog title="pause_c, pausable_traffic, rekey_vseq_fixed" linenums="1" hl_lines="4 7 8 17 33 35"
-        class pause_c;
-          bit requested, stopped;
-          task boundary();                       // the traffic, before each packet
-            if (requested) begin stopped = 1; wait (!requested); end
-          endtask
-          task request();                        // returns when the traffic stopped
-            requested = 1;
-            wait (stopped);
-          endtask
-          function void resume(); requested = 0; stopped = 0; endfunction
-        endclass
 
-        class pausable_traffic extends traffic_seq;
-          `uvm_object_utils(pausable_traffic)
-          pause_c pause;
-          function new(string name = "pausable_traffic"); super.new(name); endfunction
-          task send(int k); pause.boundary(); super.send(k); endtask   // virtual in traffic_seq
-        endclass
+    class RekeyVseqFixed(uvm_sequence):
+        async def body(self):
+            seqr, pause = self.sequencer, Pause()
+            await ConfigSeq("boot").start(seqr.reg_seqr)
+            traffic = cocotb.start_soon(PausableTraffic("traffic", pause).start(seqr.pkt_seqr))
+            await ClockCycles(cocotb.top.clk, REKEY_AT)
+            await pause.request()                    # (1)!
+            await ConfigSeq("rekey", [(KEY, 0xC3)]).start(seqr.reg_seqr)
+            pause.resume()
+            await traffic
+    ```
 
-        class rekey_vseq_fixed extends rekey_vseq;
-          `uvm_object_utils(rekey_vseq_fixed)
-          function new(string name = "rekey_vseq_fixed"); super.new(name); endfunction
-          task body();
-            pause_c          pause   = new();
-            config_seq       boot    = config_seq::type_id::create("boot");
-            config_seq       rekey   = config_seq::type_id::create("rekey");
-            pausable_traffic traffic = pausable_traffic::type_id::create("traffic");
-            traffic.pause = pause;
-            rekey.writes  = '{'{KEY, 8'hC3}};
-            boot.start(p_sequencer.reg_seqr, this);
-            fork traffic.start(p_sequencer.pkt_seqr, this); join_none
-            #(rekey_at * 10ns);
-            pause.request();
-            rekey.start(p_sequencer.reg_seqr, this);
-            pause.resume();
-            wait fork;
-          endtask
-        endclass
-        ```
+    1. הבקשה במחזור 16. חבילה 3 עוד באמצע, והקריאה חוזרת רק אחרי הבייט האחרון שלה.
+
+    ב-SystemVerilog המבנה זהה : ‏`pause_c` עם שני ביטים, ‏`wait (stopped)` ו-`wait (!requested)` במקום
+    ה-`Event`, ו-`send` של `traffic_seq` מוגדר `virtual` כדי שהמחלקה הנגזרת תעקוף אותו.
 
     #### למה זה נכון { .sol-proof }
 

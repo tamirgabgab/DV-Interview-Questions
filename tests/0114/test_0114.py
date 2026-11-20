@@ -288,19 +288,16 @@ def test_sv_boot_vseq():
 
 
 def test_sv_rekey():
-    bug, fix = sv("class rekey_vseq extends"), sv("class pause_c")
+    # part b's fix is shown in Python only (the owner, 2026-11-20); the SV bug is still checked
+    bug = sv("class rekey_vseq extends")
     p_bug, p_fix = py("class RekeyVseq("), py("class Pause:")
     assert "int rekey_at = 10;" in bug
     assert order_of(bug, "boot.start(", "traffic.start(", "#(rekey_at * 10ns);", "rekey.start(", "wait fork;")
     assert order_of(p_bug, 'ConfigSeq("boot")', "TrafficSeq(", "ClockCycles(", 'ConfigSeq("rekey", [(KEY, 0xC3)])')
-    assert "'{'{KEY, 8'hC3}}" in bug and "'{'{KEY, 8'hC3}}" in fix
-    for name in ("task boundary();", "task request();", "function void resume();"):
-        assert name in fix
+    assert "'{'{KEY, 8'hC3}}" in bug
     for name in ("async def boundary(self):", "async def request(self):", "def resume(self):"):
         assert name in p_fix
-    assert order_of(fix, "pause.boundary();", "super.send(k);")
     assert order_of(p_fix, "await self.pause.boundary()", "await super().send(k)")
-    assert order_of(fix, "#(rekey_at * 10ns);", "pause.request();", "rekey.start(", "pause.resume();", "wait fork;")
     assert order_of(p_fix, "ClockCycles(", "await pause.request()", 'ConfigSeq("rekey"', "pause.resume()", "await traffic")
 
 

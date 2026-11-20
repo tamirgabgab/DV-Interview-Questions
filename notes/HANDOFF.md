@@ -673,8 +673,8 @@ redesign plan of 2026-10-16 and the proposal series six to eight, and items 112 
       when it is set; a JS glob checked against `fnmatch`), 784 px at 1920.
     - 0113: 781 -> 354 lines, two parts (the old part c is test-only code now); box `objrun`
       (17 falling edges, the objections, a drain slider, the end lines), 918 px.
-    - 0114: 1018 -> 517 lines, three parts (still over the 450 aimed at: the next cuts would
-      be part b's SV fix or part a's waveform, offered to the owner); box `seqarb` (one
+    - 0114: 1018 -> 477 lines, three parts (part b's fix is in Python only, with a sentence on
+      the SystemVerilog, the owner's choice; its test checks the SV bug only); box `seqarb` (one
       sequencer, FIFO or STRICT_FIFO, a priority, lock or grab, slot by slot), 522 px.
     - 0115: 511 -> 240 lines, two parts; box `edgerace` (ten cycles event by event in the
       scheduling regions, SystemVerilog or cocotb; 32 of its SV choices run in Verilator as
