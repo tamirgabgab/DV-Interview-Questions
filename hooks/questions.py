@@ -87,6 +87,7 @@ TOPICS = {
     "combinatorics": "קומבינטוריקה",
     "constraints": "אילוצים",
     "coverage": "כיסוי",
+    "debug": "דיבאג",
     "digital-design": "תכן דיגיטלי",
     "digital-logic": "לוגיקה ספרתית",
     "digits": "ספרות",
