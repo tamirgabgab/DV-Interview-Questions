@@ -89,7 +89,8 @@ Round 8 (0036) stays on the recommended model; round 9 is safe on the cheaper on
   0110 (RTL bugs, junior) and 0111 (a passing test over a broken DUT, senior). Then the
   owner chose four of eleven proposals (2026-11-20): 0112 factory override, 0113 phases
   and objections, 0114 virtual sequence, 0115 a monitor's sampling race, with the Python in
-  cocotb and pyuvm.
+  cocotb and pyuvm (work log 222). Then shortened to a time budget (easy 20 minutes, medium
+  40, hard 60) with a simulation box each (work log 224).
 
 ### Round 7. Grading and wording
 

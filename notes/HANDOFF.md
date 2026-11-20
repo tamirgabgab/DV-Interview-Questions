@@ -660,6 +660,26 @@ redesign plan of 2026-10-16 and the proposal series six to eight, and items 112 
     - 0066 intervals 1002 / 1087 -> 916 / 992: the timeline at 23rem, a five-line code
       window, no variables line, and the summary without the ranges (the figure shows them).
 
+224. **Round 6, the four DV questions shortened, a box each (session 35, 2026-11-20).** The
+    owner: a question must be answerable in reasonable time (easy 20 minutes, medium 40, hard
+    60), with less code and fewer parts (medium two, hard three), and a simulation box per
+    question. Four agents, one per page in worktrees; the session merged their branches and
+    added the shared lines (the stylesheets in `mkdocs.yml`, the colour pairs, the kinds in
+    CONTRIBUTING.md). Each page's full environment moved to `tests/<id>/env.py` / `env.sv`
+    (and the DUT to `tb.sv` or its own file); the tests put the page's blocks into it, so the
+    page code still runs as published, and every number on the page is still checked.
+    - 0112: 696 -> 323 lines, two parts; box `factory` (the component tree built one
+      component at a time, `new` or `create` per line, type or instance override, the path,
+      when it is set; a JS glob checked against `fnmatch`), 784 px at 1920.
+    - 0113: 781 -> 354 lines, two parts (the old part c is test-only code now); box `objrun`
+      (17 falling edges, the objections, a drain slider, the end lines), 918 px.
+    - 0114: 1018 -> 517 lines, three parts (still over the 450 aimed at: the next cuts would
+      be part b's SV fix or part a's waveform, offered to the owner); box `seqarb` (one
+      sequencer, FIFO or STRICT_FIFO, a priority, lock or grab, slot by slot), 522 px.
+    - 0115: 511 -> 240 lines, two parts; box `edgerace` (ten cycles event by event in the
+      scheduling regions, SystemVerilog or cocotb; 32 of its SV choices run in Verilator as
+      one parameterized bench, the two "DUT first" orders come from the model only), 780 px.
+
 ---
 
 ## In progress
@@ -673,7 +693,8 @@ redesign plan of 2026-10-16 and the proposal series six to eight, and items 112 
   goes on with four questions the owner chose (2, 3, 4 and 10 of the proposals): 0112
   factory override, 0113 phases and objections, 0114 virtual sequence, 0115 a monitor's
   sampling race. Their Python is cocotb with pyuvm on Verilator (`run_cocotb` in
-  `tools/page_tests.py`, the owner's suggestion); the UVM SystemVerilog is shown, not run.
+  `tools/page_tests.py`, the owner's suggestion); the UVM SystemVerilog is shown, not run. Round 2 of the four (224) made
+  them shorter and gave each a box.
 - **State:** `main` (5c71e11, deployed 2026-11-20 13:04 Israel time) has rounds 1 to 5 and
   7 and the pilot of round 6 (111 questions, 204 boxes); the live site was checked at 390
   and 1440 px in both schemes (built math, 0110, 0111, the home page). Next: the owner's
