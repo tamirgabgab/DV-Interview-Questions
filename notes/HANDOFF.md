@@ -618,6 +618,35 @@ redesign plan of 2026-10-16 and the proposal series six to eight, and items 112 
       `.bx-rounds` / `.bx-sum` (0009), `.an-notes` (0025, 0024), `.cr-top` / `.cr-free`
       (0024), `.wt-top` (0064), `.iv-top` / `.iv-aside` (0066). The phone order is as before.
 
+222. **Round 6, four more DV questions (session 35, 2026-11-20).** The owner chose 2, 3, 4 and
+    10 of eleven proposals, and suggested cocotb for UVM in Python: pyuvm 5.0.0 on cocotb
+    2.1.0 runs on the pinned Verilator. `run_cocotb()` in `tools/page_tests.py` writes a
+    page's testbench and its SystemVerilog into `.cache/cocotb/<name>/`, builds when the
+    SystemVerilog changed (a few seconds) and returns each cocotb test's result; it skips
+    without cocotb or Verilator (CONTRIBUTING.md, "Tests"). Fetching Accellera's uvm-core to
+    run SV UVM in Verilator was refused by the session's permission check, so the UVM
+    SystemVerilog tabs are shown, not run (a note under them), and each test checks them
+    against the Python by structure. No run panel (no demo.py): Pyodide has no simulator.
+    Four agents wrote one page each in worktrees from a shared scaffold (branch
+    r6b-scaffold); the session merged them, put them on the testbench path and the map.
+    - 0112 (junior), "ה-override שלא נכנס לתוקף": a driver built with `new`, so a type
+      override never applies; an instance override with a path missing `uvm_test_top.`;
+      when the override must be set. DUT `parity_rx`; 12 cocotb scenarios.
+    - 0113 (junior), "הטסט שנגמר בזמן 0": no objection (ends at 0 ns, 0 compared), the
+      in-flight items of a 4-stage pipeline (drain 35 ns at least; pyuvm has no drain time,
+      a Timer before the drop), a monitor's objection that never drops (a global timeout).
+    - 0114 (senior), "סנכרון שני agents ב-virtual sequence": config and traffic forked
+      together, a re-key in mid-packet fixed with a pause handshake on a packet boundary,
+      and a tested Python model of the sequencer's arbitration, lock and grab (pyuvm's
+      sequencer is a plain FIFO).
+    - 0115 (senior), "ה-monitor שרואה שגיאות שלא קיימות": both tabs run. In Verilator the
+      processes resumed by an edge run in the order they waited, before the always blocks,
+      so a blocking driver started after the monitor gives six false mismatches; in cocotb
+      a plain write waits for ReadWrite (like `<=`) and the bug needs `Immediate`. The
+      fixes change the driver; a monitor-only fix still reports six (the page shows it).
+    - Pages are long (0114 has 1018 lines, most of it a collapsed environment); the owner
+      may want them shorter. No explorer boxes in this round.
+
 ---
 
 ## In progress

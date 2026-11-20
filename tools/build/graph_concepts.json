@@ -56,6 +56,10 @@
    "label": "Closed form",
    "group": "math"
   },
+  "cocotb": {
+   "label": "cocotb",
+   "group": "verification"
+  },
   "combinational_logic": {
    "label": "Combinational logic",
    "group": "digital design"
@@ -476,6 +480,10 @@
    "label": "Running sums",
    "group": "algorithms"
   },
+  "scheduling_regions": {
+   "label": "Scheduling regions",
+   "group": "verification"
+  },
   "scoreboard": {
    "label": "Scoreboard",
    "group": "verification"
@@ -483,6 +491,10 @@
   "sequence_numbers": {
    "label": "Sequence numbers",
    "group": "protocols"
+  },
+  "sequencer_arbitration": {
+   "label": "Sequencer arbitration",
+   "group": "verification"
   },
   "shift_register": {
    "label": "Shift register",
@@ -598,6 +610,18 @@
   },
   "uvm": {
    "label": "UVM",
+   "group": "verification"
+  },
+  "uvm_factory": {
+   "label": "UVM factory",
+   "group": "verification"
+  },
+  "uvm_objections": {
+   "label": "UVM phases and objections",
+   "group": "verification"
+  },
+  "virtual_sequence": {
+   "label": "Virtual sequence",
    "group": "verification"
   },
   "weighing_puzzle": {
@@ -2573,6 +2597,88 @@
      "id": "0050",
      "explicit": true,
      "why": "a scoreboard that searches suits only a block that may reorder; 0050 matches by ID"
+    }
+   ]
+  },
+  "0112": {
+   "core": [
+    "uvm_factory",
+    "uvm",
+    "testbench_architecture"
+   ],
+   "secondary": [
+    "systemverilog",
+    "cocotb"
+   ],
+   "related": [
+    {
+     "id": "0049",
+     "explicit": true,
+     "why": "the components the factory builds and their full names"
+    }
+   ]
+  },
+  "0113": {
+   "core": [
+    "uvm_objections",
+    "uvm",
+    "testbench_architecture"
+   ],
+   "secondary": [
+    "scoreboard",
+    "pipelining",
+    "systemverilog",
+    "cocotb"
+   ],
+   "related": [
+    {
+     "id": "0049",
+     "explicit": true,
+     "why": "the phases of the environment whose run phase ends here"
+    }
+   ]
+  },
+  "0114": {
+   "core": [
+    "virtual_sequence",
+    "sequencer_arbitration",
+    "uvm"
+   ],
+   "secondary": [
+    "testbench_architecture",
+    "timing_waveform",
+    "systemverilog",
+    "cocotb"
+   ],
+   "related": [
+    {
+     "id": "0049",
+     "explicit": true,
+     "why": "the sequencer and the agents a virtual sequence drives"
+    }
+   ]
+  },
+  "0115": {
+   "core": [
+    "scheduling_regions",
+    "scoreboard",
+    "timing_waveform"
+   ],
+   "secondary": [
+    "systemverilog",
+    "simulation",
+    "cocotb"
+   ],
+   "related": [
+    {
+     "id": "0111",
+     "explicit": true,
+     "why": "the opposite case: a broken DUT that the testbench passes"
+    },
+    {
+     "id": "0050",
+     "explicit": true,
+     "why": "the scoreboard that reports the false mismatches"
     }
    ]
   }
