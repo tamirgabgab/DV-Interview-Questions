@@ -75,6 +75,24 @@
   --shadow-3: 0 8px 28px rgba(0, 0, 0, 0.45);
 }
 
+/* N6.12: the colours that stay the same in both schemes. A rule outside a palette block
+   names a variable, never a literal colour (lint_pages.py checks it; a mask keeps its black,
+   which means opaque there). A lighter step is a color-mix with transparent:
+   `color-mix(in srgb, var(--site-on-navy) 82%, transparent)` is white at 82%. */
+:root {
+  /* on the navy cards (home hero, message, guide, 404 page, interview bar) and the footer:
+     text, lines and a pressed button */
+  --site-on-navy: #fff;
+  /* the brand navy as text on an amber or a white button, in both schemes (4.5:1 on the accent) */
+  --site-navy-ink: #1b2a4a;
+  --site-shade: #000;              /* darkens a navy card in the dark scheme; black shadows */
+  --site-scrim: rgb(12, 18, 32);   /* under the quick jump window (at 50%) */
+  --site-deep: rgb(13, 22, 44);    /* the hero board's stop button (55%, 80% on hover) */
+  --viz-on-fill: #fff;             /* a number or a word on a filled figure mark (crate, badge) */
+  --viz-ball-red: #d33a2f;         /* the red and the black balls of the b3 box */
+  --viz-ball-black: #2b2b2b;
+}
+
 /* W335: the design tokens. Spacing on a 4 px grid (the root font is 20 px), three radii,
    three shadows (per scheme, above) and four motion durations (--dur-0 to --dur-3) with one easing. New rules use these
    rather than literal values. */

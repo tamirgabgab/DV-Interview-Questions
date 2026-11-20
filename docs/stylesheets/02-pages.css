@@ -33,7 +33,7 @@
 }
 
 .md-typeset .chip-new {
-  color: #1b2a4a;
+  color: var(--site-navy-ink);
   background: var(--md-accent-fg-color);
   font-size: 0.6rem;
   letter-spacing: 0.03em;
@@ -397,7 +397,7 @@
 .md-typeset svg .crate-front { fill: var(--viz-crate); stroke: var(--viz-crate-edge); }
 .md-typeset svg .crate-top { fill: var(--viz-crate-top); stroke: var(--viz-crate-edge); }
 .md-typeset svg .crate-side { fill: var(--viz-crate-side); stroke: var(--viz-crate-edge); }
-.md-typeset svg .crate-text { fill: #fff; font-family: var(--md-text-font-family); }
+.md-typeset svg .crate-text { fill: var(--viz-on-fill); font-family: var(--md-text-font-family); }
 .md-typeset svg.figure .tick,
 .md-typeset svg.figure .legend { fill: var(--viz-text); font-size: 13px; font-family: var(--md-text-font-family); }
 .md-typeset .viz-legend .s1 { background: var(--viz-s1); }

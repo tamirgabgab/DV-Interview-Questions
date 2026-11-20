@@ -18,17 +18,17 @@
    "start practising" is the only filled button; the builder's "start the interview" is an
    outlined one, as "a random question" is; the search and its ready queries are a row of
    their own under the buttons. */
-.md-typeset .home-hero .hb-actions .md-button.hb-start { border: 1px solid rgba(255, 255, 255, 0.7); background: transparent; color: #fff; font-weight: 600; }
-.md-typeset .home-hero .hb-actions .md-button.hb-start:is(:hover, :focus-visible) { border-color: var(--md-accent-fg-color); background: rgba(255, 255, 255, 0.08); color: #fff; }
-.md-typeset .home-hero .hh-find { margin-top: var(--sp-4); padding-top: var(--sp-3); border-top: 1px solid rgba(255, 255, 255, 0.14); }
+.md-typeset .home-hero .hb-actions .md-button.hb-start { border: 1px solid color-mix(in srgb, var(--site-on-navy) 70%, transparent); background: transparent; color: var(--site-on-navy); font-weight: 600; }
+.md-typeset .home-hero .hb-actions .md-button.hb-start:is(:hover, :focus-visible) { border-color: var(--md-accent-fg-color); background: color-mix(in srgb, var(--site-on-navy) 8%, transparent); color: var(--site-on-navy); }
+.md-typeset .home-hero .hh-find { margin-top: var(--sp-4); padding-top: var(--sp-3); border-top: 1px solid color-mix(in srgb, var(--site-on-navy) 14%, transparent); }
 .md-typeset .home-hero .hh-find .hh-suggest { margin-bottom: var(--sp-3); }
 
 /* --- 5. the hero board's stop button (hero-board.js adds it unless motion is reduced) ------- */
 .md-typeset .home-hero .hh-pause {
   position: absolute; z-index: 2; bottom: var(--sp-3); inset-inline-start: var(--sp-3);
   display: inline-grid; place-items: center; width: 2rem; height: 2rem; padding: 0;
-  border: 1px solid rgba(255, 255, 255, 0.7); border-radius: 50%; background: rgba(13, 22, 44, 0.55);
-  color: #fff; cursor: pointer; transition: border-color var(--dur-0) var(--ease), background-color var(--dur-0) var(--ease);
+  border: 1px solid color-mix(in srgb, var(--site-on-navy) 70%, transparent); border-radius: 50%; background: color-mix(in srgb, var(--site-deep) 55%, transparent);
+  color: var(--site-on-navy); cursor: pointer; transition: border-color var(--dur-0) var(--ease), background-color var(--dur-0) var(--ease);
 }
 .md-typeset .home-hero .hh-pause::before {            /* two bars: running, a press stops it */
   content: ""; width: 0.6rem; height: 0.7rem;
@@ -37,7 +37,7 @@
 .md-typeset .home-hero .hh-pause.is-paused::before {  /* a play triangle (media icons are not mirrored in RTL): start it */
   width: 0.6rem; height: 0.7rem; background: currentColor; clip-path: polygon(0 0, 100% 50%, 0 100%); margin-inline-start: 0.12rem;
 }
-.md-typeset .home-hero .hh-pause:hover { border-color: var(--md-accent-fg-color); background: rgba(13, 22, 44, 0.8); }
+.md-typeset .home-hero .hh-pause:hover { border-color: var(--md-accent-fg-color); background: color-mix(in srgb, var(--site-deep) 80%, transparent); }
 .md-typeset .home-hero .hh-pause:focus-visible { outline: 2px solid var(--md-accent-fg-color); outline-offset: 2px; }
 @media screen and (max-width: 59.9375em) {              /* the builder runs to the bottom: room under it */
   .md-typeset .home-hero:has(.hh-pause) { padding-bottom: 3rem; }

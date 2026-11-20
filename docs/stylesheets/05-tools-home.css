@@ -231,7 +231,7 @@ body.interview-mode .md-typeset .question-tools {
   border-color: var(--md-primary-fg-color);
 }
 [data-md-color-scheme="slate"] .md-typeset .question-tools .qt-mark.is-active {
-  color: #1b2a4a;
+  color: var(--site-navy-ink);
   background: var(--md-typeset-a-color);
   border-color: var(--md-typeset-a-color);
 }

@@ -124,15 +124,17 @@
    fall short of 4.5:1 against the code background. */
 .md-typeset .highlighttable .linenos,
 .md-typeset .highlighttable .linenos a,
-.md-typeset .highlight [data-linenos]::before { color: #5f5f5f; }
+.md-typeset .highlight [data-linenos]::before { color: var(--site-linenos-color); }
 [data-md-color-scheme="slate"] .md-typeset .highlighttable .linenos,
 [data-md-color-scheme="slate"] .md-typeset .highlighttable .linenos a,
-[data-md-color-scheme="slate"] .md-typeset .highlight [data-linenos]::before { color: #a7a6a0; }
+[data-md-color-scheme="slate"] .md-typeset .highlight [data-linenos]::before { color: var(--site-linenos-color); }
 [data-md-color-scheme="slate"] .md-typeset .highlight .hll {
-  background-color: rgba(255, 255, 255, 0.03);
+  background-color: var(--site-code-hl-bg);
   box-shadow: inset 3px 0 0 var(--md-accent-fg-color);
 }
 [data-md-color-scheme="default"] {
+  --site-linenos-color: #5f5f5f;                 /* the line numbers of code blocks */
+  --site-code-hl-bg: rgba(27, 42, 74, 0.06);     /* a highlighted code line */
   --md-code-hl-comment-color: #616161;
   --md-code-hl-keyword-color: #2f5ead;
   --md-code-hl-number-color: #b31f1f;
@@ -149,11 +151,13 @@
 }
 /* the dark scheme's constant and number tokens, lifted to 4.5:1 on a highlighted line */
 [data-md-color-scheme="slate"] {
+  --site-linenos-color: #a7a6a0;
+  --site-code-hl-bg: rgba(255, 255, 255, 0.03);
   --md-code-hl-constant-color: #a497ec;
   --md-code-hl-number-color: #f07d70;
 }
 [data-md-color-scheme="default"] .md-typeset .highlight .hll {
-  background-color: rgba(27, 42, 74, 0.06);
+  background-color: var(--site-code-hl-bg);
   box-shadow: inset 3px 0 0 var(--md-accent-fg-color);
 }
 

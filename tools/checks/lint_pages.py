@@ -30,6 +30,9 @@ Once per run (when no page is named): every question is in a study path, and the
 strings (``docs/javascripts/explorer/*.js``) keep the colon rule: ``const NB`` is U+00A0, and
 no Hebrew text has a plain space before a colon (a Hebrew letter, or a closing ``)`` / ``}``
 / tag of a text, then " : "), so a colon never wraps to the start of a line in a box.
+The stylesheets (``docs/stylesheets/**/*.css``) name a colour by a variable: only a custom
+property (``--name: #...``) may hold a literal colour, so the palette stays in its blocks and
+follows the light / dark switch (N6.12); a mask keeps its literal black, which means opaque.
 Warnings (printed, exit status unchanged): an inline SVG colour written as a literal
 (``fill="#..."``, ``stroke:#...``, ``fill="white"``) instead of a class whose colour is a CSS
 variable, since such a figure does not follow the light / dark switch.
@@ -446,6 +449,31 @@ def lint_explorers() -> list[str]:
     return out
 
 
+STYLESHEETS = QUESTIONS.parent / "stylesheets"
+CSS_COLOUR = re.compile(r"#[0-9a-fA-F]{3,8}\b|\b(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch)\(|(?<![\w-])(?:white|black)(?![\w-])", re.I)
+MASKS = {"mask", "-webkit-mask", "mask-image", "-webkit-mask-image"}
+
+
+def lint_stylesheets() -> list[str]:
+    """A literal colour in an ordinary declaration of a stylesheet: it belongs in a variable
+    (a palette block, or a custom property beside the rule), so the rule follows the scheme
+    (N6.12: 100 such declarations moved to variables)."""
+    out = []
+    for f in sorted(STYLESHEETS.rglob("*.css")):
+        raw = f.read_text(encoding="utf-8")
+        text = re.sub(r"/\*.*?\*/", lambda m: re.sub(r"[^\n]", " ", m.group()), raw, flags=re.S)
+        for m in re.finditer(r"([\w-]+)\s*:\s*([^;{}]*)", text):
+            prop, value = m.groups()
+            if prop.startswith("--") or prop.lower() in MASKS:
+                continue
+            value = re.sub(r"url\([^)]*\)|\"[^\"]*\"|'[^']*'", "", value)
+            found = CSS_COLOUR.search(value)
+            if found:
+                n = raw.count("\n", 0, m.start()) + 1
+                out.append(f"{f.relative_to(STYLESHEETS)}:{n}: {prop}: literal colour {found.group().rstrip('(')!r}: use a variable (01-base.css)")
+    return out
+
+
 def main(argv: list[str]) -> int:
     paths = [question_path(a) for a in argv] if argv else sorted(QUESTIONS.glob("*/0*.md"))
     bad = warned = 0
@@ -461,7 +489,7 @@ def main(argv: list[str]) -> int:
         bad += bool(problems)
         warned += bool(warnings)
     print(f"{len(paths) - bad}/{len(paths)} pages clean" + (f", {warned} with warnings" if warned else ""))
-    orphans = [] if argv else lint_paths() + lint_explorers()
+    orphans = [] if argv else lint_paths() + lint_explorers() + lint_stylesheets()
     for o in orphans:
         print(f"  {o}")
     return 1 if bad or orphans else 0

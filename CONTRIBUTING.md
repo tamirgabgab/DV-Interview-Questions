@@ -587,6 +587,15 @@ grid (`--sp-1` to `--sp-6`: 4, 8, 16, 24, 32, 48 px), three radii (`--radius-s/m
 shadows (`--shadow-1` to `--shadow-3`, per scheme) and one motion speed and easing
 (`--dur-0` 150 ms for a press or a hover colour, `--dur-1` 200 ms, `--dur-2` 300 ms for a
 panel coming in, `--dur-3` 600 ms for a bar filling or a one-off flash, and `--ease`). A
+colour in a stylesheet is always a variable: a literal colour may stand only in a custom
+property (the palette blocks of `01-base.css`, or a local token beside its rules such as
+`--viz-*` and `--hb-*`), and the linter fails on any other declaration that holds one (a
+mask's black, which means opaque, is the exception). The colours that do not change with
+the scheme are in one `:root` block of `01-base.css`: `--site-on-navy` (the white on the
+navy cards and the footer), `--site-navy-ink` (the navy as text on an amber or a white
+button), `--site-shade` (black, for darkening and shadows), `--site-scrim`, `--site-deep`,
+`--viz-on-fill` and the two ball colours of the b3 box; a lighter step is a mix with
+transparent, `color-mix(in srgb, var(--site-on-navy) 82%, transparent)`. A
 progress bar scales (`transform: scaleX(var(--p))`, `transform-origin: right`) rather than
 changing its width. In the light scheme the page is off-white
 (`--md-default-bg-color: #f7f8fb`) and cards, boxes, admonitions and tables are white
@@ -930,8 +939,9 @@ python tools/figures/fill.py --check 26     # generated blocks of a page are up 
 ```
 
 The linter checks RTL at the start of every paragraph, list item, heading and table cell,
-at any indent (admonitions, list items, the steps timeline), and **warns** about literal
-SVG colours. The phone check also **warns** about display math wider than its column (it
+at any indent (admonitions, list items, the steps timeline), fails on a literal colour in
+a stylesheet declaration (outside a custom property), and **warns** about literal SVG
+colours. The phone check also **warns** about display math wider than its column (it
 would scroll on its own; split it with `aligned`), about SVG text drawn under 9 px at
 390 px (one line per figure or explorer box with its smallest text, so a figure that
 shrinks to an unreadable size on a phone is listed) and, with `--axe`, about serious and

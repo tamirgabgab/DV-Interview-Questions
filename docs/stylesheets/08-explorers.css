@@ -86,7 +86,7 @@
 .md-typeset svg .bx-g:focus-visible .bx-node { stroke: var(--site-focus-ring); stroke-width: 4; }
 .md-typeset svg .bx-num { fill: var(--viz-ink); font-size: 12px; font-weight: 700; font-family: var(--md-code-font-family); pointer-events: none; }
 .md-typeset svg .bx-badge { fill: var(--viz-s1); }
-.md-typeset svg .bx-badge-num { fill: #fff; font-size: 10px; font-weight: 700; font-family: var(--md-code-font-family); }
+.md-typeset svg .bx-badge-num { fill: var(--viz-on-fill); font-size: 10px; font-weight: 700; font-family: var(--md-code-font-family); }
 .md-typeset .explorer .bx-chip { font-weight: 700; white-space: nowrap; }
 .md-typeset svg .cm-band { stroke: var(--viz-s1); stroke-width: 6; stroke-opacity: 0.35; stroke-linecap: round; }
 .md-typeset svg .cm-band.is-full { stroke-opacity: 0.85; }
@@ -238,8 +238,8 @@
 .md-typeset svg .b3-crate:focus-visible { outline: none; }
 .md-typeset svg .b3-crate:focus-visible .crate-front { stroke: var(--site-focus-ring); stroke-width: 4; }
 .md-typeset svg .b3-ball { stroke: var(--viz-ink); stroke-width: 1.5; }
-.md-typeset svg .b3-red { fill: #d33a2f; }
-.md-typeset svg .b3-black { fill: #2b2b2b; }
+.md-typeset svg .b3-red { fill: var(--viz-ball-red); }
+.md-typeset svg .b3-black { fill: var(--viz-ball-black); }
 .md-typeset .explorer .b3-stats { font-size: 0.7rem; color: var(--viz-text); }
 .md-typeset .explorer .b3-step { margin: 0.5em 0 0.2em; }
 .md-typeset .explorer .b3-lines { margin: 0.2em 0; padding-inline-start: 1.3rem; }

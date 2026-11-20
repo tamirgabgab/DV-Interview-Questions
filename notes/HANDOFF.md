@@ -501,9 +501,20 @@ redesign plan of 2026-10-16 and the proposal series six to eight, and items 112 
       to 40 KB gzip); the phone check gives it apart and leaves it out of the 400 KB
       warning. An undefined macro now stops the build. Local checks serve the math fonts
       from `.cache/cdn` (`--local-cdn`).
+    - N6.12: the 100 declarations outside a custom property that held a literal colour
+      (8 files; the other 16 of the 116 were masks, whose black means opaque) name a
+      variable now: a `:root` block of `01-base.css` holds the colours that stay the same in
+      both schemes (`--site-on-navy`, `--site-navy-ink`, `--site-shade`, `--site-scrim`,
+      `--site-deep`, `--viz-on-fill`, the b3 balls), and 07 its line-number and
+      highlighted-line colours per scheme. White at a lower alpha is
+      `color-mix(in srgb, var(--site-on-navy) N%, transparent)`, exact. Every declaration
+      computes the same colours in Chromium in its scheme; screenshots of 7 pages at 390
+      and 1200 px in both schemes match the build before, but for the translucent cards
+      of the home page's fan (1 to 2 levels of 255). The contrast pairs use the variables
+      (614 ratios unchanged). `lint_pages.py` fails on a literal colour in a stylesheet
+      declaration outside a custom property.
     - Learned: the runtime MathJax rendered math only on the first page of a Playwright
       context with the routed CDN script; a fresh context per page measures it right.
-    - Left: N6.12 (literal colours).
 218. **Round 6, a pilot of two DV questions (session 35, 2026-11-20).** The owner: "find the
     bug" and UVM topics, two or three questions first, kind `dv` with the `debug` tag. Two
     agents, each in its own worktree from a shared scaffold, wrote one page each with its
@@ -528,7 +539,7 @@ redesign plan of 2026-10-16 and the proposal series six to eight, and items 112 
 - **Session 35 (2026-11-19 and 20):** a review of the site and of this file (work log
   212), then rounds 1 to 3 of the plan in [`ROUNDS.md`](ROUNDS.md): housekeeping (213),
   accessibility and speed (214), the phone header and layout shifts (215), round 5 and
-  the first part of round 7 (216), round 4 but N6.12 (217) and a pilot of round 6 (218).
+  the first part of round 7 (216), round 4 (217) and a pilot of round 6 (218).
   Round 8 is split in two (0036 alone, then the rest as round 9); rounds 8 and 9 are not
   started.
 - **State:** `main` has rounds 1 to 3, 5, 7 and the stylesheet split of round 4 (1336f15).
@@ -700,7 +711,7 @@ true, so CI never runs the motion paths or a box's first-visit guide.
 - [x] N6.11 (done, work log 214; P3, S) A box's first-visit guide (`core.js:1057` on): the tip covers the
   figure's axis labels and the focused enlarge button, is last in the box's tab order and
   closes on Esc only with the focus inside it.
-- [ ] N6.12 (P3, M) 115 declarations with literal colours outside `01-base.css`, in 13
+- [x] N6.12 (done, work log 217; P3, M) 115 declarations with literal colours outside `01-base.css`, in 13
   files (`09-redesign.css` 44, `21-interview.css` 31); the linter warns only about SVG.
   Move them to variables and widen the lint rule.
 - Checked and fine: contrast by axe at three widths in both schemes on ten pages; no

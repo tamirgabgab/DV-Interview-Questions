@@ -4,8 +4,8 @@ Written in session 35 (2026-11-19) from the review of the site. The tasks themse
 their measurements and file references, are in [`HANDOFF.md`](HANDOFF.md) under "Open
 items", "Next steps (session 35)", N1 to N8; this file only groups them into rounds, in
 the proposed order of work, so the owner and the session can go through them one at a
-time. Rounds 1 to 5 and 7 are done (session 35; round 4 but N6.12), round 6 has a pilot of two
-questions, and rounds 8 and 9 are not started.
+time. Rounds 1 to 5 and 7 are done (session 35), round 6 has a pilot of two questions, and
+rounds 8 and 9 are not started.
 Round 8 was split in two on 2026-11-20: 0036 alone is round 8, the rest round 9.
 
 How to use it: before a round, read its row and its section, answer the open questions,
@@ -69,8 +69,7 @@ Round 8 (0036) stays on the recommended model; round 9 is safe on the cheaper on
   owner as numbers before it goes to `main`. New from round 3: math rendered at build time
   (N9.1) removes the MathJax download and the largest layout shift; which renderer? The
   owner: MathJax at build time.
-- Status: done in session 35 (2026-11-20), work log item 217 of `HANDOFF.md`, except N6.12
-  (the literal colours).
+- Status: done in session 35 (2026-11-20), work log item 217 of `HANDOFF.md`.
 
 ### Round 5. Search and sharing
 
