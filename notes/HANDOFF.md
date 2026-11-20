@@ -737,6 +737,9 @@ redesign plan of 2026-10-16 and the proposal series six to eight, and items 112 
       folds open): over `--dom-warn` 8000 a warning, over `--dom-fail` 12000 a failure,
       the top three in the summary. `CONTRIBUTING.md` (the weight paragraph, the math
       paragraph) and the skill's phases 3, 5 and 10 say how to write within it.
+    - **After the owner's look at the phone:** a closed solution (the outlined "הצג פתרון"
+      button of the UX round, 9b) was as wide as its text and looked misaligned under the
+      full-width hints; it now takes the full width (29-question-ux.css).
 
 ---
 

@@ -129,10 +129,12 @@ body.interview-mode .md-typeset .box-teaser { display: none; }
 
 /* --- 9b: a closed solution is an outlined button, not one more hint bar ------------------------
    Still a native <details>; the hook adds the words of the closed state ("הצג", "·") in
-   span.sol-closed, hidden once the block is open, where it looks and reads as before. */
+   span.sol-closed, hidden once the block is open, where it looks and reads as before. It
+   takes the full width, as the hints above it (the owner, 2026-11-20: the narrower button
+   looked misaligned). */
 .md-typeset details.success[open] > summary .sol-closed { display: none; }
 .md-typeset details.success:not([open]):not(#_) {
-  width: fit-content; max-width: 100%; margin-top: 2.2rem; border: 1px solid var(--act-line); border-radius: var(--radius-m);
+  margin-top: 2.2rem; border: 1px solid var(--act-line); border-radius: var(--radius-m);
   background: transparent; box-shadow: none;
 }
 .md-typeset details.success:not([open]):not(#_) > summary { min-height: 2.2rem; padding-inline-end: 2.6rem; background: transparent; color: var(--act-line); font-weight: 700; }

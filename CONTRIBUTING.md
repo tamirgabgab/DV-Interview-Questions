@@ -445,8 +445,8 @@ has a button chip in its header and a teaser row under the statement (`box_tease
 computer the five tools sit in the sticky strip (`toolsPlace` in `question-page.js`,
 `.part-nav.has-tools`; a phone and a page without parts keep the toolbar row; the strip of a
 page with parts is in the built page, see "Nothing moves while a page loads" below); the strip is
-opaque; a closed solution reads "הצג פתרון · סעיף X" as an outlined button
-(`solution_summaries`, `sol-closed`); a table wider than its column scrolls inside its
+opaque; a closed solution reads "הצג פתרון · סעיף X" as an outlined button as wide as
+the hints above it (`solution_summaries`, `sol-closed`); a table wider than its column scrolls inside its
 wrapper with edge fades (`is-wide`, `fade-s`, `fade-e`; `data-cards` tables stay cards on a
 phone). The metro map writes each path's name at its line's start by rule
 (`maps_metro_names`; a test checks no name touches a station, another line or another
