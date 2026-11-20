@@ -198,7 +198,15 @@
         const s = after(st.step), done = st.step === st.plan.log.length, R = st.plan.log.length, g = Math.ceil(st.a / st.b);
         if (!fixed) { $(".hr-a").value = st.a; $(".hr-b").value = st.b; $(".out-b").textContent = String(st.b); $(".hr-c").value = st.c; $(".out-c").textContent = String(st.c); }
         $(".hr-gridbox").innerHTML = grid(s);
-        $(".hr-table").innerHTML = table();
+        const tb = $(".hr-table");
+        tb.innerHTML = table();
+        // a computer's box gives the table a height of its own (27-box-columns.css): it
+        // scrolls itself, never the page, to keep the current race in sight
+        const nowRow = tb.querySelector("tr.is-now");
+        if (nowRow && tb.scrollHeight > tb.clientHeight + 1) {
+          const r = nowRow.getBoundingClientRect(), v = tb.getBoundingClientRect();
+          if (r.bottom > v.bottom || r.top < v.top) tb.scrollTop += r.bottom - v.bottom + 2;
+        }
         $(".hr-chain").innerHTML = chainText();
         $(".ex-pos").textContent = `תחרות ${st.step} מתוך ${R}`;
         $(".ex-prev").disabled = st.step === 0; $(".ex-next").disabled = done; $(".ex-end").disabled = done;
@@ -268,6 +276,8 @@
       horses: "המהירויות מוגרלות מערך אתחול ונסתרות, כמו בחידה. ״התחרות הבאה״ ו״הפעלה״ מריצים את התוכנית תחרות אחרי תחרות : הרשת צובעת כל סוס (נפסל, מועמד, נקבע) עם מספר המהירים הידועים ממנו, הטבלה גדלה, והשורה מתחת מסבירה מי נפסל ולמה. בתיבה הכללית קובעים a, b ו-c, ומתג החשיפה מראה את הדירוג האמיתי. לחיצה על סוס ברשת מראה בשלב ההוכחה את שרשרת התוצאות שמוכיחה מי מהיר ממנו.",
     },
     models: { horsesSpeeds, horsesPlan, horsesChain },
-    cols: { horses: { main: ".viz-legend, .hr-gridbox", side: ".hr-step, .hr-proof" } },   // the grid of horses beside its step and its proof; the races table stays wide under them
+    // the grid of horses and its legend beside its step and its proof; the races table stays
+    // wide under them, in a height of its own on a computer, so each box fits one screen
+    cols: { horses: { main: ".viz-legend, .hr-gridbox", side: ".hr-step, .hr-proof" } },
   });
 })();

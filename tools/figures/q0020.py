@@ -82,8 +82,8 @@ def params_svg(mps=128, split=(48, 128, 80)):
                  f'<title>0x{start:X}–0x{start + size - 1:X}: {size} bytes</title></rect>')
         p.append(f'<text class="cs-size" x="{(a + b) / 2:.1f}" y="82" text-anchor="middle">{size}</text>')
         p.append(f'<text class="tick" x="{(a + b) / 2:.1f}" y="108" text-anchor="middle">{r}</text>')
-    # RCB bracket
-    ya = 128
+    # RCB bracket (low enough that its label clears the segment names at 11 px on a phone)
+    ya = 136
     p.append(f'<line class="ink-line" x1="{x(BASE + 64) + 1:.1f}" y1="{ya}" x2="{x(BASE + 128) - 1:.1f}" y2="{ya}" '
              f'stroke-width="1.6" marker-start="url(#cs-arrow)" marker-end="url(#cs-arrow)"/>')
     p.append(f'<text class="legend halo" x="{x(BASE + 96):.1f}" y="{ya - 6}" text-anchor="middle">RCB = {RCB}</text>')

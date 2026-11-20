@@ -296,8 +296,9 @@
       islands: "לחיצה על תא הופכת אותו ממים ליבשה ובחזרה, \"לוח אקראי\" מגריל לוח לפי הסיכוי ליבשה, \"מקרה מלכודת\" טוען לוח שמכשיל פתרון נאיבי, ובוחרים ארבעה או שמונה כיוונים. כל צעד הוא תא אחד של מילוי בהצפה : הסריקה פוגשת יבשה שלא סומנה ומתחילה אי חדש, או תא יוצא מהתור ושכניו נבדקים. התור מצויר ליד הלוח, התא שיצא מוקף, התאים שנכנסו מסומנים בכתום, וכל אי מקבל צבע עם המספר שלו (בסעיף ג : הגודל שלו, והרשימה הממוינת מתחת). השורה שמתחת מסבירה כל צעד, והפאנל 'הסבר' מדליק את שורות הקוד.",
     },
     models: { ilTrace, ilSizes, ilParse, ilText },
-    // on a computer: the board, the queue and the notes on the left, the steps-and-code
-    // panel on the right
-    cols: { islands: { main: ".il-panels, .viz-legend, .il-note, .il-sizes", w: "minmax(0, 0.85fr)" } },
+    // on a computer: the editing hint, the board, the queue and the legend on the left, the steps-and-code
+    // panel on the right, and the two notes under both, the whole box wide (its code
+    // scrolls in a height of its own, 27-box-columns.css), so each box fits one screen
+    cols: { islands: { main: ".il-edit-hint, .il-panels, .viz-legend", w: "minmax(0, 1.2fr)" } },
   });
 })();

@@ -38,9 +38,12 @@ def board(x0, y0, cells="." * 9, fills=None, caption="", ghost=False, numbers=Fa
     for k in (1, 2):
         g.append(f'<line class="ttt-grid" x1="{x0 + k * C}" x2="{x0 + k * C}" y1="{y0}" y2="{y0 + 3 * C}"/>'
                  f'<line class="ttt-grid" x1="{x0}" x2="{x0 + 3 * C}" y1="{y0 + k * C}" y2="{y0 + k * C}"/>')
-    if caption:
-        g.append(f'<text class="legend" x="{x0 + 1.5 * C}" y="{y0 + 3 * C + 20}" text-anchor="middle" '
-                 f'direction="rtl">{caption}</text>')
+    if caption:                                # a string, or a tuple of lines (a phone shows them at 11 px)
+        lines = (caption,) if isinstance(caption, str) else caption
+        cx = x0 + 1.5 * C
+        spans = "".join(f'<tspan x="{cx}" dy="{0 if k == 0 else 1.2}em">{t}</tspan>' for k, t in enumerate(lines))
+        g.append(f'<text class="legend" x="{cx}" y="{y0 + 3 * C + 20}" text-anchor="middle" '
+                 f'direction="rtl">{spans if len(lines) > 1 else lines[0]}</text>')
     g.append("</g>")
     return "".join(g)
 
@@ -60,16 +63,16 @@ def numbering():
 
 
 def examples():
-    boards = [("XXXOXOOOX", "X ניצח : 2 שלישיות"), ("XXOXO.O..", "O ניצח"),
-              ("XOXXOOOXX", "תיקו"), ("XXXOOO...", "✗ שניהם ניצחו"),
-              ("XXXOO.O..", "✗ O שיחק אחרי הניצחון")]
+    boards = [("XXXOXOOOX", ("X ניצח :", "2 שלישיות")), ("XXOXO.O..", "O ניצח"),
+              ("XOXXOOOXX", "תיקו"), ("XXXOOO...", ("✗ שניהם", "ניצחו")),
+              ("XXXOO.O..", ("✗ O שיחק", "אחרי הניצחון"))]
     body, x = [], 6
     for cells, caption in boards:
         fills = {i: "cell-s2" for i in won_cells(cells, "X", LINES)}
         fills.update({i: "cell-s1" for i in won_cells(cells, "O", LINES)})
         body.append(board(x, 6, cells, fills, caption))
         x += 3 * C + 40
-    return svg(x - 20, 3 * C + 34, "דוגמאות ללוחות סיום חוקיים ולא חוקיים", "".join(body))
+    return svg(x - 20, 3 * C + 62, "דוגמאות ללוחות סיום חוקיים ולא חוקיים", "".join(body))
 
 
 def wrap_examples():

@@ -55,15 +55,17 @@ def triangle(cx, cy, angles, inside):
         x, y = pt(cx, cy, a, R - 6)
         p.append(f'<circle class="ink-dot" cx="{x:.1f}" cy="{y:.1f}" r="5"><title>{a}°</title></circle>')
     p.append(f'<circle class="center-dot" cx="{cx}" cy="{cy}" r="4"/><text class="tick" x="{cx + 6}" y="{cy + 14}">O</text>')
-    caption = ("✓ מכיל את המרכז : כל הפערים קטנים מ-180°" if inside else
-               f"✗ לא מכיל : יש פער של {max((angles[(i + 1) % 3] - angles[i]) % 360 for i in range(3))}° > 180°")
-    p.append(f'<text class="legend" x="{cx}" y="{cy + 162}" text-anchor="middle" direction="rtl">{caption}</text>')
+    # two lines, so the captions of the two circles keep apart at 11 px on a phone
+    caption = (("✓ מכיל את המרכז :", "כל הפערים קטנים מ-180°") if inside else
+               ("✗ לא מכיל :", f"יש פער של {max((angles[(i + 1) % 3] - angles[i]) % 360 for i in range(3))}° > 180°"))
+    spans = "".join(f'<tspan x="{cx}" dy="{0 if k == 0 else 1.2}em">{t}</tspan>' for k, t in enumerate(caption))
+    p.append(f'<text class="legend" x="{cx}" y="{cy + 162}" text-anchor="middle" direction="rtl">{spans}</text>')
     return "".join(p)
 
 
 def examples_figure():
     body = "".join(triangle(160 + 320 * i, 150, angles, inside) for i, (angles, inside) in enumerate(EXAMPLES))
-    return ('<svg class="figure" viewBox="0 0 640 330" role="img" aria-label="שתי דוגמאות : משולש שמכיל את מרכז '
+    return ('<svg class="figure" viewBox="0 0 640 352" role="img" aria-label="שתי דוגמאות : משולש שמכיל את מרכז '
             f'המעגל ומשולש שלא מכיל אותו">{body}</svg>')
 
 

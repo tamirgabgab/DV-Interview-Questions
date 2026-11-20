@@ -134,7 +134,7 @@ def examples_table():
 def building_svg(k=K, n=N):
     """The building with the first egg's floors on the right, the second egg's floors of
     the first gap on the left, and the third egg's single steps in the first sub-gap."""
-    W, H, X0, X1, TOP, BOT = 640, 380, 250, 390, 20, 360
+    W, H, X0, X1, TOP, BOT = 640, 400, 250, 390, 40, 380   # room above for the label at 11 px on a phone
     pitch = (BOT - TOP) / n
     y = lambda fl: BOT - fl * pitch                     # the top edge of floor fl
     first = first_egg_floors(k, n)
@@ -152,18 +152,18 @@ def building_svg(k=K, n=N):
         p.append(f'<line class="egg-drop1" x1="{X0}" x2="{X1 + 10}" y1="{y(fl):.1f}" y2="{y(fl):.1f}"/>'
                  f'<text class="egg-lbl1" x="{X1 + 16}" y="{y(fl) + 4:.1f}">{fl}</text>')
         low = fl
-    p.append(f'<text class="legend" x="{X1 + 16}" y="{TOP - 6}">הביצה הראשונה</text>')
+    p.append(f'<text class="legend" x="{X1 + 16}" y="{TOP - 16}">הביצה הראשונה</text>')
     last_label = None                                    # labels only where they do not overlap
     for fl in reversed(second):
         p.append(f'<line class="egg-drop2" x1="{X0 - 10}" x2="{X1}" y1="{y(fl):.1f}" y2="{y(fl):.1f}"/>')
         if last_label is None or y(fl) - last_label >= 11:
             p.append(f'<text class="egg-lbl2" x="{X0 - 16}" y="{y(fl) + 4:.1f}" text-anchor="end">{fl}</text>')
             last_label = y(fl)
-    p.append(f'<text class="legend" x="{X0 - 16}" y="{y(second[-1]) - 8:.1f}" text-anchor="end">הביצה השנייה</text>')
+    p.append(f'<text class="legend" x="{X0 - 16}" y="{y(second[-1]) - 18:.1f}" text-anchor="end">הביצה השנייה</text>')
     for fl in third:
         p.append(f'<line class="egg-drop3" x1="{X0 - 60}" x2="{X0 - 40}" y1="{y(fl):.1f}" y2="{y(fl):.1f}"/>')
     p.append(f'<text class="egg-lbl3" x="{X0 - 66}" y="{y(third[-1]) + 10:.1f}" text-anchor="end">{third[0]}–{third[-1]}</text>'
-             f'<text class="legend" x="{X0 - 66}" y="{y(third[-1]) - 6:.1f}" text-anchor="end">השלישית</text>')
+             f'<text class="legend" x="{X0 - 66}" y="{y(third[-1]) - 12:.1f}" text-anchor="end">השלישית</text>')
     p.append(f'<text class="tick" x="{X0 - 6}" y="{BOT + 14}" text-anchor="end">קומה 0</text>'
              f'<text class="tick" x="{X1 + 16}" y="{BOT + 14}">{n} קומות, {min_drops(k, n)} הטלות</text></svg>')
     return "".join(p)

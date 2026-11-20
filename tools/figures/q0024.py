@@ -76,9 +76,10 @@ def panel(p, cx, cy, a, b, name_a, name_b, head, foot, what):
 
 
 def circle_svg(aria, left, right):
-    p = [f'<svg class="figure" viewBox="0 0 640 294" style="max-width:40rem" role="img" aria-label="{aria}">']
-    panel(p, 160, 156, *left)
-    panel(p, 480, 156, *right)
+    # the heads sit 16 units above the pointer names, room for both at 11 px on a phone
+    p = [f'<svg class="figure" viewBox="0 0 640 310" style="max-width:40rem" role="img" aria-label="{aria}">']
+    panel(p, 160, 172, *left)
+    panel(p, 480, 172, *right)
     p.append("</svg>")
     return "".join(p)
 

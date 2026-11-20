@@ -376,7 +376,7 @@
     const dx = b.x < lo ? lo - b.x : b.x + b.width > hi ? hi - b.x - b.width : 0;
     if (Math.abs(dx) < 0.5) return;
     t.setAttribute("transform", `translate(${dx.toFixed(1)} 0)`);
-    t.dataset.fitShift = "";
+    t.dataset.fitShift = dx.toFixed(1);
   };
 
   // a row along x, or with col a column along y (a digit fills about 0.7 of its box's height)
@@ -403,7 +403,7 @@
       const scale = m ? Math.hypot(m.a, m.b) : 0;
       if (!scale || !t.textContent.trim()) continue;
       const size = parseFloat(getComputedStyle(t).fontSize);
-      const tick = t.matches(".tick, .coord"), min = tick ? TICK_PX : MIN_PX;
+      const tick = t.matches(".tick, .coord, .legend"), min = tick ? TICK_PX : MIN_PX;
       if (size * scale >= min) continue;
       t.dataset.fitBase = t.style.fontSize;
       const grown = Math.min((tick ? TICK_PX : FIT_PX) / scale, size * MAX_GROW);
@@ -429,7 +429,19 @@
       t.el.classList.toggle("fit-hidden", hit);
       if (!hit) kept.push(b);
     });
+    // an axis's name (anchored at its end on the row of the x axis's labels, at a corner of
+    // the chart) wins over the labels it now covers: the 0 of the y axis, the first of the x axis
     svg.querySelectorAll("text[data-fit-base]:not(.fit-hidden)").forEach((t) => keepInside(svg, t));
+    const shifted = (t) => { const b = t.getBBox(); return { x: b.x + (parseFloat(t.dataset.fitShift) || 0), y: b.y, width: b.width, height: b.height }; };
+    const named = labels.filter((t) => t.getAttribute("text-anchor") === "end" && axisRows.has(at(t, "y").split("|").pop()));
+    named.forEach((n) => {
+      const a = shifted(n);
+      labels.forEach((t) => {
+        if (t === n || named.includes(t) || t.classList.contains("fit-hidden")) return;
+        const b = shifted(t);
+        if (a.x < b.x + b.width && b.x < a.x + a.width && a.y < b.y + 0.7 * b.height && b.y < a.y + 0.7 * a.height) t.classList.add("fit-hidden");
+      });
+    });
     const wrap = svg.parentElement;
     if (wrap && wrap.classList.contains("fig-wrap")) decide(wrap);   // the enlarged text may reach the button
   };

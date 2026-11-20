@@ -558,6 +558,8 @@
       rainwater: "עורכים את הגבהים : לחיצה, גרירה שמסמנת כמה ערכים יחד (ואז \"ערך\" או ‎+1 ו-‎−1, בקבוצה \"עריכת המערך\"), מספר שמקלידים, לחיצה כפולה לעריכה במקום, או שדה הטקסט שבאותה קבוצה, שאפשר להדביק לתוכו מערך. \"תצוגה\" בוחרת בין צעד אחרי צעד לבין התוצאה הסופית, שנשמרת גם אחרי כל עריכה ומילוי אקראי. בשורה רצים שני המצביעים, ובמפה כל צעד מוציא מהערימה את התא הנמוך בגבול וממלא את השכנים החדשים שלו.",
     },
     models: { rwRow, rwMap, rwParse, rwText },
-    cols: { rainwater: { main: ".rw-code", side: ".rw-step" } },   // the step (right) beside its code line (left); the editing group lays its rows out in two columns (27-box-columns.css)
+    // the bars (or the map and its heap) on the left, the step and the code line beside them,
+    // so either box fits one screen; the widths per mode are in 27-box-columns.css
+    cols: { rainwater: { main: ".rw-bars, .rw-ptrs, .rw-panels", side: ".rw-step, .rw-code" } },
   });
 })();

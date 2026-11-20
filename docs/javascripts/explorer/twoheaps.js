@@ -339,7 +339,10 @@
     help: {
       twoheaps: "מקלידים זרם של מספרים שלמים (או מגרילים) ובוחרים מצב. שתי הערימות מצוירות זו מול זו : high למעלה עם הראש שלה למטה, low למטה עם הראש שלה למעלה, והקו ביניהן הוא התשובה. בסעיף א כל ערך הוא שלושה צעדים : הדחיפה ל-low, המעבר של הראש ל-high, והאיזון עם החציון. בסעיף ב מחוון ל-p, והצעד השלישי משלים את low ליעד ⌈p · n⌉. בסעיף ג חלון של W הערכים האחרונים : ערך שיצא מהחלון נשאר בערימה מחוק ואפור עד שהוא נזרק מהראש, והגדלים שמוצגים הם החיים. השורה שמתחת מסבירה כל צעד, והפאנל 'הסבר' מדליק את שורות הקוד.",
     },
-    cols: { twoheaps: {} },   // the stream and the two heaps beside the steps and the code
+    // the stream and the two heaps beside the legend, the steps and the code, the two notes
+    // under both, the whole box wide (the heaps' drawing and the code have heights of their
+    // own on a computer, 27-box-columns.css), so each box fits one screen
+    cols: { twoheaps: { main: ".th-wrap", side: ".viz-legend", w: "minmax(0, 0.8fr)" } },
     models: { thTraceMedian, thTraceQuantile, thTraceWindow, thRank, thLevels },
   });
 })();

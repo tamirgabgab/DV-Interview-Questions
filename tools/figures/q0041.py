@@ -152,7 +152,7 @@ def coverage_chart(n=N):
     c.hline(0.5, "50%", label_at="end", cls="grid", width=1)
     curve = cover_curve(n, tmax)
     c.path([(t, v) for t, v in enumerate(curve)], "s1-line")
-    c.vline(q50, 0.5, f"חציון {q50}")
+    c.vline(q50, 0.5, f"חציון {q50}", side="left")
     c.vline(e, curve[round(e)], f"תוחלת {e:.1f}")
     c.vline(q95, 0.95, f"95% : {q95}")
     c.axis("טסטים")

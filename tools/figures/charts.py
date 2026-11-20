@@ -91,13 +91,17 @@ class Chart:
                 self.add(f'<text class="legend" x="{self.x1 - 4}" y="{y - 6:.1f}" text-anchor="end">{label}</text>')
         return self
 
-    def vline(self, x, y_to, label=None, dash="3 3"):
-        """A thin dashed drop from (x, y_to) to the axis, labelled next to its foot."""
+    def vline(self, x, y_to, label=None, dash="3 3", side="right"):
+        """A thin dashed drop from (x, y_to) to the axis, labelled next to its foot (on its
+        right, or with side="left" on its left, so two drops close together keep apart)."""
         X = self.X(x)
         self.add(f'<line class="ink-line" x1="{X:.1f}" x2="{X:.1f}" y1="{self.Y(y_to):.1f}" y2="{self.base}" '
                  f'stroke-width="1" stroke-dasharray="{dash}"/>')
         if label:
-            self.add(f'<text class="legend" x="{X + 6:.1f}" y="{self.base - 6}">{label}</text>')
+            if side == "left":
+                self.add(f'<text class="legend" x="{X - 6:.1f}" y="{self.base - 6}" text-anchor="end">{label}</text>')
+            else:
+                self.add(f'<text class="legend" x="{X + 6:.1f}" y="{self.base - 6}">{label}</text>')
         return self
 
     def axis(self, x_label=None, at="start"):

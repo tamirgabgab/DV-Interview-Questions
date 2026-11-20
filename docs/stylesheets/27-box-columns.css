@@ -143,10 +143,36 @@
   .md-typeset .explorer .prob-chart svg { max-width: 30rem; }
 }
 
-/* tagpool (0062): the timeline in its wide column drops its 30rem minimum (the column keeps
-   its text at 11 px and more) */
+/* islands (0065): the queue beside the board, its legend in two rows, and the code beside them
+   shows about six lines and scrolls itself to the lit ones */
 @container (min-width: 600px) {
-  .md-typeset .explorer .ex-cols .tp-wrap svg { min-width: 0; }
+  .md-typeset .explorer[data-kind="islands"] .ex-cols .ex-explain .ex-codewrap { max-height: 6.6rem; overflow-y: auto; }
+  .md-typeset .explorer[data-kind="islands"] .ex-main .viz-legend { gap: 0.15rem 0.7rem; }
+}
+
+/* horses (0043): the grid without the figure's margins, and the races table scrolls itself
+   to the current race under a sticky head */
+@container (min-width: 600px) {
+  .md-typeset .explorer[data-kind="horses"] .hr-gridbox svg.figure { margin: 0.3rem auto; }
+  .md-typeset .explorer[data-kind="horses"] .hr-table { max-height: 7rem; overflow-y: auto; }
+  .md-typeset .explorer[data-kind="horses"] .hr-table th { position: sticky; top: 0; z-index: 1; background: var(--md-default-bg-color); }
+}
+
+/* twoheaps (0068): the heaps drawn 14rem wide (their text stays at 13 px and more) and the
+   code beside them shows about six lines, scrolled to the lit ones */
+@container (min-width: 600px) {
+  .md-typeset .explorer[data-kind="twoheaps"] .ex-cols .th-twowrap svg { max-width: 14rem; }
+  .md-typeset .explorer[data-kind="twoheaps"] .ex-cols .ex-explain .ex-codewrap { max-height: 6.2rem; overflow-y: auto; }
+}
+
+/* tagpool (0062): the timeline in its wide column drops its 30rem minimum (the column keeps
+   its text at 11 px and more) and its margins, the enlarge button sits on the drawing's top
+   corner instead of a strip of its own (no text there: the names are on the left), and the
+   code shows eight lines and scrolls itself to the lit ones, so either box fits one screen */
+@container (min-width: 600px) {
+  .md-typeset .explorer .ex-cols .tp-wrap svg { min-width: 0; margin: 0 auto; }
+  .md-typeset .explorer .ex-cols .tp-wrap > .fig-wrap--above { padding-top: 0; }
+  .md-typeset .explorer[data-kind="tagpool"] .ex-cols .ex-explain .ex-codewrap { max-height: 6.4rem; overflow-y: auto; }
 }
 
 /* probability (0015): no columns of cols (the box is one block), but from a 600 px box the
@@ -245,6 +271,13 @@
   .md-typeset .explorer:is([data-kind="maxones"], [data-kind="rainwater"]) > .ex-fold > .ex-fold-title { grid-column: 1 / -1; }
   .md-typeset .explorer:is([data-kind="maxones"], [data-kind="rainwater"]) > .ex-fold > .ex-controls { grid-column: 1; }
   .md-typeset .explorer:is([data-kind="maxones"], [data-kind="rainwater"]) > .ex-fold > :is(.mo-textrow, .rw-textrow) { grid-column: 2; grid-row: 2 / span 3; flex-direction: column; align-items: flex-start; }
+}
+/* rainwater (0047): the bars, or the map with its heap (the heap's caption wrapped so the two
+   stay side by side), beside the step and the code line */
+@container (min-width: 600px) {
+  .md-typeset .explorer[data-kind="rainwater"] > .ex-cols { --ex-main-w: minmax(0, 1.3fr); }
+  .md-typeset .explorer[data-kind="rainwater"][data-mode="map"] > .ex-cols { --ex-main-w: minmax(0, 1.5fr); }
+  .md-typeset .explorer[data-kind="rainwater"] .ex-main .rw-heap-panel figcaption { max-width: 9rem; }
 }
 
 /* acknak (0025): the RC, the queues and the EP in one row only from an 800 px box; in a
