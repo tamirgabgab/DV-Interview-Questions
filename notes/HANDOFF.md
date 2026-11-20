@@ -542,9 +542,10 @@ redesign plan of 2026-10-16 and the proposal series six to eight, and items 112 
   the first part of round 7 (216), round 4 (217) and a pilot of round 6 (218).
   Round 8 is split in two (0036 alone, then the rest as round 9); rounds 8 and 9 are not
   started.
-- **State:** `main` has rounds 1 to 3, 5, 7 and the stylesheet split of round 4 (1336f15).
-  The branch adds the math at build time and the questions 0110 and 0111 (111 questions,
-  204 boxes), for `main` once its CI is green.
+- **State:** `main` (5c71e11, deployed 2026-11-20 13:04 Israel time) has rounds 1 to 5 and
+  7 and the pilot of round 6 (111 questions, 204 boxes); the live site was checked at 390
+  and 1440 px in both schemes (built math, 0110, 0111, the home page). Next: the owner's
+  look at 0110 and 0111 before the rest of round 6, then rounds 8 and 9.
 - **Waiting on the owner:** the
   Search Console verification code (N3.4); a try of a box's number field and of the lists' filter on an
   iPhone (the page must not zoom on focus, N6.8); YouTube links of the videos made in the owner's other project
