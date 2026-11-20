@@ -341,8 +341,9 @@
   // data-fit-drop that still renders under MIN_PX is hidden, its tooltip stays); a row of tick
   // labels (class tick or coord) that then overlaps is thinned, every k-th label kept (the first and the last
   // always), the smallest k with no overlap, and so is a column of them (a y axis, labels
-  // anchored at their end). Tick and coord labels, which thinning keeps apart, render at
-  // TICK_PX at least (round 9: the axes of 0028 and 0044 read at 11 px on a phone); a lone
+  // anchored at their end). Tick and coord labels, which thinning keeps apart, and legend
+  // labels (the names of a chart's lines, such as "T ≈ 0.333") render at TICK_PX at least
+  // (round 9: the axes of 0028 and 0044; round 10: the legends, at 11 px on a phone); a lone
   // one that then overlaps another (the values over a bar chart's bars) is hidden, the
   // higher kept. Redone when a figure comes into view, on resize, and when an explorer box
   // redraws; the lightbox copy gets the original sizes.

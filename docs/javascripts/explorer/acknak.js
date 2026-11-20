@@ -184,10 +184,10 @@
         `<button type="button" class="md-button ex-send">ה-RC שולח TLP</button>` +
         `<button type="button" class="md-button ex-flush">טיימר ה-Ack פג</button>` +
         `<button type="button" class="md-button ex-timeout">ה-REPLAY_TIMER פג</button></div>` +
-        randomRow("שיעור התקלות", "תנועה אקראית (כמו ה-test של העמוד)") +
+        randomRow("שיעור התקלות", "תנועה אקראית") +
         `<div class="an-box"><div class="an-side an-rc" data-steady></div><div class="an-link" data-steady></div><div class="an-side an-ep" data-steady></div></div>` +
-        `<p class="ex-title">ציר האירועים : עמודה לכל אירוע, המונים אחריו, ו-✗ כשאינווריאנט נופל</p><div class="wv-wrap an-strip" tabindex="0" role="group" aria-label="ציר האירועים, גלילה אופקית"></div>` +
-        `<p class="wv-step an-log" aria-live="polite"></p><p class="ex-summary an-sum"></p><p class="ex-note an-rand"></p>`;
+        `<p class="ex-title an-striptitle">ציר האירועים : עמודה לכל אירוע, המונים אחריו, ו-✗ כשאינווריאנט נופל</p><div class="wv-wrap an-strip" tabindex="0" role="group" aria-label="ציר האירועים, גלילה אופקית"></div>` +
+        `<div class="an-notes"><p class="wv-step an-log" aria-live="polite"></p><p class="ex-summary an-sum"></p><p class="ex-note an-rand"></p></div>`;
       const $ = (sel) => box.querySelector(sel);
       const chips = (items, cls) => (items.length ? items.map((t) => `<span class="an-chip${t.cls ? " " + t.cls : ""}">${t.text}</span>`).join("") : `<span class="an-empty">ריק</span>`);
       const field = (name, value, changed) => `<div class="an-field${changed ? " is-changed" : ""}"><span class="an-name">${name}</span><span class="an-val">${value}</span></div>`;
@@ -306,6 +306,10 @@
     help: {
       acknak: "ה-RC וה-EP עם שני תורי הקישור : ״הצעד הבא״ ו״הפעלה״ מריצים את תסריטי העמוד ואת מקרה המלכודת, האירועים החופשיים שולחים, מוסרים (גם עם CRC שגוי או אובדן) ומפעילים טיימרים, ו״הרצה אקראית״ מגרילה תנועה עם תקלות ובודקת את האינווריאנטים. ציר האירועים מוסיף עמודה לכל אירוע.",
     },
+    // on a computer the event strip on the left and the event's line, the invariants and the
+    // random run's note beside it, so the box fits one screen; the notes have a wrapper so they
+    // can go in a column (the summary alone could not)
+    cols: { acknak: { main: ".an-striptitle, .an-strip", side: ".an-notes", w: "minmax(0, 1.6fr)" } },
     models: { AN_MOD, anInit, anApply, AN_SCRIPTS, anRun, anInvariants, anRandomScript, anEventLabel },
   });
 })();

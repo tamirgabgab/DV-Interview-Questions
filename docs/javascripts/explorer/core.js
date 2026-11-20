@@ -245,7 +245,7 @@
     const first = base + from;
     const rows = [{ name: "event", kind: "bus", split: true, values: Lg.map((l, i) => (first + i === 0 ? "start" : label(l))) }]
       .concat(rowsOf(S), [{ name: "✗", kind: "flag", values: S.map((s) => (invariants(s).length ? 1 : 0)) }]);
-    return waveStrip(rows, n, { slotW: 52, labelW: 92, cursor: n - 1, ticks: (k) => first + k, label: `ציר האירועים : ${n} עמודות` });
+    return waveStrip(rows, n, { slotW: 52, labelW: 92, rowH: 26, cursor: n - 1, ticks: (k) => first + k, label: `ציר האירועים : ${n} עמודות` });
   };
   const randNote = (rd, seed, faults, names, checks) => {
     const v = rd.violation;
@@ -282,7 +282,7 @@
     `<div class="wv-row"><div class="wv-names" aria-hidden="true" style="width:${L}px;margin-right:-${L}px;padding-top:${T}px">` +
     names.map((n) => `<div style="height:${RH}px;line-height:${RH - 2}px">${n}</div>`).join("") + `</div>${svg}</div>`;
   const waveStrip = (rows, N, opts = {}) => {
-    const L = opts.labelW ?? 66, SW = opts.slotW ?? 36, RH = 30, T = opts.ticks ? 20 : 8;
+    const L = opts.labelW ?? 66, SW = opts.slotW ?? 36, RH = opts.rowH ?? 30, T = opts.ticks ? 20 : 8;
     const W = L + N * SW + 6, H = T + rows.length * RH + 4;
     const x = (k) => L + k * SW;
     let s = `<svg class="wave-strip" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="${opts.role || "img"}" aria-label="${opts.label || ""}" data-wavedrom="${attr(waveDromText(waveDromOf(rows, N, opts)))}">`;

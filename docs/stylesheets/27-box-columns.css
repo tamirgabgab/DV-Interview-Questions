@@ -61,9 +61,17 @@
   .md-typeset .explorer[data-kind="farm"] .ex-side .farm-table td:is(:nth-child(2), :nth-child(3)) bdi.ex-nw { white-space: nowrap; }
 }
 
-/* boxes (0009): the ring a little smaller in its column, so the walk beside the proof is shorter */
+/* boxes (0009): the ring smaller in its column, so the walk and the formula under it are as tall as the
+   1,000 rounds and the proof beside them; there each bar's name is on a line of its own, the bar
+   and its count under it */
 @container (min-width: 600px) {
-  .md-typeset .explorer[data-kind="boxes"] .ex-main svg.bx-live { width: 16rem; }
+  .md-typeset .explorer[data-kind="boxes"] .ex-main svg.bx-live { width: 12.5rem; margin: 0.3rem auto; }
+  .md-typeset .explorer[data-kind="boxes"] .ex-side .bx-bar { grid-template-columns: minmax(0, 1fr) auto; gap: 0 0.6rem; margin: 0.2rem 0; font-size: 0.7rem; line-height: 1.4; }
+  .md-typeset .explorer[data-kind="boxes"] .ex-side .bx-bar-label { grid-column: 1 / -1; }
+  /* the count of rounds is the first bar's count (with person 0 every round succeeds) */
+  .md-typeset .explorer[data-kind="boxes"] .ex-side .bx-runs { display: none; }
+  .md-typeset .explorer[data-kind="boxes"] .ex-side :is(.bx-swaps, .bx-cut-help, .bx-cut-text) { line-height: 1.45; }
+  .md-typeset .explorer[data-kind="boxes"] .ex-side .bx-proof > * { margin-block: 0.3rem; }
 }
 /* arbiter (0054): the grid in its column keeps its labels at about 11 px */
 @container (min-width: 600px) {
@@ -126,6 +134,57 @@
 @container (min-width: 600px) {
   .md-typeset .explorer .an-box { flex-wrap: nowrap; gap: 0.6rem 0.8rem; }
   .md-typeset .explorer .an-box > :is(.an-side, .an-link) { flex: 1 1 0; }
+}
+/* acknak (0025), to fit one screen: the free events beside the random traffic's title, its
+   controls in one row, and the EP a little wider so its delivered TLPs sit in one row */
+@container (min-width: 600px) {
+  .md-typeset .explorer[data-kind="acknak"] > .an-free { float: left; gap: 0.4rem; margin: 0.4rem 0 0; }
+  .md-typeset .explorer[data-kind="acknak"] > .an-free .md-button { padding: 0.3em 0.8em; font-size: 0.68rem; }
+  .md-typeset .explorer[data-kind="acknak"] > .ex-fold > .ex-controls,
+  .md-typeset .explorer[data-kind="acknak"] > .an-box { clear: both; }
+  .md-typeset .explorer[data-kind="acknak"] .an-random input[type="range"] { width: 5rem; }
+  .md-typeset .explorer[data-kind="acknak"] .an-box > .an-rc { flex-grow: 1.05; }
+  .md-typeset .explorer[data-kind="acknak"] .an-box > .an-ep { flex-grow: 1.15; }
+  .md-typeset .explorer[data-kind="acknak"] .an-field { margin: 0.1rem 0; }
+  .md-typeset .explorer[data-kind="acknak"] .an-chip { height: 1.25rem; min-width: 1.4rem; font-size: 0.68rem; }
+  .md-typeset .explorer[data-kind="acknak"] .ex-side .an-log { margin-top: 0; }
+}
+/* credits (0024), to fit one screen: the circle at about its drawn size beside the counters, the
+   free events three to a row under the counters, and the random run's controls beside the strip */
+@container (min-width: 600px) {
+  .md-typeset .explorer[data-kind="credits"] .cr-top { display: grid; grid-template-columns: 13.5rem minmax(0, 1fr); grid-template-areas: "circle panel" "circle free"; align-items: start; gap: 0.4rem 1.2rem; }
+  .md-typeset .explorer[data-kind="credits"] .cr-top > .cr-circle { grid-area: circle; min-width: 0; }
+  .md-typeset .explorer[data-kind="credits"] .cr-top svg.cr-live { width: 13.5rem; }
+  .md-typeset .explorer[data-kind="credits"] .cr-top > .cr-panel { grid-area: panel; }
+  .md-typeset .explorer[data-kind="credits"] .cr-top > .cr-free { grid-area: free; }
+  .md-typeset .explorer[data-kind="credits"] .cr-free .an-free { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.35rem; margin: 0; }
+  .md-typeset .explorer[data-kind="credits"] .cr-free .an-free > .ex-title { grid-column: 1 / -1; order: -1; }
+  .md-typeset .explorer[data-kind="credits"] .cr-free .an-free .md-button { width: 100%; padding: 0.3em 0.2em; font-size: 0.55rem; white-space: nowrap; }
+  .md-typeset .explorer[data-kind="credits"] .ex-side .ex-fold-title { font-size: 0.7rem; }
+  .md-typeset .explorer[data-kind="credits"] .ex-side .an-random { gap: 0.4rem 0.8rem; }
+  .md-typeset .explorer[data-kind="credits"] .ex-side .an-random input[type="range"] { width: 5rem; }
+}
+/* intervals (0066), to fit one screen: the timeline at about its drawn size (640 units) with the
+   trap presets and the legend beside it, the step's note under it, and the explain panel at full
+   width under them, its steps and values beside a code window of its own height; the box has no
+   columns, so it is a container of its own */
+.md-typeset .explorer[data-kind="intervals"] { container-type: inline-size; }
+@container (min-width: 600px) {
+  .md-typeset .explorer[data-kind="intervals"] input.iv-ivs { width: 11rem; }
+  .md-typeset .explorer[data-kind="intervals"] input.iv-t { width: 5rem; }
+  .md-typeset .explorer[data-kind="intervals"] .iv-top { display: flex; align-items: flex-start; gap: 0.6rem 1rem; }
+  .md-typeset .explorer[data-kind="intervals"] .iv-top > .iv-wrap { flex: 0 1 26rem; min-width: 0; }
+  .md-typeset .explorer[data-kind="intervals"] .iv-top > .iv-wrap svg { min-width: 0; }
+  .md-typeset .explorer[data-kind="intervals"] .iv-top > .iv-aside { flex: 1 1 0; min-width: 0; }
+  .md-typeset .explorer[data-kind="intervals"] .iv-aside > .iv-presets { margin-top: 0; line-height: 2; }
+  .md-typeset .explorer[data-kind="intervals"] .iv-aside > .iv-presets .md-button { padding: 0.05rem 0.4rem; font-size: 0.6rem; }
+  .md-typeset .explorer[data-kind="intervals"] .iv-aside > .viz-legend { flex-direction: column; align-items: flex-start; gap: 0.2rem; }
+  .md-typeset .explorer[data-kind="intervals"] .ex-explain { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); grid-template-areas: "title title" "chips code" "vars code"; align-items: start; gap: 0 1rem; }
+  .md-typeset .explorer[data-kind="intervals"] .ex-explain > .ex-proof-title { grid-area: title; }
+  .md-typeset .explorer[data-kind="intervals"] .ex-explain > .ex-stepchips { grid-area: chips; }
+  .md-typeset .explorer[data-kind="intervals"] .ex-explain .ex-stepchips li { padding-block: 0; font-size: 0.62rem; }
+  .md-typeset .explorer[data-kind="intervals"] .ex-explain > .ex-vars { grid-area: vars; }
+  .md-typeset .explorer[data-kind="intervals"] .ex-explain > .ex-codewrap { grid-area: code; max-height: 6.8rem; overflow-y: auto; }
 }
 /* bitrev (0077): narrower still, so 12 bits and four-digit sums fit without scrolling */
 @container (min-width: 600px) {
@@ -298,6 +357,31 @@
 @container (min-width: 600px) {
   .md-typeset .explorer .ex-main > .strip-walls { gap: 0.4rem 0.6rem; }
   .md-typeset .explorer .ex-main > .strip-walls > .strip-wall { flex: 1 1 6.5rem; min-width: 0; }
+}
+
+/* netdelay (0067), to fit one screen: the graph smaller and without its margins, the links table
+   about three rows tall with its head kept, and beside them the legend and a seven-line code window
+   (each scrolls itself; the code to the step's lines) */
+@container (min-width: 600px) {
+  .md-typeset .explorer[data-kind="netdelay"] .ex-main .nd-wrap svg.figure { width: 18rem; margin: 0.2rem auto; }
+  .md-typeset .explorer[data-kind="netdelay"] .ex-side .viz-legend { gap: 0.15rem 0.7rem; }
+  .md-typeset .explorer[data-kind="netdelay"] .ex-main .nd-etab-wrap { max-height: 6.2rem; overflow-y: auto; }
+  .md-typeset .explorer[data-kind="netdelay"] .ex-main .nd-etab-wrap th { position: sticky; top: 0; z-index: 1; background: var(--md-default-bg-color); }
+  .md-typeset .explorer[data-kind="netdelay"] .ex-main table.nd-etab td { padding-block: 0.05em; }
+  .md-typeset .explorer[data-kind="netdelay"] .ex-cols .ex-explain .ex-stepchips li { padding-block: 0; font-size: 0.6rem; }
+  .md-typeset .explorer[data-kind="netdelay"] .ex-cols .ex-explain .ex-codewrap { max-height: 5rem; }
+}
+
+/* weights (0064), to fit one screen: the scale at about its drawn size (640 units) with the legend
+   in a column beside it, a seven-line code window and a conversion table that scrolls after
+   seven rows */
+@container (min-width: 600px) {
+  .md-typeset .explorer[data-kind="weights"] .wt-top { display: flex; align-items: center; gap: 0.6rem 1.2rem; }
+  .md-typeset .explorer[data-kind="weights"] .wt-top > .wt-wrap { flex: 0 1 28rem; min-width: 0; }
+  .md-typeset .explorer[data-kind="weights"] .wt-top > .viz-legend { flex: 1 1 0; flex-direction: column; align-items: flex-start; }
+  .md-typeset .explorer[data-kind="weights"] .ex-cols .ex-explain .ex-codewrap { max-height: 7rem; }
+  .md-typeset .explorer[data-kind="weights"] .ex-main .wt-conv { max-height: 11rem; overflow-y: auto; }
+  .md-typeset .explorer[data-kind="weights"] .ex-main .wt-conv th { position: sticky; top: 0; z-index: 1; background: var(--md-default-bg-color); }
 }
 
 /* the steps-and-code panel in the side column (core.js explain()): its code view is at most

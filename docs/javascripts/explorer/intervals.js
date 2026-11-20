@@ -260,13 +260,13 @@
         `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(1400, 800, 350) +
         `<span class="ex-pos"></span></div>` +
         `<p class="ex-summary iv-sum" aria-live="polite"></p>` +
-        `<div class="iv-wrap" data-fig-strip></div>` +
+        `<div class="iv-top"><div class="iv-wrap" data-fig-strip></div><div class="iv-aside">` +
         `<p class="wv-presets iv-presets">מקרי מלכודת${NB}: ${PRESETS.map((p, k) => `<button type="button" class="md-button ex-preset" data-k="${k}" title="${p.title}">${p.name}</button>`).join(" ")}</p>` +
         `<span class="viz-legend"><span class="iv-only-a"><i class="iv-key-bar"></i>קטע מהקלט</span><span class="iv-only-a"><i class="iv-key-merged"></i>קטע ממוזג</span>` +
         `<span class="iv-not-a"><i class="iv-key-blk"></i>הגובה של קטע אחד</span><span class="iv-not-a"><i class="iv-key-line"></i>הגובה הכולל</span><span class="iv-only-b"><i class="iv-key-piece"></i>חתיכה שנפלטה</span>` +
         `<span class="iv-only-c"><i class="iv-key-thr"></i>הסף T</span><span class="iv-only-c"><i class="iv-key-peak"></i>השיא עד עכשיו</span><span class="iv-only-c"><i class="iv-key-range"></i>טווח בגובה לפחות T</span>` +
         `<span><i class="iv-key-cur"></i>הקטע או החתיכה של הצעד</span></span>` +
-        `<p class="iv-note"></p>`;
+        `</div></div><p class="iv-note"></p>`;
       const show = explain(box, "הסבר : השלבים של הפתרון והקוד");
       answer(box, NB); answer(box, null);           // the answer line keeps its place from the first step
       const $ = (sel) => box.querySelector(sel);
@@ -390,7 +390,6 @@
     help: {
       intervals: "מקלידים קטעים כזוגות התחלה-סוף (למשל 1-3 2-6), ובסעיפים ב ו-ג עם גובה, התחלה-סוף-גובה (למשל 1-7-7), או מגרילים. בסעיף א כל צעד הוא קטע אחד בסדר הממוין : מאריך את הקטע הממוזג האחרון או פותח חדש, והפלט על השורה שמתחת לציר. בסעיף ב כל צעד הוא מיקום אחד של אירועים : החתיכה עד אליו נפלטת בגובה הסכום הרץ, הבלוקים הם הגובה של כל קטע והקו הוא הסכום. בסעיף ג כל צעד הוא חתיכה אחת מול הסף T שבסליידר : מצטרפת לטווח או פותחת חדש, והשיא מקווקו. השורה שמתחת מסבירה כל צעד, והפאנל 'הסבר' מדליק את שורות הקוד. כפתורי מקרי המלכודת טוענים קלט לא ממוין, קטעים מקוננים ונוגעים, ובסעיף ב קטעים שנוגעים באותו גובה או מתחילים יחד.",
     },
-    cols: { intervals: { main: ".iv-presets, .viz-legend, .iv-note" } },   // the wide timeline stays full width; under it its legend and the step's note beside the code
     models: { ivMerge, ivMergeUnsorted, ivSkyline, ivPieces, ivAbove },
   });
 })();

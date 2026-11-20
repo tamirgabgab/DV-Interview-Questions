@@ -81,9 +81,9 @@
         `<button type="button" class="md-button ex-play">הפעלה</button>` + speedSel(1600, 1000, 450) +
         `<span class="ex-pos"></span></div>` +
         `<p class="ex-summary wt-sum" aria-live="polite"></p>` +
-        `<div class="wt-wrap" data-fig-strip></div>` +
+        `<div class="wt-top"><div class="wt-wrap" data-fig-strip></div>` +
         `<span class="viz-legend"><span><i class="wt-key-load"></i>המשא</span><span><i class="wt-key-other"></i>בכף השנייה</span><span class="wt-two"><i class="wt-key-beside"></i>ליד המשא</span>` +
-        `<span><i class="wt-key-off"></i>בחוץ</span><span><i class="wt-key-wait"></i>עוד לא הוחלט</span><span><i class="wt-key-now"></i>הצעד הנוכחי</span></span>` +
+        `<span><i class="wt-key-off"></i>בחוץ</span><span><i class="wt-key-wait"></i>עוד לא הוחלט</span><span><i class="wt-key-now"></i>הצעד הנוכחי</span></span></div>` +
         `<div class="wt-digits at-scroll" tabindex="0" aria-label="הספרות של המשא"></div>` +
         `<p class="wt-sums"></p><p class="wt-note"></p>` +
         `<p class="ex-title">ההמרה, ספרה אחר ספרה</p><div class="wt-conv at-scroll" tabindex="0" aria-label="טבלת ההמרה"></div>`;
@@ -251,7 +251,9 @@
 
   dvqExplorers.register({
     views: { weights: weightsView },
-    cols: { weights: { main: ".wt-digits, .wt-sums, .wt-note, .ex-title, .wt-conv" } },   // the scale stays wide; under it its tables beside the code
+    // on a computer the scale at its own size with the legend beside it; under them the digits,
+    // the sums and the conversion table beside the step's note and the code (27-box-columns.css)
+    cols: { weights: { main: ".wt-digits, .wt-sums, .ex-title, .wt-conv", side: ".wt-note" } },
     help: {
       weights: "בוחרים סעיף (כף אחת, שתי כפות, או c עותקים מכל משקולת), מספר משקלים k ומשא n. כל צעד הוא ספרה אחת של n, מהנמוכה : השארית, הספרה (בשתי כפות שארית גדולה מ-c הופכת לספרה שלילית עם העברה), והמשקולת עוברת מהשורה שמתחת למאזניים לכף שלה. הטבלה מתחת למאזניים היא הספרות, הספרה השלילית מסומנת, ולמעלה החסם של k משקלים מול מה שהמשקולות שוקלות בפועל.",
     },

@@ -97,10 +97,10 @@
         `<button type="button" class="md-button ex-all">עד הסוף</button>` +
         `<button type="button" class="md-button ex-start">מההתחלה</button></div>` +
         `<p class="bx-walk" aria-live="polite"></p><p class="bx-alone"></p></div></div>` +
-        `<div class="ex-controls bx-stats-row">` +
+        `<div class="bx-rounds"><div class="ex-controls bx-stats-row">` +
         `<button type="button" class="md-button ex-rounds">1,000 סיבובים</button>` +
         `<button type="button" class="md-button ex-rounds-reset">איפוס המונים</button><span class="bx-runs"></span></div>` +
-        `<div class="bx-bars"></div><p class="ex-note bx-swaps"></p><p class="ex-summary bx-formula"></p>` +
+        `<div class="bx-bars"></div><p class="ex-note bx-swaps"></p></div><div class="bx-sum"><p class="ex-summary bx-formula"></p></div>` +
         `<section class="ex-proof bx-proof"><p class="ex-proof-title">שלב ההוכחה : איפה לחתוך</p>` +
         `<p class="bx-cut-help"></p><div class="bx-cut-row" role="group" aria-label="הקופסאות של המעגל הארוך לפי הסדר; לחיצה בוחרת את הקופסה שאדם 0 מחליף עם הראשונה"></div>` +
         `<div class="bx-cut-chart"></div><p class="bx-cut-text"></p></section>`;
@@ -142,15 +142,15 @@
           return;
         }
         const L = long.length, h = st.h !== null && st.h < L ? st.h : L >> 1, lo = L - m, hi = m;
-        $(".bx-cut-help").innerHTML = `המעגל הארוך לפי הסדר, מהקופסה ${ltr(long[0])}. אדם 0 מחליף את הפתק של הקופסה הראשונה עם הפתק של קופסה אחרת עליו. לחצו על קופסה כדי לבחור את החיתוך${st.helper ? ", והטבעת למעלה מתעדכנת" : ""}.`;
+        $(".bx-cut-help").innerHTML = `המעגל הארוך מהקופסה ${ltr(long[0])}. לחצו על קופסה : אדם 0 יחליף את הפתק שלה עם הפתק של הראשונה${st.helper ? ", והטבעת תתעדכן" : ""}.`;
         row.innerHTML = long.map((b, i) => i === 0
           ? `<span class="bx-cut-cell is-first">${b}</span>`
           : `<button type="button" class="bx-cut-cell${i === h ? " is-cut" : ""}${i <= h ? " is-a" : " is-b"}${i >= lo && i <= hi ? "" : " is-bad"}" data-h="${i}" aria-pressed="${i === h}" aria-label="${b}, חיתוך אחרי ${i} קופסאות">${b}</button>`).join("");
         // the chart: one column per h, the larger piece's length; in two columns (a box of
         // 600 px and more, stylesheets/27-box-columns.css) the proof has half the width, and a
-        // narrower drawing keeps its numbers readable
+        // narrower drawing keeps its numbers readable; a flatter one keeps the box on one screen
         const cs = getComputedStyle(box), two = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) >= 600;
-        const w = two ? 360 : 640, ht = 200, x0 = 46, right = 12, top = 14, base = 166, slot = (w - x0 - right) / (L - 1);
+        const w = two ? 360 : 640, ht = two ? 110 : 200, x0 = 46, right = 12, top = 14, base = ht - 34, slot = (w - x0 - right) / (L - 1);
         const Y = (v) => base - (v / L) * (base - top);
         let svg = `<svg class="perf-chart" viewBox="0 0 ${w} ${ht}" role="img" aria-label="החתיכה הגדולה לכל נקודת חיתוך, מול הקו N / 2 = ${m}">`;
         [0, m, L].forEach((v) => { svg += `<line class="grid" x1="${x0}" x2="${w - right}" y1="${f(Y(v))}" y2="${f(Y(v))}"/><text class="tick" x="${x0 - 8}" y="${f(Y(v) + 4)}" text-anchor="end">${v}</text>`; });
@@ -312,7 +312,9 @@
     help: {
       boxes: "N קופסאות במעגל עם המעגלים שלהן בצבעים : ״ערבוב״ מגריל סידור, בוחרים אדם ועוקבים אחרי הפתיחות שלו, ו״1,000 סיבובים״ משווה את האסטרטגיה עם אדם 0 ובלעדיו לבחירה אקראית, וסופר כמה החלפות אדם 0 עשה. ״העתקת קישור״ שומר את המצב. בשלב ההוכחה בוחרים בעצמכם איפה אדם 0 חותך את המעגל הארוך, ורואים מתי שתי החתיכות קצרות מספיק.",
     },
-    cols: { boxes: { main: ".bx-box", side: ".bx-proof" } },   // the ring and the walk beside the proof; the 1,000 rounds stay wide under them
+// on a computer the ring, the walk and the formula on the left, the 1,000 rounds and the proof
+    // beside them, so the box fits one screen; the formula has a wrapper so it can go in a column
+    cols: { boxes: { main: ".bx-box, .bx-sum", side: ".bx-rounds, .bx-proof" } },
     models: { permCycles, permHelper, permCutAt, permSwap, permWalk, permAllWin, permHelped, permShuffle, permRandomPicks, permStrategyProb, permRandomProb },
   });
 })();

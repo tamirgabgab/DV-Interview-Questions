@@ -127,17 +127,18 @@
         `<label>גודל ה-buffer <select class="ex-size" aria-label="גודל ה-buffer">${[3, 4, 5, 6, 8].map((v) => `<option value="${v}"${v === 5 ? " selected" : ""}>${v}</option>`).join("")}</select></label>` +
         `<label><input type="checkbox" class="ex-wrap"> <span>להתחיל מ-250 (הגלישה)</span></label>` +
         `<button type="button" class="md-button ex-reset">איפוס</button></div>` +
-        `<div class="ex-controls an-free"><span class="ex-title">אירועים חופשיים :</span> ` +
+        `<div class="cr-top">` +
+        `<div class="cr-free"><div class="ex-controls an-free"><span class="ex-title">אירועים חופשיים :</span> ` +
         `<button type="button" class="md-button cr-act" data-ev="grant">Credit Grant</button>` +
         `<button type="button" class="md-button cr-act" data-ev="transmit">ה-Egress משדר פקטה</button>` +
         `<button type="button" class="md-button cr-act" data-ev="receive" data-how="ok">הפקטה הבאה התקבלה</button>` +
         `<button type="button" class="md-button cr-act" data-ev="receive" data-how="lose">הפקטה הבאה אבדה</button>` +
         `<button type="button" class="md-button cr-act" data-ev="dequeue">פקטה יוצאת מה-buffer</button>` +
-        `<button type="button" class="md-button cr-act" data-ev="sync">Path Credit Sync</button></div>` +
+        `<button type="button" class="md-button cr-act" data-ev="sync">Path Credit Sync</button></div></div>` +
+        `<div class="cr-circle"></div><div class="cr-panel"><div class="cr-table"></div><p class="cr-buf"></p><p class="cr-link"></p></div></div>` +
         randomRow("שיעור האובדן", "תנועה אקראית (כמו ה-test של העמוד, אירועים חוקיים בלבד)") +
-        `<div class="cr-circle"></div><div class="cr-panel"><div class="cr-table"></div><p class="cr-buf"></p><p class="cr-link"></p></div>` +
-        `<p class="ex-title">ציר האירועים : עמודה לכל אירוע, המונים אחריו, ו-✗ כשאינווריאנט נופל</p><div class="wv-wrap an-strip" tabindex="0" role="group" aria-label="ציר האירועים, גלילה אופקית"></div>` +
-        `<p class="wv-step an-log" aria-live="polite"></p><p class="ex-summary an-sum"></p><p class="ex-note an-rand"></p>`;
+        `<p class="ex-title an-striptitle">ציר האירועים : עמודה לכל אירוע, המונים אחריו, ו-✗ כשאינווריאנט נופל</p><div class="wv-wrap an-strip" tabindex="0" role="group" aria-label="ציר האירועים, גלילה אופקית"></div>` +
+        `<div class="an-notes"><p class="wv-step an-log" aria-live="polite"></p><p class="ex-summary an-sum"></p><p class="ex-note an-rand"></p></div>`;
       const $ = (sel) => box.querySelector(sel);
       const circle = (s) => {
         const C = 150, R = 110, ang = (v) => -Math.PI / 2 + (v / CR_MOD) * 2 * Math.PI;
@@ -264,7 +265,10 @@
     help: {
       credits: "ארבעת המונים כמחוגים על מעגל : תסריטי העמוד ב״הצעד הבא״, אירועים חופשיים (Grant, שידור, קבלה או אובדן, הוצאה, Sync) ו״הרצה אקראית״ עם שיעור אובדן. שורת הסיכום מאזנת קרדיטים מול תאים פנויים, וציר האירועים מוסיף עמודה לכל אירוע.",
     },
-    cols: { credits: { main: ".cr-circle", side: ".ex-fold, .cr-panel", w: "minmax(0, 19rem)" } },   // the circle beside the random run and the counters; the event strip stays wide
+    // on a computer the circle beside the counters and the free events under them
+    // (27-box-columns.css), and the event strip beside the random run, the event's line and the
+    // invariants; the notes have a wrapper so they can go in a column (the summary alone could not)
+    cols: { credits: { main: ".an-striptitle, .an-strip", side: ".ex-fold, .an-notes", w: "minmax(0, 1.6fr)" } },
     models: { crEventLabel, CR_MOD, crDist, crInit, crCanTransmit, crApply, CR_SCRIPTS, crRun, crBalance, crInvariants, crRandomScript },
   });
 })();
