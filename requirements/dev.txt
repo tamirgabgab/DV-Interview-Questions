@@ -1,3 +1,5 @@
 -c lock.txt   # every dependency below these at a fixed version
 pytest==9.1.1
 playwright==1.56.0
+cocotb==2.1.0     # the DV questions run their Python testbenches on Verilator
+pyuvm==5.0.0      # UVM in Python on cocotb (0112 to 0115)

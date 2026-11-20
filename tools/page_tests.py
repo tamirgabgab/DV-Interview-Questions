@@ -6,6 +6,9 @@
   every kind file of docs/javascripts/explorer/, merged by tools/explorer_node.js.
 - ``assert_figures_match(qid)`` checks that every generated block on the page equals the
   generator output (see tools/figures/fill.py).
+- ``run_cocotb(...)`` runs a cocotb testbench (a page's Python, with pyuvm or plain cocotb)
+  on Verilator against SystemVerilog sources and returns each test's result and the log;
+  the test is skipped when cocotb or Verilator is not installed (CI installs both).
 """
 
 from __future__ import annotations
@@ -58,3 +61,64 @@ def lit(plan: list[str]) -> set[str]:
     """Every key a list of steps lights."""
     return {k for step in plan for group in step.split(">") for k in group.split()}
 
+
+
+def run_cocotb(name: str, module: str, sources: dict[str, str], toplevel: str, tests: list[str] | None = None,
+               timescale: tuple[str, str] = ("1ns", "1ps")) -> tuple[dict[str, bool], str]:
+    """Run the cocotb tests of ``module`` (Python source, written as ``<name>_tb.py``) on
+    Verilator against ``sources`` (file name -> SystemVerilog text), top level ``toplevel``.
+    Returns ({test name: passed}, the log). The build lives in .cache/cocotb/<name>/ and is
+    rebuilt only when the sources change; ``tests`` picks some of the module's tests."""
+    import hashlib
+    import importlib.util
+    import os
+    import xml.etree.ElementTree as ET
+
+    import pytest
+
+    if importlib.util.find_spec("cocotb") is None:
+        pytest.skip("cocotb is not installed (pip install -r requirements/dev.txt)")
+    if not shutil.which("verilator"):
+        pytest.skip("verilator is not installed")
+    from cocotb_tools.runner import get_runner
+
+    work = ROOT / ".cache" / "cocotb" / name
+    work.mkdir(parents=True, exist_ok=True)
+    for f, text in sources.items():
+        path = work / f
+        if not path.exists() or path.read_text(encoding="utf-8") != text:
+            path.write_text(text, encoding="utf-8")
+    mod = f"{name}_tb"
+    (work / f"{mod}.py").write_text(module, encoding="utf-8")
+    key = hashlib.sha256("".join(f + t for f, t in sorted(sources.items())).encode()).hexdigest()[:16]
+    stamp = work / "build" / "sources.sha"
+    fresh = not (stamp.exists() and stamp.read_text() == key)
+    runner = get_runner("verilator")
+    log = work / "run.log"
+    with open(log, "w", encoding="utf-8") as out:
+        fd, err = os.dup(1), os.dup(2)
+        os.dup2(out.fileno(), 1)
+        os.dup2(out.fileno(), 2)
+        try:
+            runner.build(sources=[work / f for f in sources], hdl_toplevel=toplevel, build_dir=work / "build",
+                         always=fresh, timescale=timescale, build_args=["-Wno-fatal", "-Wno-lint", "-Wno-style"])
+            stamp.write_text(key)
+            xml = work / "results.xml"
+            xml.unlink(missing_ok=True)
+            try:    # the runner exits when a test fails; the results file still says which
+                runner.test(hdl_toplevel=toplevel, test_module=mod, testcase=tests, build_dir=work / "build",
+                            test_dir=work, results_xml=str(xml))
+            except SystemExit:
+                pass
+        finally:
+            os.dup2(fd, 1)
+            os.dup2(err, 2)
+            os.close(fd)
+            os.close(err)
+    text = log.read_text(encoding="utf-8", errors="replace")
+    if not xml.exists():
+        raise AssertionError("cocotb produced no results:\n" + "\n".join(text.splitlines()[-30:]))
+    results = {}
+    for case in ET.parse(xml).getroot().iter("testcase"):
+        results[case.get("name")] = case.find("failure") is None and case.find("error") is None
+    return results, text

@@ -953,6 +953,16 @@ figure, the live figures of the explorer boxes included): `reading-tools.js` mov
 button above such a figure, so a failure means that mechanism broke. The explorer tests run the JavaScript under Node (CI installs it; locally the tests
 skip without it).
 
+The UVM and cocotb questions (0112 and on) have Python that runs only in a simulator: the
+page's Python is a cocotb testbench, with [pyuvm](https://github.com/pyuvm/pyuvm) for the
+UVM classes, and `run_cocotb()` of `tools/page_tests.py` writes it with the SystemVerilog it
+drives into `.cache/cocotb/<name>/`, builds that with Verilator (again only when the
+SystemVerilog changed) and returns each cocotb test's result and the log. The tests skip
+without cocotb or Verilator; CI has both (`requirements/dev.txt`). Such a page has no run
+panel (no `tests/<id>/demo.py`): Pyodide has no simulator. Where pyuvm leaves out a part of
+UVM (the drain time, `lock` and `grab`, the sequencer's arbitration modes), the page says so
+and its SystemVerilog tab shows the UVM form.
+
 `check_explorers.py` opens every page with an explorer box at 390 px and, in each box,
 clicks every visible button once in document order, then "reset everything"; an uncaught
 error, a console error or a page wider than the screen fails it, and the report names the
