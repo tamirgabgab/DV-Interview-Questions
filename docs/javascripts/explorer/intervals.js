@@ -331,7 +331,7 @@
         } else {
           const P = pieces();
           $(".iv-wrap").innerHTML = svgC(st.ivs, P, e, st.t);
-          sum = e ? `החתיכה ${ltr(e.j + 1)} מתוך ${ltr(P.length)}${NB}: ${ltr(span(e.s, e.e, false))} בגובה ${ltr(e.h)}, הסף ${ltr(`T = ${st.t}`)}. טווחים עד עכשיו${NB}: ${e.ranges.length ? spansH(e.ranges, false) : "אין"}. השיא עד עכשיו${NB}: <b>${ltr(e.peak)}</b>.`
+          sum = e ? `החתיכה ${ltr(e.j + 1)} מתוך ${ltr(P.length)}${NB}: ${ltr(span(e.s, e.e, false))} בגובה ${ltr(e.h)}, הסף ${ltr(`T = ${st.t}`)}. השיא עד עכשיו${NB}: <b>${ltr(e.peak)}</b>.`
             : `${ltr(P.length)} חתיכות מסעיף ב, הסף ${ltr(`T = ${st.t}`)}. כל צעד הוא חתיכה אחת${NB}: מעל הסף או לא, מצטרפת לטווח או פותחת חדש.`;
           if (e) {
             note = e.ok ? (e.joined ? `${ltr(`${e.h} ≥ ${st.t}`)}, והטווח האחרון נגמר בדיוק ב-${ltr(e.s)}${NB}: החתיכה מצטרפת אליו, והוא עכשיו ${ltr(span(e.ranges[e.ranges.length - 1][0], e.e, false))}.`

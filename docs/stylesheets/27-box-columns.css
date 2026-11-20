@@ -149,8 +149,9 @@
   .md-typeset .explorer[data-kind="acknak"] .an-chip { height: 1.25rem; min-width: 1.4rem; font-size: 0.68rem; }
   .md-typeset .explorer[data-kind="acknak"] .ex-side .an-log { margin-top: 0; }
 }
-/* credits (0024), to fit one screen: the circle at about its drawn size beside the counters, the
-   free events three to a row under the counters, and the random run's controls beside the strip */
+/* credits (0024), to fit one screen: the circle at about its drawn size beside the compact
+   counters, the free events three to a row under the counters, and the random run's controls in
+   three short rows beside the strip */
 @container (min-width: 600px) {
   .md-typeset .explorer[data-kind="credits"] .cr-top { display: grid; grid-template-columns: 13.5rem minmax(0, 1fr); grid-template-areas: "circle panel" "circle free"; align-items: start; gap: 0.4rem 1.2rem; }
   .md-typeset .explorer[data-kind="credits"] .cr-top > .cr-circle { grid-area: circle; min-width: 0; }
@@ -158,33 +159,40 @@
   .md-typeset .explorer[data-kind="credits"] .cr-top > .cr-panel { grid-area: panel; }
   .md-typeset .explorer[data-kind="credits"] .cr-top > .cr-free { grid-area: free; }
   .md-typeset .explorer[data-kind="credits"] .cr-free .an-free { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.35rem; margin: 0; }
-  .md-typeset .explorer[data-kind="credits"] .cr-free .an-free > .ex-title { grid-column: 1 / -1; order: -1; }
+  .md-typeset .explorer[data-kind="credits"] .cr-link .an-chips { display: inline-flex; }
   .md-typeset .explorer[data-kind="credits"] .cr-free .an-free .md-button { width: 100%; padding: 0.3em 0.2em; font-size: 0.55rem; white-space: nowrap; }
   .md-typeset .explorer[data-kind="credits"] .ex-side .ex-fold-title { font-size: 0.7rem; }
-  .md-typeset .explorer[data-kind="credits"] .ex-side .an-random { gap: 0.4rem 0.8rem; }
+  .md-typeset .explorer[data-kind="credits"] .cr-table .an-field { padding-block: 0; }
+  .md-typeset .explorer[data-kind="credits"] .cr-table .an-field > span { padding-block: 0; line-height: 1.3; }
+  .md-typeset .explorer[data-kind="credits"] .ex-side .an-random { display: grid; grid-template-columns: auto auto; align-items: center; justify-content: start; gap: 0.4rem 0.8rem; }
   .md-typeset .explorer[data-kind="credits"] .ex-side .an-random input[type="range"] { width: 5rem; }
+  .md-typeset .explorer[data-kind="credits"] .ex-side .an-random > label:has(.ex-count) { grid-area: 1 / 1; }
+  .md-typeset .explorer[data-kind="credits"] .ex-side .an-random > .ex-seedlab { grid-area: 1 / 2; display: flex; align-items: center; gap: 0.3rem; white-space: nowrap; }
+  .md-typeset .explorer[data-kind="credits"] .ex-side .an-random > .ex-seedlab input { flex: 0 0 4.5rem; min-width: 0; }
+  .md-typeset .explorer[data-kind="credits"] .ex-side .an-random > label:has(.ex-rate) { grid-area: 2 / 1 / 3 / 3; }
+  .md-typeset .explorer[data-kind="credits"] .ex-side .an-random > .ex-run { grid-area: 3 / 1 / 4 / 3; justify-self: start; }
 }
-/* intervals (0066), to fit one screen: the timeline at about its drawn size (640 units) with the
+/* intervals (0066), to fit one screen: the timeline a little under its drawn size with the
    trap presets and the legend beside it, the step's note under it, and the explain panel at full
-   width under them, its steps and values beside a code window of its own height; the box has no
+   width under them, its steps beside a five-line code window (no variables line); the box has no
    columns, so it is a container of its own */
 .md-typeset .explorer[data-kind="intervals"] { container-type: inline-size; }
 @container (min-width: 600px) {
   .md-typeset .explorer[data-kind="intervals"] input.iv-ivs { width: 11rem; }
   .md-typeset .explorer[data-kind="intervals"] input.iv-t { width: 5rem; }
   .md-typeset .explorer[data-kind="intervals"] .iv-top { display: flex; align-items: flex-start; gap: 0.6rem 1rem; }
-  .md-typeset .explorer[data-kind="intervals"] .iv-top > .iv-wrap { flex: 0 1 26rem; min-width: 0; }
+  .md-typeset .explorer[data-kind="intervals"] .iv-top > .iv-wrap { flex: 0 1 23rem; min-width: 0; }
   .md-typeset .explorer[data-kind="intervals"] .iv-top > .iv-wrap svg { min-width: 0; }
   .md-typeset .explorer[data-kind="intervals"] .iv-top > .iv-aside { flex: 1 1 0; min-width: 0; }
   .md-typeset .explorer[data-kind="intervals"] .iv-aside > .iv-presets { margin-top: 0; line-height: 2; }
   .md-typeset .explorer[data-kind="intervals"] .iv-aside > .iv-presets .md-button { padding: 0.05rem 0.4rem; font-size: 0.6rem; }
   .md-typeset .explorer[data-kind="intervals"] .iv-aside > .viz-legend { flex-direction: column; align-items: flex-start; gap: 0.2rem; }
-  .md-typeset .explorer[data-kind="intervals"] .ex-explain { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); grid-template-areas: "title title" "chips code" "vars code"; align-items: start; gap: 0 1rem; }
+  .md-typeset .explorer[data-kind="intervals"] .ex-explain { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); grid-template-areas: "title title" "chips code"; align-items: start; gap: 0 1rem; }
   .md-typeset .explorer[data-kind="intervals"] .ex-explain > .ex-proof-title { grid-area: title; }
   .md-typeset .explorer[data-kind="intervals"] .ex-explain > .ex-stepchips { grid-area: chips; }
   .md-typeset .explorer[data-kind="intervals"] .ex-explain .ex-stepchips li { padding-block: 0; font-size: 0.62rem; }
-  .md-typeset .explorer[data-kind="intervals"] .ex-explain > .ex-vars { grid-area: vars; }
-  .md-typeset .explorer[data-kind="intervals"] .ex-explain > .ex-codewrap { grid-area: code; max-height: 6.8rem; overflow-y: auto; }
+  .md-typeset .explorer[data-kind="intervals"] .ex-explain > .ex-vars { display: none; }
+  .md-typeset .explorer[data-kind="intervals"] .ex-explain > .ex-codewrap { grid-area: code; max-height: 4.6rem; overflow-y: auto; }
 }
 /* bitrev (0077): narrower still, so 12 bits and four-digit sums fit without scrolling */
 @container (min-width: 600px) {
@@ -373,15 +381,14 @@
 }
 
 /* weights (0064), to fit one screen: the scale at about its drawn size (640 units) with the legend
-   in a column beside it, a seven-line code window and a conversion table that scrolls after
-   seven rows */
+   in a column beside it, small step chips, no variables line and a five-line code window */
 @container (min-width: 600px) {
   .md-typeset .explorer[data-kind="weights"] .wt-top { display: flex; align-items: center; gap: 0.6rem 1.2rem; }
   .md-typeset .explorer[data-kind="weights"] .wt-top > .wt-wrap { flex: 0 1 28rem; min-width: 0; }
   .md-typeset .explorer[data-kind="weights"] .wt-top > .viz-legend { flex: 1 1 0; flex-direction: column; align-items: flex-start; }
-  .md-typeset .explorer[data-kind="weights"] .ex-cols .ex-explain .ex-codewrap { max-height: 7rem; }
-  .md-typeset .explorer[data-kind="weights"] .ex-main .wt-conv { max-height: 11rem; overflow-y: auto; }
-  .md-typeset .explorer[data-kind="weights"] .ex-main .wt-conv th { position: sticky; top: 0; z-index: 1; background: var(--md-default-bg-color); }
+  .md-typeset .explorer[data-kind="weights"] .ex-cols .ex-explain .ex-stepchips li { padding-block: 0; font-size: 0.6rem; }
+  .md-typeset .explorer[data-kind="weights"] .ex-cols .ex-explain .ex-codewrap { max-height: 5.5rem; }
+  .md-typeset .explorer[data-kind="weights"] .ex-cols .ex-explain .ex-vars { display: none; }
 }
 
 /* the steps-and-code panel in the side column (core.js explain()): its code view is at most

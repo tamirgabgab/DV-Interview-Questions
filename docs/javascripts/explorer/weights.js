@@ -85,8 +85,7 @@
         `<span class="viz-legend"><span><i class="wt-key-load"></i>המשא</span><span><i class="wt-key-other"></i>בכף השנייה</span><span class="wt-two"><i class="wt-key-beside"></i>ליד המשא</span>` +
         `<span><i class="wt-key-off"></i>בחוץ</span><span><i class="wt-key-wait"></i>עוד לא הוחלט</span><span><i class="wt-key-now"></i>הצעד הנוכחי</span></span></div>` +
         `<div class="wt-digits at-scroll" tabindex="0" aria-label="הספרות של המשא"></div>` +
-        `<p class="wt-sums"></p><p class="wt-note"></p>` +
-        `<p class="ex-title">ההמרה, ספרה אחר ספרה</p><div class="wt-conv at-scroll" tabindex="0" aria-label="טבלת ההמרה"></div>`;
+        `<p class="wt-sums"></p><p class="wt-note"></p>`;
       const show = explain(box, "הסבר : השלבים של הפתרון והקוד");
       const $ = (sel) => box.querySelector(sel);
       const play = $(".ex-play"), speed = $(".ex-speed");
@@ -145,19 +144,6 @@
           `</tbody></table>`;
       };
 
-      // the conversion table: a row per digit, every row in place from the start (the rows
-      // not reached yet are empty), so the table keeps its size through the steps
-      const convTable = (rows, b, two) => {
-        const head = ["הצעד", "המשקולת", "המספר", `השארית mod ${b}`, "הספרה", ...(two ? ["ההעברה"] : []), "המספר אחרי"];
-        return `<table class="wt-ctab"><thead><tr>${head.map((h) => `<th>${h}</th>`).join("")}</tr></thead><tbody>` +
-          rows.map((r) => {
-            const on = r.i < st.s;
-            const v = (x) => (on ? x : " ");
-            return `<tr class="${r.i === st.s - 1 ? "is-now" : ""}${on ? "" : " is-later"}"><td>${r.i + 1}</td><td>${r.w}</td><td>${v(r.before)}</td><td>${v(r.r)}</td>` +
-              `<td class="${on && r.d < 0 ? "is-neg" : ""}">${on ? `<bdi dir="ltr">${num(r.d)}</bdi>` : " "}</td>${two ? `<td>${v(r.carry)}</td>` : ""}<td>${v(r.after)}</td></tr>`;
-          }).join("") + `</tbody></table>`;
-      };
-
       const draw = () => {
         const m = mode(), c = cOf(), two = m.two, b = wtBase(c, two), k = st.k;
         const R = reachOf();
@@ -176,14 +162,12 @@
         $(".ex-next").disabled = $(".ex-end").disabled = done;
         // the bound of k values against what the weights b^i reach, found by trying every vector
         const weights = rows.map((r) => r.w), got = wtReach(weights, two ? -c : 0, c);
-        const states = two ? (m.copies ? `מ-${ltr(`${MINUS}${c}`)} עד ${ltr(c)} עותקים נטו בכף השנייה` : "בכף השנייה, ליד המשא או בחוץ") : (m.copies ? `מ-0 עד ${ltr(c)} עותקים בכף` : "בכף או בחוץ");
         const formula = two ? `(${b}^${k} − 1) / 2` : `${b}^${k} − 1`;
-        $(".wt-sum").innerHTML = `${m.copies ? `${ltr(`c = ${c}`)} עותקים מכל משקל, ` : ""}${ltr(`k = ${k}`)} ${m.copies ? "משקלים" : "משקולות"}${NB}: לכל ${m.copies ? "משקל" : "משקולת"} ${ltr(b)} מצבים (${states}), ולכן ${ltr(b ** k)} הצבות. ` +
-          `<b>החסם${NB}: ${ltr(`${formula} = ${R}`)}</b>${two ? ", כי ההצבה הריקה שוקלת 0 והמראה של הצבה שוקלת את הנגדי" : ", בלי ההצבה הריקה"}. ` +
-          `המשקולות ${ltr(weights.join(", "))}${m.copies ? `, ${ltr(c)} מכל אחת (${ltr(k * c)} משקולות),` : ""} שוקלות בפועל כל משא עד ${ltr(got)} ${got === R ? "✓" : "✗"} (בדיקה של כל ההצבות).`;
+        $(".wt-sum").innerHTML = `${m.copies ? `${ltr(`c = ${c}`)} עותקים מכל משקל, ` : ""}${ltr(`k = ${k}`)} ${m.copies ? "משקלים" : "משקולות"}${NB}: לכל ${m.copies ? "משקל" : "משקולת"} ${ltr(b)} מצבים, ולכן ${ltr(b ** k)} הצבות. ` +
+          `<b>החסם${NB}: ${ltr(`${formula} = ${R}`)}</b>. ` +
+          `המשקולות ${ltr(weights.join(", "))}${m.copies ? `, ${ltr(c)} מכל אחת (${ltr(k * c)} משקולות),` : ""} שוקלות בפועל כל משא עד ${ltr(got)} ${got === R ? "✓" : "✗"}.`;
         $(".wt-wrap").innerHTML = svg(rows);
         $(".wt-digits").innerHTML = digitsTable(rows);
-        $(".wt-conv").innerHTML = convTable(rows, b, two);
         // the two pans so far, and what is still to place: n = sum of the placed digits + B^s * rest
         const placed = rows.slice(0, st.s);
         const side = (sign) => placed.filter((r) => Math.sign(r.d) === sign).flatMap((r) => Array(Math.abs(r.d)).fill(r.w)).reverse();
@@ -252,8 +236,8 @@
   dvqExplorers.register({
     views: { weights: weightsView },
     // on a computer the scale at its own size with the legend beside it; under them the digits,
-    // the sums and the conversion table beside the step's note and the code (27-box-columns.css)
-    cols: { weights: { main: ".wt-digits, .wt-sums, .ex-title, .wt-conv", side: ".wt-note" } },
+    // the sums and the step's note beside the code (27-box-columns.css)
+    cols: { weights: { main: ".wt-digits, .wt-sums, .wt-note" } },
     help: {
       weights: "בוחרים סעיף (כף אחת, שתי כפות, או c עותקים מכל משקולת), מספר משקלים k ומשא n. כל צעד הוא ספרה אחת של n, מהנמוכה : השארית, הספרה (בשתי כפות שארית גדולה מ-c הופכת לספרה שלילית עם העברה), והמשקולת עוברת מהשורה שמתחת למאזניים לכף שלה. הטבלה מתחת למאזניים היא הספרות, הספרה השלילית מסומנת, ולמעלה החסם של k משקלים מול מה שהמשקולות שוקלות בפועל.",
     },

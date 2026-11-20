@@ -128,7 +128,7 @@
         `<label><input type="checkbox" class="ex-wrap"> <span>להתחיל מ-250 (הגלישה)</span></label>` +
         `<button type="button" class="md-button ex-reset">איפוס</button></div>` +
         `<div class="cr-top">` +
-        `<div class="cr-free"><div class="ex-controls an-free"><span class="ex-title">אירועים חופשיים :</span> ` +
+        `<div class="cr-free"><div class="ex-controls an-free" role="group" aria-label="אירועים חופשיים">` +
         `<button type="button" class="md-button cr-act" data-ev="grant">Credit Grant</button>` +
         `<button type="button" class="md-button cr-act" data-ev="transmit">ה-Egress משדר פקטה</button>` +
         `<button type="button" class="md-button cr-act" data-ev="receive" data-how="ok">הפקטה הבאה התקבלה</button>` +
@@ -136,8 +136,8 @@
         `<button type="button" class="md-button cr-act" data-ev="dequeue">פקטה יוצאת מה-buffer</button>` +
         `<button type="button" class="md-button cr-act" data-ev="sync">Path Credit Sync</button></div></div>` +
         `<div class="cr-circle"></div><div class="cr-panel"><div class="cr-table"></div><p class="cr-buf"></p><p class="cr-link"></p></div></div>` +
-        randomRow("שיעור האובדן", "תנועה אקראית (כמו ה-test של העמוד, אירועים חוקיים בלבד)") +
-        `<p class="ex-title an-striptitle">ציר האירועים : עמודה לכל אירוע, המונים אחריו, ו-✗ כשאינווריאנט נופל</p><div class="wv-wrap an-strip" tabindex="0" role="group" aria-label="ציר האירועים, גלילה אופקית"></div>` +
+        randomRow("שיעור האובדן", "תנועה אקראית, אירועים חוקיים בלבד") +
+        `<p class="ex-title an-striptitle">ציר האירועים : המונים אחרי כל אירוע, ✗ כשאינווריאנט נופל</p><div class="wv-wrap an-strip" tabindex="0" role="group" aria-label="ציר האירועים, גלילה אופקית"></div>` +
         `<div class="an-notes"><p class="wv-step an-log" aria-live="polite"></p><p class="ex-summary an-sum"></p><p class="ex-note an-rand"></p></div>`;
       const $ = (sel) => box.querySelector(sel);
       const circle = (s) => {
@@ -186,7 +186,7 @@
         $(".ex-pos").textContent = scripted ? `צעד ${st.pos} מתוך ${st.script.steps.length}` : "";
         $(".an-log").innerHTML = st.log ? st.log.items.map(logText).join(" ") : `הקמת הנתיב : ${ltr(`PCA = ${s.pca}`)} הוא גודל ה-buffer${s.pca !== s.size ? " מעל נקודת ההתחלה" : ""}, ושאר המונים ב-${ltr(s.pcc)}. ‏PCL עדיין ${ltr(s.pcl)}, ולכן אין קרדיטים עד ה-Credit Grant הראשון.`;
         // the balance against the buffer: credits + in flight never exceed the free slots;
-        // the gap is slots not yet granted plus packets lost and not yet synced
+        // the gap shown is only the leak: packets lost and not yet synced
         const strip = $(".an-strip");
         strip.innerHTML = eventStrip(st, (S) => [
           { name: "PCC", kind: "bus", values: S.map((x) => x.pcc) },
@@ -199,7 +199,6 @@
         strip.scrollLeft = strip.scrollWidth;
         const b = crBalance(s), bad = crInvariants(s);
         const gap = [];
-        if (b.ungranted) gap.push(`${ltr(b.ungranted)} תאים שהתפנו ומחכים ל-Grant`);
         if (b.leak > 0) gap.push(`<b>דליפה</b> : ${ltr(b.leak)} פקטות אבדו ולא סונכרנו, ולכן ${ltr(b.leak)} תאים פנויים בלי קרדיט עד ה-Path Credit Sync הבא`);
         $(".an-sum").innerHTML = (crCanTransmit(s) ? `<span class="wv-ok">מותר לשדר : ${ltr(credits)} קרדיטים (מרחק 1 עד 127 קדימה מ-PCC ל-PCL).</span>` : `<span class="wv-bad">אסור לשדר : ${credits === 0 ? "הקרדיטים אזלו, PCL = PCC" : "PCL מאחורי PCC על המעגל (Grant ישן או מושחת)"}.</span>`) +
           ` ` + (bad.includes("overflow") ? `<span class="wv-bad">✗ ${s.occ > s.size ? "ה-buffer גלש" : `${ltr(s.errors)} הפרות של הסביבה (שידור בלי קרדיט, גלישה או הוצאה מ-buffer ריק)`}.</span> ` : "") +
@@ -268,7 +267,7 @@
     // on a computer the circle beside the counters and the free events under them
     // (27-box-columns.css), and the event strip beside the random run, the event's line and the
     // invariants; the notes have a wrapper so they can go in a column (the summary alone could not)
-    cols: { credits: { main: ".an-striptitle, .an-strip", side: ".ex-fold, .an-notes", w: "minmax(0, 1.6fr)" } },
+    cols: { credits: { main: ".an-striptitle, .an-strip", side: ".ex-fold, .an-notes", w: "minmax(0, 1.3fr)" } },
     models: { crEventLabel, CR_MOD, crDist, crInit, crCanTransmit, crApply, CR_SCRIPTS, crRun, crBalance, crInvariants, crRandomScript },
   });
 })();

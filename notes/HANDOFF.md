@@ -647,6 +647,19 @@ redesign plan of 2026-10-16 and the proposal series six to eight, and items 112 
     - Pages are long (0114 has 1018 lines, most of it a collapsed environment); the owner
       may want them shorter. No explorer boxes in this round.
 
+223. **Round 10, the boxes still over 1000 px (session 35, 2026-11-20).** The owner chose to
+    delete secondary parts. At 1920 x 1080 after "all steps", before -> after:
+    - 0064 weights 1092 / 1141 / 1210 -> 940 / 909 / 975: the conversion table is gone (the
+      digits table and the step's note say the same), the summary lost the states clause
+      and the reason of the bound, the step's note moved to the main column, the code window
+      is five lines with small step chips and no variables line.
+    - 0024 credits 1131 -> 977: the free events lost their title (an `aria-label` on the
+      group), the invariant line no longer lists slots waiting for a Grant (a leak still
+      shows), a short random-run title, the random run's controls in three rows, compact
+      counters, "אין" on the line of the packets in flight, a wider side column (1.3fr).
+    - 0066 intervals 1002 / 1087 -> 916 / 992: the timeline at 23rem, a five-line code
+      window, no variables line, and the summary without the ranges (the figure shows them).
+
 ---
 
 ## In progress
@@ -656,7 +669,7 @@ redesign plan of 2026-10-16 and the proposal series six to eight, and items 112 
   accessibility and speed (214), the phone header and layout shifts (215), round 5 and
   the first part of round 7 (216), round 4 (217) and a pilot of round 6 (218).
   Round 8 is split in two (0036 alone, then the rest as round 9); rounds 8 (219) and 9
-  (220) are on `main`; round 10 (221, N10 and the phone labels) is on the branch. Round 6
+  (220) are on `main`; round 10 (221 and 223, N10 and the phone labels) is on the branch. Round 6
   goes on with four questions the owner chose (2, 3, 4 and 10 of the proposals): 0112
   factory override, 0113 phases and objections, 0114 virtual sequence, 0115 a monitor's
   sampling race. Their Python is cocotb with pyuvm on Verilator (`run_cocotb` in
