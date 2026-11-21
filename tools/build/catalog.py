@@ -2,7 +2,8 @@
 """Write notes/CATALOG.md: every question's id, its Hebrew title as a link to its page on the
 live site, and its level, read from the pages' front matter. Also write the README's table
 of tutorial videos (between `<!-- videos -->` and `<!-- /videos -->`): one row per page
-with a `video:` id, with the page and its YouTube link.
+with a `video:` id, with the page and its YouTube link. And the README's counts, each
+between `<!-- n:KEY -->` and `<!-- /n -->` (KEY: all, a level, or paths).
 
     python tools/build/catalog.py           # rewrite notes/CATALOG.md and the README's video table
     python tools/build/catalog.py --check   # exit 1 when either is out of date
@@ -22,6 +23,7 @@ SITE = "https://tamirgabgab.github.io/DV-Interview-Questions/"
 LEVELS = {"student": "student (סטודנט)", "junior": "junior (ג'וניור)", "senior": "senior (סניור)"}
 FIELD = re.compile(r"^(id|title|level|video):\s*(.+?)\s*$", re.M)
 VIDEOS = re.compile(r"(<!-- videos -->\n).*?(<!-- /videos -->)", re.S)
+COUNT = re.compile(r"(<!-- n:(\w+) -->)\d*(<!-- /n -->)")
 
 
 def fronts(root: Path) -> list[tuple[dict, str]]:
@@ -60,8 +62,17 @@ def video_rows(root: Path) -> str:
     return "| Id | Question | Video |\n|----|----------|-------|\n" + "\n".join(rows) + "\n"
 
 
+def counts(root: Path) -> dict[str, int]:
+    """The numbers the README states: all questions, each level, the study paths."""
+    levels = [level for _, _, level, _ in pages(root)]
+    paths = [p for p in (root / "docs" / "paths").glob("*.md") if p.name != "index.md"]
+    return {"all": len(levels), **{lv: levels.count(lv) for lv in LEVELS}, "paths": len(paths)}
+
+
 def render_readme(root: Path) -> str:
     text = (root / "README.md").read_text(encoding="utf-8")
+    n = counts(root)
+    text = COUNT.sub(lambda m: f"{m.group(1)}{n[m.group(2)]}{m.group(3)}", text)
     return VIDEOS.sub(lambda m: m.group(1) + video_rows(root) + m.group(2), text, count=1)
 
 

@@ -1,7 +1,7 @@
 # DV Interview Questions
 
 Design Verification (DV) job interview questions, with the math, probability and logic
-puzzles that come up in the same interviews: 92 questions at three levels, each with a full
+puzzles that come up in the same interviews: <!-- n:all -->115<!-- /n --> questions at three levels, each with a full
 solution in Hebrew, tested code and an interactive box.
 
 ## The site
@@ -16,10 +16,10 @@ with [graphify](https://pypi.org/project/graphifyy/)); click a question for a li
   newest questions, the levels, featured study paths and the FAQ
 - [All questions](https://tamirgabgab.github.io/DV-Interview-Questions/all/): a table you
   can filter by level, difficulty, kind and topic, and a random question
-- By level: [student](https://tamirgabgab.github.io/DV-Interview-Questions/questions/student/) (14),
-  [junior](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/) (62),
-  [senior](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/) (24)
-- [Study paths](https://tamirgabgab.github.io/DV-Interview-Questions/paths/): 13 paths of a
+- By level: [student](https://tamirgabgab.github.io/DV-Interview-Questions/questions/student/) (<!-- n:student -->14<!-- /n -->),
+  [junior](https://tamirgabgab.github.io/DV-Interview-Questions/questions/junior/) (<!-- n:junior -->72<!-- /n -->),
+  [senior](https://tamirgabgab.github.io/DV-Interview-Questions/questions/senior/) (<!-- n:senior -->29<!-- /n -->)
+- [Study paths](https://tamirgabgab.github.io/DV-Interview-Questions/paths/): <!-- n:paths -->13<!-- /n --> paths of a
   few questions on one topic, in the order to solve them
 - [Topics](https://tamirgabgab.github.io/DV-Interview-Questions/tags/) and
   [what's new](https://tamirgabgab.github.io/DV-Interview-Questions/new/)
@@ -40,7 +40,7 @@ with [graphify](https://pypi.org/project/graphifyy/)); click a question for a li
 - An interactive box in every question: edit the input, then play the solution step by
   step or jump to the result. Figures are inline SVG, generated and checked against the page.
 - Interview mode (a clock against a target time, hints counted, a confidence question
-  before a solution, the interviewer's follow-up questions and a summary), an interview
+  before a solution and a summary), an interview
   builder on the home page, a quick jump to any question (Ctrl K or /), "solved" and
   "favourite" marks kept in the browser, search, light and dark themes, and a layout that
   works on a phone.
