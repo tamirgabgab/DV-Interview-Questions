@@ -501,7 +501,19 @@ touches. "Checks" names the checks that need a new case, beyond the usual run.
   rails of an open solution read as structure (keep) or as clutter?
 - The owner's answers (2026-11-21): captions only where the prose refers to a figure; 21.3
   is skipped when 11.1 is enough; 21.4 as a pilot on three questions; 21.6 dropped.
-- Status: not started.
+- Status: done on 2026-11-21 (branch `claude/vibrant-ritchie-8ju107`). 21.1: arrowheads
+  take their line's colour (`fill: context-stroke` in 03-runner-figures.css), `charts.py` has
+  one label scale per figure type, `arrow_marker()` and `legend()`; legends moved under
+  the charts of 0005 to 0009, 0011, 0016 and 0033 (0017's stays above its stepper); 0040's
+  back arcs leave and reach a state at 45 degrees; 0049 is redrawn at 548 x 520 (its box
+  too), labels about 9 px on a phone; a "Figure style" section in CONTRIBUTING. 21.2:
+  `<p class="fig-cap">` numbered by the hook (`data-n`), the linter matches every "איור N"
+  to a caption; captions on 0003, 0018, 0030 and 0103 (0098's figure has none: its caption
+  would land far from it). 21.3 skipped. 21.4: marks with `data-k` slide between frames
+  (question-tools.js, 300 ms, the reader's step only, none under reduced motion), on 0017,
+  0031 and 0090 (0016 and 0024 have nothing that moves). 21.5: `check_collisions.py`, the
+  fourteenth CI check; 175 collisions on 30 pages known at the start only warn
+  (`collisions_known.txt`).
 
 ### Round 22. Paths with a finish line
 
@@ -523,7 +535,14 @@ touches. "Checks" names the checks that need a new case, beyond the usual run.
   crossing, protocols, testbench, constraints, coding, advanced algorithms, digits,
   probability, logic puzzles, optimization puzzles, geometry and motion, the cake, and back
   to logic design; a finished next path is skipped to the next unfinished one.
-- Status: not started.
+- Status: done on 2026-11-21 (branch `claude/vibrant-ritchie-8ju107`). 22.1: a band in the
+  line's colour with its icon and number, step numbers in that colour until solved, the
+  line's colour on the edge of the path strip; 39 pairs in `check_contrast.py`. 22.2: a
+  `next:` key in every path file (the hook checks the ring), a finish card on the path page
+  (`.path-finish`, shown by `marks.js`), the path-complete message offers the first
+  unfinished path along the ring, and a line's terminus ring on the metro map fills when
+  the line is done. 22.3: the home page's map draws the six featured lines as one row each
+  (`maps_metro_rows`, 58 px apart), about 400 px tall instead of 650 at 1440 px.
 
 ### Round 23. Take it with you
 

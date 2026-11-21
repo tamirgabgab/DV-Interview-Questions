@@ -758,6 +758,24 @@ redesign plan of 2026-10-16 and the proposal series six to eight, and items 112 
     proposals in rounds 11 to 23 with their open questions. `ROUNDS.md` is closed. No page
     or script changed in this item.
 
+228. **Rounds 11, 21 and 22 of the plan (session 35, 2026-11-21).** The owner asked for
+    round 11, then 21, then 22, following the recommendations, and answered the open
+    questions: a `next:` key per path in one ring, publishing once at the end, 21.3 skipped,
+    21.4 as a pilot on three questions, captions only where the prose cites a figure, 21.6
+    dropped. What was done is in the status lines of [`PLAN.md`](PLAN.md); in short:
+    - **Round 11 (quick wins):** WaveDrom and Mermaid in the site's palette, a better quick
+      jump, true texts, touch targets and an undo in the boxes, the question map linked and
+      in Hebrew, two-line path rows.
+    - **Round 21 (figure craft):** arrowheads in their line's colour, legends under the
+      charts, 0040's arcs and 0049's layout redrawn, a "Figure style" section, numbered
+      captions with a lint, a sliding stepper on 0017, 0031 and 0090 (not 0016 and 0024 as
+      planned: nothing moves between their frames), and `check_collisions.py` with 175
+      known collisions on 30 pages that only warn.
+    - **Round 22 (paths with a finish line):** line colours on the path pages and strips, a
+      finish card and a next path, a terminus ring on the metro map, the home map in rows.
+    - **Left open:** the 175 known collisions (fix a figure, then delete its lines from
+      `collisions_known.txt`); 0098 has no caption; 0017's legend sits above its stepper.
+
 ---
 
 ## In progress
@@ -775,12 +793,9 @@ redesign plan of 2026-10-16 and the proposal series six to eight, and items 112 
   them shorter and gave each a box.
 - **Skills (225) and N11 round 1 (226)** are on `main`: `dv-question`, `webapp-testing`, the
   six web-quality skills; lighter pages and the element budget of the phone check.
-- **State:** `main` (fd1ec26, deployed 2026-11-20 23:00 Israel time) has rounds 1 to 10,
-  round 6's six DV questions 0110 to 0115 (115 questions), the skills (225), N11 round 1
-  (226) and the full-width solution button; the CI ran every check on it. The branch adds
-  only notes: the cancelled backlog's archive and the new plan (227).
-- **Next:** the owner picks a round from [`PLAN.md`](PLAN.md) (rounds 11 to 23) and answers
-  its open questions; the suggested start is round 11 (quick wins), then 12, 13 and 16.
+- **State:** the branch has rounds 11, 21 and 22 of [`PLAN.md`](PLAN.md) (228); `main`
+  is fast-forwarded to it once its CI is green (see the log item for the result).
+- **Next:** the owner picks the next round from `PLAN.md` (12 to 20 and 23 are open).
 - **Waiting on the owner:** the list under "Open items" (Search Console, the iPhone try,
   the YouTube links, the giscus ids, a look at the live site).
 - **Decision (owner, session 20): the repository stays public.** The options kept for
