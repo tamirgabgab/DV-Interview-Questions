@@ -201,7 +201,7 @@
 .md-typeset ol.path-rows > li.path-row {
   position: relative;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) 15.5rem 11.5rem;
+  grid-template-columns: auto minmax(0, 1fr) 15.5rem 9.5rem;   /* 11.6: more room for the description */
   align-items: center;
   column-gap: var(--sp-3);
   box-sizing: border-box;
@@ -232,14 +232,16 @@
   outline-offset: -2px;
 }
 
+/* 11.6: two lines of the description rather than one cut at about 45 characters */
 .md-typeset .path-row .pr-desc {
-  display: block;
+  display: -webkit-box;
   overflow: hidden;
   color: var(--md-default-fg-color--light);
   font-size: 0.66rem;
   line-height: 1.5;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
 }
 
 .md-typeset .path-row .pr-mix { display: flex; align-items: center; gap: 0.5rem; min-width: 0; white-space: nowrap; }
