@@ -793,8 +793,10 @@ redesign plan of 2026-10-16 and the proposal series six to eight, and items 112 
   them shorter and gave each a box.
 - **Skills (225) and N11 round 1 (226)** are on `main`: `dv-question`, `webapp-testing`, the
   six web-quality skills; lighter pages and the element budget of the phone check.
-- **State:** the branch has rounds 11, 21 and 22 of [`PLAN.md`](PLAN.md) (228); `main`
-  is fast-forwarded to it once its CI is green (see the log item for the result).
+- **State:** `main` (a9bf478, deployed 2026-11-21 23:16 Israel time) has rounds 11, 21 and
+  22 of [`PLAN.md`](PLAN.md) (228); the branch CI (run 671) and the `main` CI (run 672) ran
+  every check, and the live home map, a path page and a question's path strip were looked
+  at in both widths and both schemes.
 - **Next:** the owner picks the next round from `PLAN.md` (12 to 20 and 23 are open).
 - **Waiting on the owner:** the list under "Open items" (Search Console, the iPhone try,
   the YouTube links, the giscus ids, a look at the live site).
