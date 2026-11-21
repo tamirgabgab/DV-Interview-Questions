@@ -81,6 +81,8 @@ DV-Interview-Questions/
 │   ├── HANDOFF-archive.md      # The work log of sessions 1 to 21 and the finished rounds U to X
 │   ├── HANDOFF-archive-2.md    # The work log of sessions 22 to 30, the redesign plan, proposal series 6 to 8
 │   ├── HANDOFF-archive-3.md    # The work log of sessions 31 to 34 (items 112 to 191), the review rounds of session 34
+│   ├── HANDOFF-archive-4.md    # The backlog the owner cancelled on 2026-11-21, as it stood
+│   ├── PLAN.md                 # The plan of the next rounds (11 to 23), from the review of 2026-11-21
 │   └── VIDEOS.md               # How a question gets its YouTube video
 ├── requirements/
 │   ├── site.txt                # Pinned Python dependencies for building the site

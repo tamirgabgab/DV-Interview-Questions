@@ -741,6 +741,23 @@ redesign plan of 2026-10-16 and the proposal series six to eight, and items 112 
       button of the UX round, 9b) was as wide as its text and looked misaligned under the
       full-width hints; it now takes the full width (29-question-ux.css).
 
+227. **The old backlog cancelled; a fresh review and a new plan (session 35, 2026-11-21).**
+    The owner cancelled everything that was still open (the rest of round 6, the rest of
+    N11, N9.2 to N9.5, the tall boxes, the deferred DV additions and the older leftovers)
+    and asked for a wide review with the skills and for proposals of a different kind: new
+    styles of questions, the look, effects, better explanations, a better interactive
+    interface. "Open items" moved whole to `HANDOFF-archive-4.md`; only what waits on the
+    owner stayed. Four reviewers worked read-only in parallel on the built site, one lens
+    each (pedagogy and formats; visual design, figures and motion with `impeccable`,
+    `diagram-design` and `ui-ux-pro-max`; the interactive layer, all 208 boxes swept at
+    two widths; the site as a product with the web-quality skills), and the lead looked at
+    the main pages and spot-checked their findings. The result is [`PLAN.md`](PLAN.md):
+    six headline gaps (nothing solved comes back; the mock interview ends in nothing;
+    nothing is short; the boxes show and rarely ask; the concept data is invisible; two
+    figure languages), a verified inventory of what exists, what must not be lost, and 61
+    proposals in rounds 11 to 23 with their open questions. `ROUNDS.md` is closed. No page
+    or script changed in this item.
+
 ---
 
 ## In progress
@@ -756,20 +773,16 @@ redesign plan of 2026-10-16 and the proposal series six to eight, and items 112 
   sampling race. Their Python is cocotb with pyuvm on Verilator (`run_cocotb` in
   `tools/page_tests.py`, the owner's suggestion); the UVM SystemVerilog is shown, not run. Round 2 of the four (224) made
   them shorter and gave each a box.
-- **Skills (225):** `dv-question` (a pasted conversation to a page), `webapp-testing` and the
-  six web-quality skills are on the branch; the weight audit's proposals are N11, of which
-  1, 3 and 5 are done on the branch (226) with an element budget in the phone check.
+- **Skills (225) and N11 round 1 (226)** are on `main`: `dv-question`, `webapp-testing`, the
+  six web-quality skills; lighter pages and the element budget of the phone check.
 - **State:** `main` (fd1ec26, deployed 2026-11-20 23:00 Israel time) has rounds 1 to 10,
-  round 6's four DV questions 0112 to 0115 after their round 2 (115 questions), the skills
-  (225), N11 round 1 (226, deployed 22:47 after a full CI run on `main`) and the
-  full-width solution button; the CI ran every check on it. Next: the owner's look at 0112 to 0115 and their boxes.
-- **Waiting on the owner:** the
-  Search Console verification code (N3.4); a try of a box's number field and of the lists' filter on an
-  iPhone (the page must not zoom on focus, N6.8); YouTube links of the videos made in the owner's other project
-  (add them as `video:`, notes/VIDEOS.md); the giscus ids (README, Comments) in `extra.comments` of `mkdocs.yml`; checks of
-  the live site at 390 px and on a desktop, light and dark (github.io is not reachable
-  from the cloud sandbox); a lint rule for numbers laid out from the right was offered
-  and not answered (do not add it without a yes).
+  round 6's six DV questions 0110 to 0115 (115 questions), the skills (225), N11 round 1
+  (226) and the full-width solution button; the CI ran every check on it. The branch adds
+  only notes: the cancelled backlog's archive and the new plan (227).
+- **Next:** the owner picks a round from [`PLAN.md`](PLAN.md) (rounds 11 to 23) and answers
+  its open questions; the suggested start is round 11 (quick wins), then 12, 13 and 16.
+- **Waiting on the owner:** the list under "Open items" (Search Console, the iPhone try,
+  the YouTube links, the giscus ids, a look at the live site).
 - **Decision (owner, session 20): the repository stays public.** The options kept for
   later are in `HANDOFF-archive-2.md` ("In progress notes").
 

@@ -1,5 +1,10 @@
 # Fix rounds: the plan to go over with the owner
 
+**Closed on 2026-11-21.** Rounds 1 to 5 and 7 to 10 are done and round 6 stopped at six
+questions (0110 to 0115); the owner cancelled what was left of the backlog, which is kept in
+[`HANDOFF-archive-4.md`](HANDOFF-archive-4.md). The next rounds, 11 to 23, come from a fresh
+review and are in [`PLAN.md`](PLAN.md). This file stays as the record of the first plan.
+
 Written in session 35 (2026-11-19) from the review of the site. The tasks themselves, with
 their measurements and file references, are in [`HANDOFF.md`](HANDOFF.md) under "Open
 items", "Next steps (session 35)", N1 to N8; this file only groups them into rounds, in

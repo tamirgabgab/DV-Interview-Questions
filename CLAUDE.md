@@ -6,7 +6,9 @@ map of the repository; `CONTRIBUTING.md` documents the content format and the to
 working notes are in `notes/`: `notes/CATALOG.md` lists the questions (written by
 `tools/build/catalog.py`); `notes/HANDOFF.md` is the living task list and the recent work log
 (older logs in `notes/HANDOFF-archive.md`, `notes/HANDOFF-archive-2.md` and
-`notes/HANDOFF-archive-3.md`);
+`notes/HANDOFF-archive-3.md`; the backlog cancelled on 2026-11-21 in
+`notes/HANDOFF-archive-4.md`); `notes/PLAN.md` is the plan of the next rounds (11 to 23), for
+the owner to pick from;
 `notes/VIDEOS.md` explains how a question page links its tutorial video (made outside this
 repository, published on YouTube). The tools are in `tools/checks/` (what CI runs), `tools/build/` (what the site is built
 from), `tools/authoring/` (the new-question scaffold and its template) and `tools/figures/`.
