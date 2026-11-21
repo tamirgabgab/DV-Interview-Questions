@@ -164,7 +164,7 @@ added: 2026-10-19
     נקייה ל-Replay.
 
     ```mermaid
-    flowchart LR
+    flowchart TB
         TL1[Transaction Layer TX] -->|new TLP| TX[dll_transmitter]
         TX -->|copy, seq = NEXT_TRANSMIT_SEQ| RB[(Retry Buffer)]
         TX -->|another copy| LINK[link: tx_tlps]

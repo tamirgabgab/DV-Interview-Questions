@@ -195,7 +195,7 @@ added: 2026-10-19
     נשמר מעצמו, וה-interleaving נוצר מהבחירה האקראית בין קריאות :
 
     ```mermaid
-    flowchart LR
+    flowchart TB
         W["MemWr<br/>address, length, data"] --> PW["process_write"]
         PW --> M[("memory<br/>block_t per block address")]
         R["MemRd<br/>address, length, RID, tag"] --> PR["process_read"]

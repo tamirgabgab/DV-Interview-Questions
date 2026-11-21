@@ -140,6 +140,12 @@
    the shadow tree inherits from its host. Nothing else in Material's diagram CSS uses it. */
 .md-typeset .mermaid {
   color: var(--viz-s3);
+  /* round 11.1: the diagrams in the figure palette rather than Material's amber nodes (the
+     shadow tree inherits these from its host, in both schemes) */
+  --md-mermaid-node-bg-color: var(--site-primary-soft);
+  --md-mermaid-node-fg-color: var(--md-typeset-a-color);
+  --md-mermaid-label-fg-color: var(--viz-ink);
+  --md-mermaid-edge-color: var(--viz-text);
 }
 
 .md-typeset .arithmatex,
