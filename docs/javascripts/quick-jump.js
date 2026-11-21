@@ -79,7 +79,12 @@
   const render = () => {
     const q = input.value.trim();
     rows = [];
-    if (data && q) I().match(data.qs, q, MAX).forEach((r) => rows.push({ kind: "q", r }));
+    if (data && q) {
+      I().match(data.qs, q, MAX).forEach((r) => rows.push({ kind: "q", r }));
+      // a study path or a topic by its name (round 11.2), under the questions
+      I().matchOthers(data.paths, q).forEach((r) => rows.push({ kind: "path", r }));
+      I().matchOthers(data.topics, q).forEach((r) => rows.push({ kind: "topic", r }));
+    }
     if (!q) {
       let lastOpen = null;
       try { lastOpen = JSON.parse(localStorage.getItem("dvq-last") || "null"); } catch (e) { /* none */ }
@@ -99,6 +104,12 @@
         return `<li role="option" id="qj-o${i}" data-i="${i}" aria-selected="false" class="qj-q">` +
           `<span class="qj-id">${esc(r[I().ID])}</span><span class="qj-text"><span class="qj-name">${mark(r[I().TITLE])}</span>` +
           `<span class="qj-meta">${esc(L)}, ${esc(D)}${topics ? `. ${esc(topics)}` : ""}</span></span></li>`;
+      }
+      if (row.kind === "path" || row.kind === "topic") {
+        const meta = row.kind === "path" ? "מסלול לימוד" : `נושא${NB}: כל השאלות שלו`;
+        return `<li role="option" id="qj-o${i}" data-i="${i}" aria-selected="false" class="qj-q qj-other">` +
+          `<span class="qj-id" aria-hidden="true">${row.kind === "path" ? "⇢" : "#"}</span><span class="qj-text"><span class="qj-name">${mark(row.r[0])}</span>` +
+          `<span class="qj-meta">${meta}</span></span></li>`;
       }
       if (row.kind === "last") {
         return `<li role="option" id="qj-o${i}" data-i="${i}" aria-selected="false" class="qj-q">` +
@@ -130,7 +141,8 @@
     const row = rows[i];
     if (!row) return;
     if (row.kind === "search") { close(false); siteSearch(row.q); return; }
-    const url = row.kind === "q" ? I().siteUrl(row.r[I().URL]) : row.last.url;
+    const url = row.kind === "q" ? I().siteUrl(row.r[I().URL])
+      : row.kind === "last" ? row.last.url : I().siteUrl(row.r[1]);
     close(false);
     window.location.href = url;
   };

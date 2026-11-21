@@ -177,6 +177,39 @@ ID_FIELD = "qid"      # a question page's id, "0021 21", ranked above every othe
 PREFIX_LETTERS = set("והבכלמש")
 WORD = re.compile(r"[\u05d0-\u05ea]+|[A-Za-z0-9_]+")
 
+# Search words (round 11.2). The quick jump matched titles and Hebrew topic names only, so
+# "coverage", "fsm", "josephus" (in the page's own address) or "פיפו" found nothing. Each row
+# of questions.json gains the English words of its address and of its tags, and the words of
+# every group below that the question touches (by those words, its title or its topics); the
+# site search gets the same groups in its hidden field. A group is one idea in the ways a
+# reader may type it: English, Hebrew, a transliteration.
+SYNONYMS = [
+    ("fifo", "פיפו"), ("gray", "גריי", "גרי"), ("lfsr", "לפסר"),
+    ("metastability", "metastable", "מטאסטביליות", "מטסטביליות", "synchronizer", "סינכרונייזר", "cdc"),
+    ("debug", "bug", "bugs", "דיבאג", "באג", "באגים"), ("coverage", "covergroup", "כיסוי", "קאברג"),
+    ("fsm", "state", "מצבים", "מכונת"), ("probability", "הסתברות"),
+    ("constraint", "constraints", "randomize", "אילוץ", "אילוצים"), ("handshake", "valid", "ready", "לחיצת"),
+    ("josephus", "יוספוס"), ("scoreboard", "סקורבורד"), ("assertion", "assertions", "sva", "אסרשן"),
+    ("arbiter", "ארביטר"), ("clock", "clk", "שעון", "שעונים"), ("reset", "ריסט", "איפוס"),
+    ("counter", "מונה"), ("dp", "dynamic", "דינמי"), ("factory", "פקטורי"),
+]
+_SYN_INDEX = {w: g for g in SYNONYMS for w in g}
+SLUG_WORD = re.compile(r"[a-z][a-z0-9]+")
+
+
+def search_words(q: dict) -> str:
+    """The extra words of a question's row in questions.json: its address and tags in
+    English, and every synonym group it touches (SYNONYMS)."""
+    own = set(SLUG_WORD.findall(Path(q["src_uri"]).stem.lower()))
+    for t in q["tags"]:
+        own |= set(SLUG_WORD.findall(t)) | {t}
+    seen = own | {w.lower() for w in WORD.findall(" ".join([str(q["title"]), *(topic_name(t) for t in q["tags"])]))}
+    words = set(own)
+    for w in seen:
+        words |= set(_SYN_INDEX.get(w, ()))
+    return " ".join(sorted(words))
+
+
 # Explorer boxes: docs/javascripts/explorer/core.js and one file per kind, whose first line
 # names the kinds it registers ("// kinds: cake-arith cake-geo").
 EXPLORER_DIR = "javascripts/explorer"
@@ -2660,6 +2693,7 @@ def _search_question(doc: dict, q: dict) -> None:
     doc["tags"] = [LEVELS[q["level"]], DIFFICULTIES[q["difficulty"]], KINDS[q["kind"]],
                    *[topic_name(t) for t in doc.get("tags", []) if t not in (LEVELS[q["level"]], DIFFICULTIES[q["difficulty"]])]]
     doc[ID_FIELD] = f'{q["id"]} {int(q["id"])}'
+    doc[SEARCH_FIELD] = " ".join(filter(None, [doc.get(SEARCH_FIELD, ""), search_words(q)]))
 
 
 def _question_docs(docs: list[dict], pages: dict) -> list[dict]:
@@ -2786,8 +2820,13 @@ def on_post_build(config, **kwargs):
     order = sorted(_questions.values(), key=lambda q: q["id"])
     index_data = {"levels": LEVELS, "diffs": DIFFICULTIES, "kinds": KINDS,
                   "qs": [[q["id"], str(q["title"]), q["level"], q["difficulty"], q["kind"],
-                          [topic_name(t) for t in q["tags"]], q["src_uri"][: -len(".md")] + "/", q.get("parts", 0)]
-                         for q in order]}
+                          [topic_name(t) for t in q["tags"]], q["src_uri"][: -len(".md")] + "/", q.get("parts", 0),
+                          search_words(q)]
+                         for q in order],
+                  # the quick jump's rows for the study paths and the topics (round 11.2)
+                  "paths": [[p["title"], p["src_uri"][: -len(".md")] + "/", p["description"]] for p in _paths],
+                  "topics": [[topic_name(t), f"tags/#tag:{t}", t.replace("-", " ")] for t in sorted(TOPICS)
+                             if t not in GENERIC_TAGS]}
     (site / INDEX_FILE).write_text(json.dumps(index_data, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     path = site / "search" / "search_index.json"
     if not path.exists():

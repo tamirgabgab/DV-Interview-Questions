@@ -90,3 +90,33 @@ def test_part_heading_counts_parts():
     import questions  # noqa: PLC0415
     body = (ROOT / "docs" / "questions" / "junior" / "0059-coins-in-a-row.md").read_text(encoding="utf-8")
     assert len(questions.PART_HEADING.findall(body)) == 5
+
+
+def test_match_whole_words_first():
+    ids = lambda q: [r[0] for r in run(f"I.match(QS, {json.dumps(q, ensure_ascii=False)})")]  # noqa: E731
+    qs = QS + [["0099", "גריי ומונים", "junior", "easy", "design", [], "questions/junior/0099-x/", 1, "gray"]]
+    got = node_json(f"const I = require({LIB}); process.stdout.write(JSON.stringify("
+                    f"I.match({json.dumps(qs, ensure_ascii=False)}, 'גריי').map((r) => r[0])));")
+    assert got == ["0099", "0010"]                    # the whole word before "סוגריים"
+    assert ids("בחידות") == []                        # no prefix letter on a word that has none
+    assert run("I.matchOthers([['סביבת אימות', 'paths/testbench/', 'uvm']], 'אימות').length") == 1
+    assert run("I.matchOthers([['סביבת אימות', 'paths/testbench/', 'uvm']], '59')") == []
+
+
+def test_search_words_on_the_real_index():
+    """The words that found nothing before round 11.2 find the question they name."""
+    sys.path.insert(0, str(ROOT / "hooks"))
+    import questions  # noqa: PLC0415
+    qs = questions._load_questions(ROOT / "docs")
+    rows = [[q["id"], str(q["title"]), q["level"], q["difficulty"], q["kind"],
+             [questions.topic_name(t) for t in q["tags"]], "x/", 0, questions.search_words(q)]
+            for q in sorted(qs.values(), key=lambda q: q["id"])]
+    words = ["coverage", "fsm", "debug", "probability", "constraint", "handshake", "factory",
+             "josephus", "פיפו", "metastability", "גריי"]
+    got = node_json(f"const I = require({LIB}); const R = {json.dumps(rows, ensure_ascii=False)};"
+                    f"process.stdout.write(JSON.stringify({json.dumps(words, ensure_ascii=False)}"
+                    f".map((w) => I.match(R, w).map((r) => r[1]))));")
+    for w, titles in zip(words, got):
+        assert titles, f"{w} finds nothing"
+    assert got[words.index("josephus")][0].startswith("בעיית יוספוס")   # the word of its address
+    assert "סוגריים" not in got[words.index("גריי")][0]

@@ -8,7 +8,7 @@
 //    "qs": [[id, title, level, difficulty, kind, [topic names], url from the root, parts]]}
 (function (root) {
   "use strict";
-  const ID = 0, TITLE = 1, LEVEL = 2, DIFF = 3, KIND = 4, TAGS = 5, URL_ = 6, PARTS = 7;
+  const ID = 0, TITLE = 1, LEVEL = 2, DIFF = 3, KIND = 4, TAGS = 5, URL_ = 6, PARTS = 7, WORDS = 8;
 
   // The time an interviewer would give a question: by its difficulty, and a little more
   // for every part beyond the third.
@@ -55,23 +55,32 @@
 
   // The quick jump: questions that match what was typed, best first. A number finds the
   // question with that id (59 -> 0059) and then the ids that contain it; words find
-  // titles and topic names (every word has to appear, the title counts more).
+  // titles, topic names and the row's search words (its address and tags in English, and
+  // synonyms: the hook's SYNONYMS). Every word has to appear; a whole word counts more than
+  // a part of one (round 11.2: "גריי" found only "סוגריים"), the title more than the rest.
+  // A whole word may carry one Hebrew prefix letter ("בטבלה" is "טבלה").
   const norm = (s) => String(s).toLowerCase()
-    .replace(/[֑-ׇ]/g, "")                          // Hebrew points
-    .replace(/[-־‐-―_'"׳״`]/g, " ")   // dashes, maqaf, quotes, geresh
+    .replace(/[\u0591-\u05c7]/g, "")                          // Hebrew points
+    .replace(/[-\u05be\u2010-\u2015_'"\u05f3\u05f4`]/g, " ")   // dashes, maqaf, quotes, geresh
     .replace(/\s+/g, " ").trim();
+  const PREFIX = "והבכלמש";
+  const whole = (tokens, w) => tokens.some((t) => t === w || (t.length === w.length + 1 && PREFIX.includes(t[0]) && t.endsWith(w)));
   const score = (q, text) => {
     if (/^\d+$/.test(text)) {
       if (q[ID] === text.padStart(4, "0")) return 100;
       return q[ID].includes(text) ? 60 : 0;
     }
     const title = norm(q[TITLE]), tags = q[TAGS].map(norm), words = text.split(" ");
-    if (title.startsWith(text)) return 50;
-    if (title.includes(text)) return 45;
-    if (tags.includes(text)) return 40;
-    if (tags.some((t) => t.includes(text))) return 30;
-    if (words.every((w) => title.includes(w))) return 25;
-    if (words.every((w) => title.includes(w) || tags.some((t) => t.includes(w)))) return 15;
+    const tTok = title.split(" "), aTok = tTok.concat(...tags.map((t) => t.split(" ")), norm(q[WORDS] || "").split(" "));
+    if (title.startsWith(text) && whole(tTok, words[0])) return 50;
+    if (tags.includes(text)) return 46;
+    if (words.every((w) => whole(tTok, w))) return 44;
+    if (words.every((w) => whole(aTok, w))) return 38;
+    if (title.includes(text)) return 30;
+    if (tags.some((t) => t.includes(text))) return 26;
+    if (words.every((w) => title.includes(w))) return 22;
+    const all = aTok.join(" ");
+    if (words.every((w) => all.includes(w))) return 12;
     return 0;
   };
   const match = (qs, query, limit = 8) => {
@@ -80,6 +89,17 @@
     return qs.map((q) => [score(q, text), q]).filter((x) => x[0] > 0)
       .sort((a, b) => b[0] - a[0] || (a[1][ID] < b[1][ID] ? -1 : 1))
       .slice(0, limit).map((x) => x[1]);
+  };
+  // the paths and the topics whose name or words hold every typed word (rows [name, url, words])
+  const matchOthers = (rows, query, limit = 2) => {
+    const text = norm(query);
+    if (!text || /^\d+$/.test(text)) return [];
+    const words = text.split(" ");
+    return (rows || []).map((r) => {
+      const name = norm(r[0]), tok = (name + " " + norm(r[2] || "")).split(" ");
+      const s = words.every((w) => whole(tok, w)) ? 2 : words.every((w) => name.includes(w)) ? 1 : 0;
+      return [s, r];
+    }).filter((x) => x[0] > 0).sort((a, b) => b[0] - a[0]).slice(0, limit).map((x) => x[1]);
   };
 
   const fmt = (secs) => {
@@ -125,7 +145,7 @@
   };
 
   const api = { ID, TITLE, LEVEL, DIFF, KIND, TAGS, URL: URL_, PARTS, TARGET, PART_EXTRA,
-    targetMinutes, rng, buildPlan, norm, match, fmt, loadIndex, siteUrl, plan, last };
+    targetMinutes, rng, buildPlan, norm, match, matchOthers, fmt, loadIndex, siteUrl, plan, last };
   root.dvqInterview = api;
   if (typeof module !== "undefined" && module.exports) module.exports = api;
 })(typeof window !== "undefined" ? window : globalThis);
