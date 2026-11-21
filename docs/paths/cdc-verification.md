@@ -3,6 +3,7 @@ title: "חציית שעונים ואימות"
 description: "ארבע שאלות מליבת ה-DV. FIFO בין שעונים, מצביעי Gray, SVA לפרוטוקול, וכמה טסטים אקראיים סוגרים כיסוי."
 featured: true
 order: 2
+next: pcie            # the path the finish card offers next (round 22.2)
 steps:
   - id: 33
     note: "כמה עמוק FIFO בין שני שעונים צריך להיות. מאזן קצבים בפרץ, ונוסחה מול סימולציה מחזור אחר מחזור."

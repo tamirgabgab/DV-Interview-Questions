@@ -457,3 +457,25 @@
   .md-typeset .tag-rows { grid-template-columns: minmax(0, 1fr); padding-inline: var(--sp-2); }
   .md-typeset .tag-rows details.tag-row > summary { grid-template-columns: minmax(0, 7.4rem) minmax(1rem, 1fr) 1.7rem; min-height: 2.2rem; }
 }
+
+/* Round 22.1: a path in its line's colour, as on the metro map (--mm from .mm-cN, 16-maps.css).
+   The band under the path page's title: the line's number and the path's icon on its colour.
+   The step numbers in the same colour until a step is solved (then green, as before), and on
+   a question the strip of the path takes the line's colour as its edge. */
+.md-typeset .path-band { display: flex; align-items: center; gap: 0.5rem; margin: 0.6rem 0; padding: 0.4rem 0.7rem; border-radius: 0.4rem; background: var(--mm); color: var(--mm-on); font-size: 0.72rem; font-weight: 700; }
+.md-typeset .path-band .pb-num { display: inline-grid; place-items: center; min-width: 1.4rem; height: 1.4rem; padding: 0 0.2rem; border: 2px solid var(--mm-on); border-radius: 0.3rem; font-variant-numeric: tabular-nums; }
+.md-typeset .path-band .kind-ico { width: 1.3em; height: 1.3em; }
+.md-typeset ol.path-steps[class*="mm-c"] > .path-step:not(.is-solved) .ps-num { background: var(--mm); color: var(--mm-on); }
+.md-typeset .path-nav:has(> .path-nav-line[class*="mm-c"]) { border-inline-start-width: 0; padding-inline-start: 0; }
+.md-typeset .path-nav > .path-nav-line[class*="mm-c"] { border-inline-start: 3px solid var(--mm); padding-inline-start: 0.7rem; }
+
+/* Round 22.2: the finish card under a path's steps, shown by marks.js once every step is
+   solved: the path's icon, n/n, its difficulty mix and the next path along the next keys. */
+.md-typeset .path-finish { margin: 1rem 0; padding: 0.7rem 0.9rem; border: 2px solid var(--mm); border-radius: 0.5rem; background: color-mix(in srgb, var(--mm) 10%, var(--md-default-bg-color)); }
+.md-typeset .path-finish[hidden] { display: none; }
+.md-typeset .path-finish p { margin: 0.3rem 0; }
+.md-typeset .path-finish .pf-title { display: flex; align-items: center; gap: 0.45rem; font-size: 0.85rem; font-weight: 700; }
+.md-typeset .path-finish .pf-title .kind-ico { color: var(--mm); width: 1.4em; height: 1.4em; }
+.md-typeset .path-finish .pf-n { font-variant-numeric: tabular-nums; }
+.md-typeset .path-finish .pf-mix { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.md-typeset .path-finish .pf-go { margin: 0.2rem 0 0; }

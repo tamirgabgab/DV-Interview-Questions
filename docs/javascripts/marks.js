@@ -66,6 +66,24 @@
       box.querySelector(".mp-text").textContent =
         done === ids.length ? `פתרת את כל ${ids.length} השאלות` : `פתרת ${done} מתוך ${ids.length}`;
     });
+    // a path's finish card (round 22.2): shown once every step is solved, with the first
+    // path along the next keys that is not finished yet
+    const solvedAll = (ids) => ids.length > 0 && ids.every((id) => window.dvqMarks.has(id, "solved"));
+    document.querySelectorAll(".path-finish").forEach((card) => {
+      const all = solvedAll((card.dataset.ids || "").split(" ").filter(Boolean));
+      card.hidden = !all;
+      if (!all) return;
+      let next = [];
+      try { next = JSON.parse(card.dataset.next || "[]"); } catch (e) { next = []; }
+      const open = next.find((o) => !solvedAll(o.ids || []));
+      const go = card.querySelector(".pf-go"), line = card.querySelector(".pf-next");
+      if (open && go) {
+        go.href = open.href;
+        go.textContent = `למסלול הבא\u00a0: ${open.title}`;
+      } else if (!open && line) {
+        line.textContent = "סיימת את כל המסלולים של האתר.";
+      }
+    });
     document.querySelectorAll(".path-step").forEach((li) => {
       const id = li.dataset.id;
       li.classList.toggle("is-solved", window.dvqMarks.has(id, "solved"));

@@ -3,6 +3,7 @@ title: "תכנון לוגיקה"
 description: "תשע שאלות של תכנון ספרתי מהיסוד. גלאי קצה, שלושה באגים ב-RTL, מכונות מצבים, מחלק שעון עם חצאי מחזור, LFSR, בורר ושורש ריבועי בלי מכפל, כל אחת עם קוד SV ומודל Python."
 featured: true
 order: 1
+next: cdc-verification            # the path the finish card offers next (round 22.2)
 steps:
   - id: 1
     note: "פלופ אחד ושער אחד. הבסיס לכל השאר : מה רשום, מה צירופי, ומה קורה ב-reset."

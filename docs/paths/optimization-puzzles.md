@@ -2,6 +2,7 @@
 title: "חידות אופטימיזציה"
 description: "שלוש חידות שבהן מחפשים את הדרך הטובה ביותר תחת מגבלה. מי חוצה עם מי, מאיזו קומה זורקים, ואיפה מניחים מחסנים."
 order: 10
+next: geometry-motion            # the path the finish card offers next (round 22.2)
 steps:
   - id: 31
     note: "ארבעה אנשים ולפיד אחד. למה הפתרון החמדני מפסיד, ו-Dijkstra על מצבים שמוכיח שאין טוב יותר."

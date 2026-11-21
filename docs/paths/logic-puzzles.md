@@ -3,6 +3,7 @@ title: "חידות היגיון"
 description: "חידות שבודקות חשיבה מסודרת על מקרים, על גבולות ועל מבנה נסתר."
 featured: true
 order: 9
+next: optimization-puzzles            # the path the finish card offers next (round 22.2)
 steps:
   - id: 4
     note: "חידת מקרים קצרה. כמה דגימות מספיקות כדי לתקן את כל התוויות, ואיך מתרגמים את הנימוק לקוד."

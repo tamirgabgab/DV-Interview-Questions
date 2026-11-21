@@ -3,6 +3,7 @@ title: "אלגוריתמים לראיון קוד"
 description: "מחימום קצר, דרך מחסנית, מעבר יחיד ומעגל במערך, חלון נע, סריקת אירועים וטריק של ביטים, ועד חיפוש לרוחב על שאריות ו-Dijkstra על מצבים של שעוני חול."
 featured: true
 order: 5
+next: advanced-algorithms            # the path the finish card offers next (round 22.2)
 steps:
   - id: 3
     note: "לקרוא קוד של מישהו אחר. מה הלולאה הכפולה עושה, ומה ההבדל בין j מ-0 ל-j מ-i + 1."

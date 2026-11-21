@@ -492,8 +492,10 @@ and the anchors. `tools/checks/lint_pages.py` warns about a topic without a name
 ### Study paths
 
 A study path is a short ordered list of questions on one topic, one file per path in
-`docs/paths/` (front matter `title`, `description`, `order`, and `steps`: a list of
-`{id, note}`; the note is one Hebrew sentence, with code in backticks). The page body is a
+`docs/paths/` (front matter `title`, `description`, `order`, `next` (the slug of the path
+offered when this one is finished: the keys form one ring through every path, which the hook
+checks), and `steps`: a list of `{id, note}`; the note is one Hebrew sentence, with code in
+backticks). The page body is a
 short intro and the `<!-- path-steps -->` placeholder; `docs/paths/index.md` and the home
 page show the `<!-- path-cards -->`. The hook validates the ids, adds a "מסלולים" tab to the
 navigation and puts the path bar on each question of the path. Every question is in at
@@ -502,6 +504,14 @@ of the front matter are quoted (a Hebrew colon inside a note would break the YAM
 paths today, in this order: logic design, clock crossing and verification, protocols
 (PCIe and USB4), constraints, coding, advanced algorithms, digits, probability, logic
 puzzles, optimization puzzles, geometry and motion, the cake, the testbench.
+
+A path page wears its metro line (round 22): a band in the line's colour with its icon and
+number, step numbers in that colour until solved, and a finish card (`.path-finish`,
+hidden until every id is solved: `marks.js`) with the difficulty mix and a button to the
+first unfinished path along the `next` ring. The path strip on a question has the line's
+colour on its edge. On the metro map a line ends in a ring that fills when the line is
+done; the home page's compact map draws the featured lines as one row each
+(`maps_metro_rows`).
 
 ### Search
 

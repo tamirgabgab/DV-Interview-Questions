@@ -33,6 +33,9 @@
         const name = st.dataset.name || (st.dataset.name = st.getAttribute("aria-label"));
         st.setAttribute("aria-label", on ? `${name} (פתורה)` : name);
       });
+      box.querySelectorAll(".mm-term").forEach((t) => {
+        t.classList.toggle("is-done", (t.dataset.ids || "").split(" ").filter(Boolean).every(solved));
+      });
       box.querySelectorAll(".mm-count").forEach((c) => {
         const ids = (c.dataset.ids || "").split(" ").filter(Boolean);
         const done = ids.filter(solved).length;

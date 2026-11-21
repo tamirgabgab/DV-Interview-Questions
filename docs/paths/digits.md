@@ -2,6 +2,7 @@
 title: "ספרות ומספרים"
 description: "שאלות על הספרות של מספר. מיון, חיסור, שאריות ומה שמסתתר מאחוריהם."
 order: 7
+next: probability            # the path the finish card offers next (round 22.2)
 steps:
   - id: 12
     note: "שלוש ספרות. ממיינים, מחסרים, ובודקים את כל 1,000 המספרים כדי למצוא את המיוחדים."

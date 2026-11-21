@@ -2,6 +2,7 @@
 title: "אילוצים ואקראיות ב-SystemVerilog"
 description: "מאילוץ על כמה משתנים, דרך מערכים דינמיים, ועד משחק שלם בתוך constraints."
 order: 4
+next: coding            # the path the finish card offers next (round 22.2)
 steps:
   - id: 7
     note: "משתני `rand` ראשונים. מנסחים \"המשולש מכיל את המרכז\" כאילוץ על זוויות, ורואים איך אילוץ משפיע על ההתפלגות של התוצאה."

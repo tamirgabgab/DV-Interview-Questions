@@ -3,6 +3,7 @@ title: "פרוטוקולים ומודלי ייחוס"
 description: "חמש שאלות על PCIe ו-USB4. הפיצולים החוקיים של קריאה, כמה יש ולמה, ושלושה מודלי ייחוס : Endpoint, ‏Ack/Nak וקרדיטים."
 featured: true
 order: 3
+next: testbench            # the path the finish card offers next (round 22.2)
 steps:
   - id: 20
     note: "חוקי MRRS, ‏MPS ו-RCB הופכים לתנאי אחד על נקודות החיתוך, ורקורסיה שמונה את כל הפיצולים של קריאה אחת."

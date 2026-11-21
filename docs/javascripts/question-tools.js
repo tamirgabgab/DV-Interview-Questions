@@ -140,8 +140,10 @@
         body.append(text, meter);
         const link = document.createElement("a");
         link.className = "dt-action";
-        link.href = path.next ? path.next.href : path.href;
-        link.textContent = path.next ? `למסלול הבא\u00a0: ${path.next.title}` : "לדף המסלול";
+        // the first path along the next keys that is not finished yet (round 22.2)
+        const next = (path.next || []).find((o) => !(o.ids || []).every(solved));
+        link.href = next ? next.href : path.href;
+        link.textContent = next ? `למסלול הבא\u00a0: ${next.title}` : "לדף המסלול";
         body.append(link);
       });
       return;

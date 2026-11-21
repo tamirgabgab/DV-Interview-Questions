@@ -3,6 +3,7 @@ title: "הסתברות"
 description: "מספירה של מרחב מדגם והסתברות מותנית, דרך הסתברות גאומטרית, ועד תמורות אקראיות."
 featured: true
 order: 8
+next: logic-puzzles            # the path the finish card offers next (round 22.2)
 steps:
   - id: 15
     note: "הסתברות מותנית. סופרים מרחב מדגם, משתמשים בהכלה והדחה ובנוסחת בייס, ובונים נוסחה כללית."

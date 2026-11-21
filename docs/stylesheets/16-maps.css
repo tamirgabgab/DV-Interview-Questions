@@ -80,6 +80,16 @@
 
 .mm-svg .mm-badge rect { fill: var(--mm); }
 
+/* a line's terminus: a thin ring round its last station, a filled disc once every station
+   of the line is solved (maps.js) */
+.mm-svg .mm-term {
+  fill: var(--site-surface);
+  stroke: var(--mm);
+  stroke-width: 2.5;
+  transition: opacity var(--dur-1) var(--ease), fill var(--dur-1) var(--ease);
+}
+.mm-svg .mm-term.is-done { fill: var(--mm); }
+
 .mm-svg text {
   text-anchor: middle;
   dominant-baseline: central;
@@ -320,6 +330,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .mm-svg .mm-dot,
+  .mm-svg .mm-term,
   .mm-svg [data-line],
   .mm-svg .mm-st,
   .tg-svg .tg-edge,

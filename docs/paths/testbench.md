@@ -2,6 +2,7 @@
 title: "סביבת אימות"
 description: "מהסכימה של סביבת UVM ועד scoreboard לממשק שמחזיר תשובות שלא לפי הסדר."
 order: 13
+next: constraints            # the path the finish card offers next (round 22.2)
 steps:
   - id: 49
     note: "הרכיבים של סביבת UVM ומה כל אחד עושה. המסלול של טרנזקציה מה-sequence ועד ה-scoreboard, ה-phases, ולמה ה-agent של היציאה פסיבי."

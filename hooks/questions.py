@@ -390,7 +390,22 @@ def _load_paths(docs_dir: Path) -> list[dict]:
         paths.append({"src_uri": src_uri, "title": str(meta.get("title", "")),
                       "description": str(meta.get("description", "")),
                       "order": meta.get("order", 99), "featured": bool(meta.get("featured")),
-                      "steps": steps})
+                      "next": str(meta.get("next") or ""), "steps": steps})
+    # the `next` keys (round 22.2): each names another path, and following them from any
+    # path visits every path once before it comes back (one ring)
+    slugs = {posixpath.basename(p["src_uri"])[: -len(".md")]: p for p in paths}
+    for p in paths:
+        if p["next"] and p["next"] not in slugs:
+            errors.append(f'{p["src_uri"]}: next: {p["next"]} is not a path')
+    if all(p["next"] in slugs for p in paths) and paths:
+        seen, at = [], paths[0]
+        while at["src_uri"] not in seen:
+            seen.append(at["src_uri"])
+            at = slugs[at["next"]]
+        if len(seen) != len(paths) or at is not paths[0]:
+            errors.append("the next keys of the paths must form one ring through every path")
+    elif paths:
+        errors.append("every path needs a next key (the path its finish card offers)")
     if errors:
         raise PluginError("Invalid study paths:\n  " + "\n  ".join(errors))
     return sorted(paths, key=lambda p: (p["order"], p["src_uri"]))
@@ -590,6 +605,27 @@ def path_icon(p: dict) -> str:
         return f'<i class="kind-ico path-ico path-ico-{slug}" aria-hidden="true"></i>'
     kinds = [s["q"]["kind"] for s in p["steps"]]
     return kind_icon(max(KINDS, key=kinds.count))
+
+
+def path_colour(p: dict) -> int:
+    """The line colour of a study path (1..13), as on the metro map: its place in the order."""
+    return _paths.index(p) % MAPS_COLOURS + 1
+
+
+def next_paths(p: dict) -> list[dict]:
+    """The paths after p along the `next` keys, until the ring comes back to p: the finish
+    card and the "path done" message offer the first of them the reader has not finished."""
+    slugs = {posixpath.basename(o["src_uri"])[: -len(".md")]: o for o in _paths}
+    out, at = [], slugs.get(p["next"])
+    while at is not None and at is not p and at not in out:
+        out.append(at)
+        at = slugs.get(at["next"])
+    return out
+
+
+def _next_data(p: dict, page_url: str) -> list[dict]:
+    return [{"title": o["title"], "href": _href(o["src_uri"], page_url), "ids": [s["q"]["id"] for s in o["steps"]]}
+            for o in next_paths(p)]
 
 
 def kind_chip(kind: str, quiet: bool = False, title: bool = False) -> str:
@@ -793,9 +829,8 @@ def _tools(q: dict, page_url: str) -> str:
     for i, p in enumerate(_paths):
         ids = [s["q"]["id"] for s in p["steps"]]
         if q["id"] in ids:
-            nxt = _paths[(i + 1) % len(_paths)] if len(_paths) > 1 else None
             paths.append({"title": p["title"], "ids": ids, "href": _href(p["src_uri"], page_url),
-                          "next": {"title": nxt["title"], "href": _href(nxt["src_uri"], page_url)} if nxt else None})
+                          "next": _next_data(p, page_url)})
     if paths:
         level_data += f' data-paths="{html.escape(json.dumps(paths, ensure_ascii=False))}"'
     level_data += f' data-difficulty="{q["difficulty"]}" data-parts="{q.get("parts", 0)}"'
@@ -894,7 +929,7 @@ def _path_nav(q: dict, page_url: str) -> str:
                              f'<span class="pn-title">{title}</span></a>')
         if links:
             parts.append(f'<span class="pn-links">{"".join(links)}</span>')
-        lines.append('<div class="path-nav-line">' + "".join(parts) + "</div>")
+        lines.append(f'<div class="path-nav-line mm-c{path_colour(p)}">' + "".join(parts) + "</div>")
     if not lines:
         return ""
     return '<div class="path-nav" data-search-exclude>' + "".join(lines) + "</div>\n\n"
@@ -919,7 +954,19 @@ def _path_steps(page) -> str:
             f'{level_chip(q["level"], True)}{difficulty_chip(q["difficulty"], True)}<span class="ps-mark"></span></div>'
             f'<p class="ps-note">{_inline_code(s["note"])}</p></div></li>')
     ids = [s["q"]["id"] for s in p["steps"]]
-    return _progress(ids) + '<ol class="path-steps">' + "".join(items) + "</ol>"
+    c, n = path_colour(p), len(ids)
+    qs = [s["q"] for s in p["steps"]]
+    # the band of the path (round 22.1): its line's colour and icon, as on the map
+    band = (f'<div class="path-band mm-c{c}" data-search-exclude><span class="pb-num" aria-hidden="true">{_paths.index(p) + 1}</span>'
+            f'{path_icon(p)}<span class="pb-text">מסלול {_paths.index(p) + 1} מתוך {len(_paths)} · {n} שאלות</span></div>')
+    # the finish card (round 22.2), shown by maps.js once every step is solved; it offers
+    # the first unfinished path along the next keys
+    finish = (f'<div class="path-finish mm-c{c}" data-ids="{" ".join(ids)}" '
+              f'data-next="{html.escape(json.dumps(_next_data(p, page.url), ensure_ascii=False))}" data-search-exclude hidden>'
+              f'<p class="pf-title">{path_icon(p)}סיימת את המסלול<span class="pf-n" dir="ltr">{n}/{n}</span></p>'
+              f'<p class="pf-mix">{_diff_chips(qs)}</p>'
+              '<p class="pf-next"><a class="md-button md-button--primary pf-go" href=""></a></p></div>')
+    return band + _progress(ids) + f'<ol class="path-steps mm-c{c}">' + "".join(items) + "</ol>" + finish
 
 
 def _diff_chips(qs) -> str:
@@ -2113,6 +2160,21 @@ def maps_metro_layout(paths: list[dict]) -> dict:
     return {"cols": width, "rows": rows, "lines": out_lines, "shared": shared}
 
 
+def maps_metro_rows(paths: list[dict]) -> dict:
+    """The compact map of the home page (round 22.3): every line on a row of its own, its
+    square at the right edge and its stations to the left, in the layout of
+    maps_metro_layout. A question on two lines is drawn on both, as an interchange."""
+    ids_of = [[s["q"]["id"] for s in p["steps"]] for p in paths]
+    count: dict[str, int] = {}
+    for ids in ids_of:
+        for i in set(ids):
+            count[i] = count.get(i, 0) + 1
+    lines = [{"n": n, "cells": [(1 + j, n) for j in range(len(ids))], "badge": (0, n)} for n, ids in enumerate(ids_of)]
+    return {"cols": 1 + max(len(ids) for ids in ids_of), "rows": len(ids_of), "lines": lines,
+            "shared": {i for i, k in count.items() if k > 1}}
+
+
+MAPS_ROW_PITCH = 58      # from one row of the compact map to the next (a name fits between)
 MAPS_NAME_PX = 12.5      # the size of a line's name on the map (.mm-lname in 31-maps-ux.css)
 MAPS_NAME_LEAD = 15      # from one line of a broken name to the next
 MAPS_NAME_TOP = 34       # how far above the grid a name may stand (the map grows by it)
@@ -2136,13 +2198,17 @@ def maps_text_width(text: str, size: float = MAPS_NAME_PX) -> float:
     return em * size
 
 
-def maps_metro_px(lay: dict, g: int, pad: int) -> dict:
+def maps_metro_px(lay: dict, g: int, pad: int, gy: int | None = None) -> dict:
     """The layout of maps_metro_layout in pixels: {"width", "height", "lines": [{"n", "pts":
-    [a station's centre per cell], "badge": the centre of the line's square}]}."""
-    def xy(cell):
-        return pad + (lay["cols"] - 1 - cell[0]) * g, pad + cell[1] * g
+    [a station's centre per cell], "badge": the centre of the line's square}]}. gy: the
+    distance between rows, when it is not g (the rows of maps_metro_rows leave room for a
+    name between them)."""
+    gy = gy or g
 
-    return {"width": pad * 2 + (lay["cols"] - 1) * g, "height": pad * 2 + (lay["rows"] - 1) * g,
+    def xy(cell):
+        return pad + (lay["cols"] - 1 - cell[0]) * g, pad + cell[1] * gy
+
+    return {"width": pad * 2 + (lay["cols"] - 1) * g, "height": pad * 2 + (lay["rows"] - 1) * gy,
             "lines": [{"n": ln["n"], "pts": [xy(c) for c in ln["cells"]], "badge": xy(ln["badge"])}
                       for ln in lay["lines"]]}
 
@@ -2240,7 +2306,7 @@ def maps_metro(page_url: str, compact: bool = False) -> str:
     """The metro map of the study paths (V7): an SVG of coloured lines with a station per
     question (its number inside; a link to the question, named by its id and title), a
     square with the line's number at its start and the line's name by it (maps_metro_names),
-    and a legend of the lines (links to the path pages). compact: the featured paths only
+    a ring at its end that fills when every station of the line is solved, and a legend of the lines (links to the path pages). compact: the featured paths only
     (the home page) on a tighter grid. The box scrolls sideways when the map is wider than
     it (maps.js shows a fade and a "the map goes on" button on the cut edge); the page
     itself does not. A station carries what its card shows (maps.js, .mm-card): the kind,
@@ -2250,9 +2316,9 @@ def maps_metro(page_url: str, compact: bool = False) -> str:
     chosen = [(n, p) for n, p in enumerate(_paths) if not compact or p["featured"]]
     if not chosen:
         return ""
-    lay = maps_metro_layout([p for _, p in chosen])
+    lay = maps_metro_rows([p for _, p in chosen]) if compact else maps_metro_layout([p for _, p in chosen])
     g, pad, r = (46, 26, 12) if compact else (54, 30, 13)
-    px = maps_metro_px(lay, g, pad)
+    px = maps_metro_px(lay, g, pad, MAPS_ROW_PITCH if compact else None)
     width, height = px["width"], px["height"]
     names = maps_metro_names(px, {k: p["title"] for k, (_, p) in enumerate(chosen)}, r)
     top = max([0] + [math.ceil(2 - nm["box"][1]) for nm in names.values()])       # the map grows for a name past its edge
@@ -2266,6 +2332,9 @@ def maps_metro(page_url: str, compact: bool = False) -> str:
         pts = ln["pts"]
         d = "M" + " L".join(f"{x},{y}" for x, y in pts)
         tracks.append(f'<path class="mm-line mm-c{colour}" data-line="{n + 1}" d="{d}"/>')
+        ex, ey = pts[-1]      # the terminus: a ring round the last station, filled when the line is done (maps.js)
+        tracks.append(f'<circle class="mm-term mm-c{colour}" data-line="{n + 1}" '
+                      f'data-ids="{" ".join(s["q"]["id"] for s in p["steps"])}" cx="{ex}" cy="{ey}" r="{r + 7}"/>')
         bx, by = ln["badge"]
         x0, y0 = pts[0]
         href = _href(p["src_uri"], page_url)

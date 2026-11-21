@@ -214,7 +214,8 @@ def _metro_geometry(compact):
     hook._questions = hook._load_questions(DOCS)
     paths = [p for p in hook._load_paths(DOCS) if not compact or p["featured"]]
     g, pad, r = (46, 26, 12) if compact else (54, 30, 13)
-    px = hook.maps_metro_px(hook.maps_metro_layout(paths), g, pad)
+    px = hook.maps_metro_px((hook.maps_metro_rows if compact else hook.maps_metro_layout)(paths), g, pad,
+                           hook.MAPS_ROW_PITCH if compact else None)
     return paths, px, r, hook.maps_metro_names(px, {k: p["title"] for k, p in enumerate(paths)}, r)
 
 
