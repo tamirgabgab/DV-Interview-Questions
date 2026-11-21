@@ -179,7 +179,14 @@ touches. "Checks" names the checks that need a new case, beyond the usual run.
 - **11.6 Path rows use their width.** A path row clips its description at about 45
   characters with half the row empty. S.
 - Open questions: none; it can start at once.
-- Status: not started.
+- Status: done on 2026-11-21 (branch `claude/vibrant-ritchie-8ju107`). 11.1: WaveDrom's skin
+  is restyled in `wavedrom-init.js` (prefixed shape classes, palette rules, no white
+  rectangle; the text keeps Helvetica's widths at 11pt), Mermaid takes `--md-mermaid-*`, and
+  the wide flows of 0023 and 0025 run top to bottom. 11.2: `search_words()` and `SYNONYMS`
+  in the hook, whole words first, path and topic rows. 11.3: FAQ, README counts between
+  markers (`catalog.py`), CONTRIBUTING. 11.4: box controls 36 px on touch, `--touch` fails a
+  control under 24 px, an undo after "reset everything", a retry in the run panel. 11.5:
+  links from paths and tags, the sitemap, a Hebrew panel. 11.6: two-line descriptions.
 
 ### Round 12. The interview as a session
 
@@ -492,6 +499,8 @@ touches. "Checks" names the checks that need a new case, beyond the usual run.
   at 1440 px an open solution shows three vertical rules before a figure adds a fourth.
 - Open questions: captions on every figure, or only where the prose refers to one? Do the
   rails of an open solution read as structure (keep) or as clutter?
+- The owner's answers (2026-11-21): captions only where the prose refers to a figure; 21.3
+  is skipped when 11.1 is enough; 21.4 as a pilot on three questions; 21.6 dropped.
 - Status: not started.
 
 ### Round 22. Paths with a finish line
@@ -510,6 +519,10 @@ touches. "Checks" names the checks that need a new case, beyond the usual run.
   lines as horizontal rows, about 320 px. S.
 - Open questions: who picks the "next path": a `next:` key in each path file, or the map's
   order?
+- The owner's answer (2026-11-21): a `next:` key, in one ring: logic design, clock
+  crossing, protocols, testbench, constraints, coding, advanced algorithms, digits,
+  probability, logic puzzles, optimization puzzles, geometry and motion, the cake, and back
+  to logic design; a finished next path is skipped to the next unfinished one.
 - Status: not started.
 
 ### Round 23. Take it with you
