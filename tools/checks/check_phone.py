@@ -26,6 +26,9 @@ laid out as on the live site). --local-cdn does both for the copies tools/dev_se
 in .cache/cdn (MathJax's fonts, Mermaid, WaveDrom) and runs axe-core from there unless --axe
 is given.
 
+With --touch it also fails a control of a box (a button, a field, a slider) lower than
+TARGET_MIN px (24), one line per kind of control: a finger misses a smaller one.
+
 Every page is also measured again with its text enlarged 1.3 times (--font-scale), as a
 phone's font-size setting enlarges it: a row that then widens the page fails, since Android
 Chrome zooms such a page out and shows the navigation drawer beside it.
@@ -181,6 +184,22 @@ SLIDER_ROWS = """() => {
   return out;
 }"""
 
+# The controls of a box, a timing strip's copy row and a stepper on a touch screen (11.4): one
+# entry per kind of control lower than TARGET_MIN px (WCAG 2.5.8 asks 24; a box's buttons are
+# 36 on a touch screen, 32-access.css). Run with --touch, where the (pointer: coarse) rules apply.
+TARGET_MIN = 24
+SMALL_TARGETS = """(min) => {
+  const seen = new Map();
+  for (const el of document.querySelectorAll(".md-content :is(.explorer, .wv-export, .stepper) :is(button, input:not([type='checkbox'], [type='radio']), select)")) {
+    const r = el.getBoundingClientRect();
+    if (!r.width || r.height >= min || getComputedStyle(el).visibility === "hidden") continue;
+    const box = el.closest(".explorer");
+    const name = `${box ? "box " + box.dataset.kind : "page"}: ${el.tagName.toLowerCase()}.${[...el.classList].join(".")}`;
+    if (!seen.has(name)) seen.set(name, `${name} ${Math.round(r.height)} px high`);
+  }
+  return [...seen.values()];
+}"""
+
 # The text enlarged, as a phone's font-size setting enlarges it (Android Chrome scales the
 # font sizes, so a row that fits at 1x can widen the page at 1.3x, and the browser then
 # zooms out and shows the navigation drawer beside the page): the root font size times s,
@@ -318,6 +337,7 @@ def main(argv: list[str]) -> int:
             small_text = page.evaluate(SMALL_TEXT, MIN_TEXT)
             covered = page.evaluate(ENLARGE_COVERS)
             split = page.evaluate(SLIDER_ROWS)
+            small_targets = page.evaluate(SMALL_TARGETS, TARGET_MIN) if args.touch else []
             big = None
             if big_ctx:                          # the same page loaded with the text enlarged
                 bp = big_ctx.new_page()
@@ -342,7 +362,7 @@ def main(argv: list[str]) -> int:
 
             too_big = big is not None and big["scrollWidth"] > WIDTH + 1
             too_many = elements > args.dom_fail
-            bad = too_many or info["scrollWidth"] > WIDTH + 1 or too_big or errors or covered or split or (args.axe_fail and axe) or (args.small_fail and small_text)
+            bad = too_many or info["scrollWidth"] > WIDTH + 1 or too_big or errors or covered or split or small_targets or (args.axe_fail and axe) or (args.small_fail and small_text)
             failures += bool(bad)
             status = "FAIL" if bad else "ok"
             html = (site / rel).read_text(encoding="utf-8")
@@ -380,6 +400,8 @@ def main(argv: list[str]) -> int:
                 print(f"        enlarge button covers text: {w}")
             for w in split:
                 print(f"        a slider's value on another row: {w}")
+            for w in small_targets:
+                print(f"        a control too small to touch (under {TARGET_MIN} px): {w}")
             for w in wide_math:
                 print(f"        warn wide math {w}")
             for w in small_text:

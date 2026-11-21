@@ -8,9 +8,12 @@
 // white slab, and its <style> (text{...}, .s1{...}) reached every svg of the page, the site's
 // own figures included. Before the diagrams render, its shapes' classes get a "wd-" prefix and
 // its style is replaced by rules drawn from the figure palette (02-pages.css, 08-explorers.css),
-// so they follow both schemes. The text is the site's at 13 px: WaveDrom sizes the names'
-// column from Helvetica's widths at 11pt, which a wider face (the code font) overflows. The shapes are drawn through <use>, whose copies have no
-// ancestor in the page, so their rules match the class alone; the rest is scoped to a diagram.
+// so they follow both schemes. The text keeps WaveDrom's Helvetica at 11pt (Arial and
+// Liberation Sans have its widths): WaveDrom sizes the names' column from Helvetica's widths,
+// which a wider face (the site's, or the code font) overflows, and 11pt keeps the text over
+// 9 px where a diagram shrinks to a phone. The shapes
+// are drawn through <use>, whose copies have no ancestor in the page, so their rules match
+// the class alone; the rest is scoped to a diagram.
 (function siteSkin() {
   const skin = window.WaveSkin && window.WaveSkin.default;
   if (!skin || skin[2][0] !== "style") return;
@@ -28,7 +31,7 @@
   const line = "fill:none;stroke:var(--viz-ink);stroke-linecap:round;stroke-linejoin:miter";
   const tint = (v) => `fill:color-mix(in srgb,var(${v}) 24%,transparent);stroke:none`;
   skin[2][2] = [
-    `${d} text{font-family:var(--md-text-font-family),sans-serif;font-size:13px;fill:var(--viz-ink)}`,
+    `${d} text{font-family:Helvetica,Arial,"Liberation Sans",sans-serif;font-size:11pt;fill:var(--viz-ink)}`,
     `${d} .info{fill:var(--viz-ink);font-weight:600}`,
     `${d} .muted{fill:var(--viz-text)}`,
     `.wd-s1,.wd-s4{${line};stroke-width:1.25}`,

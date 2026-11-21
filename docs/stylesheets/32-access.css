@@ -61,3 +61,16 @@
     font-size: max(16px, 1em);
   }
 }
+
+/* --- 11.4: the small controls of a box on a touch screen ------------------------------------------
+   A box's buttons are 36 px high, but on a phone its speed buttons were 27, the seed field 29,
+   the scrubber and the WaveDrom copy button 22 and a range slider 16 px: below that, the
+   finger misses. On a touch screen each of them is at least as high as a box button (the
+   phone check, --touch, fails a box control under TARGET_MIN px). */
+@media (pointer: coarse) {
+  .md-typeset .explorer :is(.md-button, .ex-speedbtn, .ex-fold-btn, select, input:not([type="checkbox"], [type="radio"])):not(#_),
+  .md-typeset .wv-export .wv-copy:not(#_),
+  .md-typeset .stepper .stepper-btn:not(#_) { min-height: 1.8rem; }
+  .md-typeset .explorer .ex-speedbtn:not(#_) { min-width: 1.8rem; }
+  .md-typeset .explorer input[type="range"]:not(#_) { height: 1.8rem; }
+}
