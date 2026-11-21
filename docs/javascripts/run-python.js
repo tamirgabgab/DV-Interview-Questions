@@ -170,11 +170,32 @@
           stages.hidden = true;
           setStatus("נעצר\u00a0: פלט ארוך מדי", "bad");
           finish();
+        } else if (data.type === "error" && data.load) {
+          // a failed download (11.4): a plain sentence and a retry rather than the browser's
+          // raw message, which stays in the console
+          console.warn("Python did not load:", data.text);
+          const note = document.createElement("span");
+          note.className = "py-err py-load";
+          note.dir = "rtl";
+          note.textContent = "הטעינה של Python נכשלה. ייתכן שהחיבור לרשת נקטע, או שהאתר שממנו הוא יורד חסום ברשת הזו. ";
+          const retry = document.createElement("button");
+          retry.type = "button";
+          retry.className = "md-button py-retry";
+          retry.textContent = "לנסות שוב";
+          retry.addEventListener("click", () => run());
+          note.append(retry);
+          output.appendChild(note);
+          text += note.textContent + "\n";
+          outWrap.hidden = false;
+          outWrap.classList.add("py-failed");
+          stages.hidden = true;
+          setStatus("שגיאה בטעינת Python", "bad");
+          finish();
         } else if (data.type === "error") {
           write(data.text, true);
           outWrap.classList.add("py-failed");
           stages.hidden = true;
-          setStatus(data.load ? "שגיאה בטעינת Python" : "שגיאה", "bad");
+          setStatus("שגיאה", "bad");
           finish();
         }
       },

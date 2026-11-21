@@ -454,6 +454,7 @@
     bar.querySelector(".ex-reset-all").addEventListener("click", () => {
       const play = box.querySelector(".ex-play");
       if (play && play.textContent === "עצירה") play.click();        // stop a running loop first
+      const before = box.dvqDefault ? stateOf(box) : null;           // for the undo (11.4)
       if (/^#(seed|state|ctl)-/.test(location.hash)) history.replaceState(null, "", `${location.pathname}${location.search}`);
       store.drop(storeKey(box));
       setup(box, !help.hidden);
@@ -461,6 +462,7 @@
         box.dvqSeed.draw();
         box.dvqFresh = JSON.stringify(stateOf(box));
       }
+      if (before && JSON.stringify(before) !== JSON.stringify(stateOf(box))) undoNote(box, before);
     });
     const link = bar.querySelector(".ex-link");
     link.addEventListener("click", () => {
@@ -699,6 +701,20 @@
     note.innerHTML = `התיבה חזרה למצב שבו עצרת. <button type="button" class="ex-restart">להתחיל מחדש</button>`;
     box.querySelector(".ex-bar").after(note);
     note.querySelector(".ex-restart").addEventListener("click", () => box.querySelector(".ex-reset-all").click());
+  };
+  // "איפוס הכול" has an undo (11.4), as taking off the solved mark has: a line under the
+  // box's bar, like the restored state's, that puts back what the reader had built.
+  const undoNote = (box, before) => {
+    const note = document.createElement("p");
+    note.className = "ex-restored ex-undo";
+    note.setAttribute("role", "status");
+    note.innerHTML = `התיבה אופסה. <button type="button" class="ex-restart">ביטול האיפוס</button>`;
+    box.querySelector(".ex-bar").after(note);
+    note.querySelector(".ex-restart").addEventListener("click", () => {
+      const ok = before.own ? Boolean(box.dvqState && box.dvqState.set(before.own)) : applyPayload(box, before.ctl || "");
+      note.remove();
+      if (ok) save(box);
+    });
   };
   // Once per box: a change of a control (not the seed field) is timed against the seeded
   // draws, and any change is saved a moment later.
