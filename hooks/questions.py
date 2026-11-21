@@ -28,6 +28,7 @@ Responsibilities:
 from __future__ import annotations
 
 import datetime as dt
+import gzip
 import html
 import json
 import os
@@ -2807,6 +2808,26 @@ def minify_scripts(site: Path) -> None:
         raise PluginError(f"esbuild failed on the site's scripts: {run.stderr.strip()[-600:]}")
 
 
+# Files of docs/ that are pages to a reader but not to MkDocs, so its sitemap leaves them out:
+# the question map (11.5), a standalone page that tools/build/graph.py writes.
+SITEMAP_EXTRA = ["graph.html"]
+
+
+def sitemap_extra(site: Path, site_url: str, lastmod: str) -> None:
+    """Add SITEMAP_EXTRA to sitemap.xml and its .gz copy (once)."""
+    path = site / "sitemap.xml"
+    if not path.exists() or not site_url:
+        return
+    xml = path.read_text(encoding="utf-8")
+    rows = "".join(f"    <url>\n         <loc>{site_url.rstrip('/')}/{name}</loc>\n         <lastmod>{lastmod}</lastmod>\n    </url>\n"
+                   for name in SITEMAP_EXTRA if (site / name).exists() and f"/{name}</loc>" not in xml)
+    if not rows:
+        return
+    xml = xml.replace("</urlset>", rows + "</urlset>", 1)
+    path.write_text(xml, encoding="utf-8")
+    (site / "sitemap.xml.gz").write_bytes(gzip.compress(xml.encode("utf-8"), mtime=0))
+
+
 def on_post_build(config, **kwargs):
     site, docs = Path(config["site_dir"]), Path(config["docs_dir"])
     not_found = site / "404.html"
@@ -2815,6 +2836,7 @@ def on_post_build(config, **kwargs):
         marks, prefixes = page_marks(output, not_found, site, _site_path(config))
         not_found.write_text(page_styles(output, False, marks, prefixes), encoding="utf-8")
     write_math(site, _site_path(config))
+    sitemap_extra(site, config.get("site_url") or "", _page_dates.get("graph.html", _site_date))
     write_bundles(site, docs, _site_path(config))
     minify_scripts(site)
     order = sorted(_questions.values(), key=lambda q: q["id"])

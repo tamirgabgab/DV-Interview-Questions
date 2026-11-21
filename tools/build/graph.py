@@ -100,6 +100,36 @@ DESCRIPTION = ('\n<meta name="description" content="מפת השאלות של DV 
                ' מחוברת לטכניקות שהפתרון שלה משתמש בהן.">')
 
 
+# The side panel's own strings in Hebrew (11.5). The concept labels stay as they are
+# (their Hebrew names are a later round).
+STRINGS = [
+    ('placeholder="Search nodes..."', 'placeholder="חיפוש שאלה או טכניקה..."'),
+    ("<h3>Node Info</h3>", "<h3>פרטים</h3>"),
+    ("<h3>Communities</h3>", "<h3>קבוצות</h3>"),
+    ('onchange="toggleAllCommunities(!this.checked)">Select All</label>',
+     'onchange="toggleAllCommunities(!this.checked)">הכול</label>'),
+    ('<span class="empty">Click a node to inspect it</span>', '<span class="empty">לחיצה על עיגול מראה את הפרטים שלו</span>'),
+    ('aria-label="Theme"', 'aria-label="ערכת צבעים"'),
+    ('data-theme-choice="light">Light</button>', 'data-theme-choice="light">בהיר</button>'),
+    ('data-theme-choice="dark">Dark</button>', 'data-theme-choice="dark">כהה</button>'),
+    ('data-theme-choice="system">System</button>', 'data-theme-choice="system">כמו המערכת</button>'),
+    ('<div class="field">Type: ${esc(n.file_type || \'unknown\')}</div>',
+     '<div class="field">סוג\u00a0: ${n.file_type === \'document\' ? \'שאלה\' : \'טכניקה\'}</div>'),
+    ('<div class="field">Community: ${esc(n.community_name || \'\')}</div>',
+     '<div class="field">קבוצה\u00a0: ${esc(n.community_name || \'\')}</div>'),
+    ('<div class="field">Degree: ${n.degree}</div>', '<div class="field">קשרים\u00a0: ${n.degree}</div>'),
+    (">Neighbors (${neighborIds.length})</div>", ">שכנים (${neighborIds.length})</div>"),
+]
+STATS = re.compile(r'<div id="stats">(\d+) nodes &middot; (\d+) edges &middot; (\d+) communities</div>')
+
+
+def localize(html: str) -> str:
+    """graphify's panel strings in Hebrew; a string already replaced is left as it is."""
+    for en, he in STRINGS:
+        html = html.replace(en, he)
+    return STATS.sub(lambda m: f'<div id="stats">{m[1]} עיגולים · {m[2]} קווים · {m[3]} קבוצות</div>', html)
+
+
 def main() -> int:
     from graphify.build import build_from_json
     from graphify.cluster import cluster
@@ -114,7 +144,7 @@ def main() -> int:
         print("graph.py: graphify's side panel changed; the question links were not added")
         return 1
     html = html.replace(SOURCE_JS, LINK_JS)
-    html = html.replace("</style>", EXTRA_CSS + "</style>", 1)
+    html = localize(html.replace("</style>", EXTRA_CSS + "</style>", 1))
     html = html.replace('<div id="sidebar">', '<div id="sidebar">' + HEADER, 1)
     html = re.sub(r"<title>.*?</title>", "<title>מפת השאלות – DV Interview Questions</title>" + DESCRIPTION, html, count=1)
     # The graph is the page's main content: a landmark for screen readers.
