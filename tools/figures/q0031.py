@@ -83,7 +83,8 @@ def replay(times, moves):
 # --- the figure --------------------------------------------------------------------------
 
 def frame(times, across, side, moving=(), forward=True, t=0, label=""):
-    """The two banks, the bridge, the torch and the people; `moving` are on the bridge."""
+    """The two banks, the bridge, the torch and the people; `moving` are on the bridge. A
+    person and the torch carry a key (data-k), so the stepper walks them across (round 21.4)."""
     w, h = 640, 190
     p = [f'<svg class="figure bridge-fig" viewBox="0 0 {w} {h}" style="max-width:40rem" role="img" aria-label="{label}">',
          '<rect class="bank" x="0" y="20" width="190" height="150" rx="8"/>',
@@ -97,7 +98,7 @@ def frame(times, across, side, moving=(), forward=True, t=0, label=""):
     far = [i for i in range(n) if (across >> i) & 1 and i not in moving]
 
     def person(i, x, y, cls):
-        p.append(f'<g><circle class="{cls}" cx="{x}" cy="{y}" r="17"/>'
+        p.append(f'<g data-k="p{i}"><circle class="{cls}" cx="{x}" cy="{y}" r="17"/>'
                  f'<text class="st-text" x="{x}" y="{y + 5}" text-anchor="middle">{times[i]}</text>'
                  f'<text class="st-small" x="{x}" y="{y + 30}" text-anchor="middle">{NAMES[i]}</text></g>')
 
@@ -114,8 +115,8 @@ def frame(times, across, side, moving=(), forward=True, t=0, label=""):
     # the torch: on the bridge with the walkers, else on the bank where it is
     tx = 320 if moving else (150 if side == 0 else 490)
     ty = 150 if moving else 118
-    p.append(f'<polygon class="torch" points="{tx},{ty - 14} {tx + 6},{ty - 2} {tx},{ty + 2} {tx - 6},{ty - 2}"/>'
-             f'<rect class="ink-fill" x="{tx - 1.5}" y="{ty + 2}" width="3" height="10"/>')
+    p.append(f'<g data-k="torch"><polygon class="torch" points="{tx},{ty - 14} {tx + 6},{ty - 2} {tx},{ty + 2} {tx - 6},{ty - 2}"/>'
+             f'<rect class="ink-fill" x="{tx - 1.5}" y="{ty + 2}" width="3" height="10"/></g>')
     p.append(f'<text class="legend" x="{w - 10}" y="{h - 8}" text-anchor="end" font-weight="700">t = {t}</text>')
     p.append("</svg>")
     return "".join(p)

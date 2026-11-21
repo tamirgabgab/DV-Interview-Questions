@@ -150,7 +150,8 @@ def stack_svg(s, n=None, flip_k=0, done=0, aria="", burnt=False, x0=0, solo=True
     """A stack, top first: a pancake k is a rounded slab as wide as its size, its number in
     the middle; burnt pancakes show their burnt side as a thick edge. flip_k > 0 frames
     the top flip_k (the flip that made this stack); done marks the bottom `done` pancakes
-    that are in their final place."""
+    that are in their final place. In a stack of its own (solo) a pancake carries its size
+    as a key (data-k), so a stepper moves it to its new place (round 21.4)."""
     n = n or len(s)
     h = len(s) * (UNIT_H + GAP) + 18
     parts = []
@@ -160,11 +161,12 @@ def stack_svg(s, n=None, flip_k=0, done=0, aria="", burnt=False, x0=0, solo=True
         w = 26 + (width - 34) * size / n
         y = 6 + i * (UNIT_H + GAP)
         cls = "pk-cake pk-done" if i >= len(s) - done else "pk-cake"
-        parts.append(f'<rect class="{cls}" x="{cx - w / 2:.1f}" y="{y}" width="{w:.1f}" height="{UNIT_H}" rx="9"/>')
+        key = f' data-k="c{size}"' if solo else ""
+        parts.append(f'<g{key}><rect class="{cls}" x="{cx - w / 2:.1f}" y="{y}" width="{w:.1f}" height="{UNIT_H}" rx="9"/>')
         if burnt:
             yb = y + UNIT_H - 4 if v > 0 else y
             parts.append(f'<rect class="pk-burnt" x="{cx - w / 2 + 5:.1f}" y="{yb}" width="{w - 10:.1f}" height="4" rx="2"/>')
-        parts.append(f'<text class="pk-num" x="{cx:.1f}" y="{y + 15}" text-anchor="middle">{size}</text>')
+        parts.append(f'<text class="pk-num" x="{cx:.1f}" y="{y + 15}" text-anchor="middle">{size}</text></g>')
     yp = 6 + len(s) * (UNIT_H + GAP) + 2
     parts.append(f'<line class="pk-plate" x1="{x0 + 4}" x2="{x0 + width - 4}" y1="{yp}" y2="{yp}"/>')
     if flip_k:

@@ -472,6 +472,30 @@
   // copies a deep link to the current step (#stepper-2-step-5 opens that step), and a swipe
   // on touch screens (left = forward on this RTL page, like the arrow keys).
   const STEP_HASH = /^#(stepper-\d+)-step-(\d+)$/;
+  // A mark that keeps its key (data-k) from one frame to the next is seen moving there
+  // (round 21.4): its centre is read before the swap, and the new frame's mark slides in
+  // from it with the `translate` property, which adds to an SVG transform attribute rather
+  // than replacing it. 300 ms, only on a step of the reader's to the next or previous
+  // frame, and none under reduced motion.
+  const centres = (frame) => {
+    const at = new Map();
+    frame.querySelectorAll("[data-k]").forEach((el) => {
+      const r = el.getBoundingClientRect();
+      at.set(el.dataset.k, [r.left + r.width / 2, r.top + r.height / 2]);
+    });
+    return at;
+  };
+  const glide = (frame, before) => {
+    frame.querySelectorAll("[data-k]").forEach((el) => {
+      const was = before.get(el.dataset.k);
+      if (!was || !el.animate) return;
+      const r = el.getBoundingClientRect(), dx = was[0] - (r.left + r.width / 2), dy = was[1] - (r.top + r.height / 2);
+      if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) return;
+      const m = el.parentNode.getScreenCTM ? el.parentNode.getScreenCTM() : null, k = (m && Math.hypot(m.a, m.b)) || 1;
+      el.animate([{ translate: `${dx / k}px ${dy / k}px` }, { translate: "0px 0px" }], { duration: 300, easing: "cubic-bezier(0.2, 0.7, 0.2, 1)" });
+    });
+  };
+  const stillMotion = () => window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   // Only the first frame is in the page; the later ones wait in <template> elements (N11.1)
   // and one frame at a time takes the place of the shown one.
   const stepper = (box, index) => {
@@ -485,21 +509,24 @@
     const pos = box.querySelector(".stepper-pos");
     if (!box.id) box.id = `stepper-${index + 1}`;
     let i = 0;
-    const show = (k) => {
+    const show = (k, moved = false) => {
+      const from = i;
       i = Math.max(0, Math.min(frames.length - 1, k));
       if (frames[i] !== shown) {
+        const before = moved && Math.abs(i - from) === 1 && !stillMotion() ? centres(shown) : null;
         shown.classList.remove("is-active");
         frames[i].classList.add("is-active");
         shown.replaceWith(frames[i]);
         shown = frames[i];
         if (window.dvqDecorate) window.dvqDecorate(shown);   // the enlarge button of its figure
+        if (before && before.size) glide(shown, before);
       }
       prev.disabled = i === 0;
       next.disabled = i === frames.length - 1;
       pos.textContent = `צעד ${i + 1} מתוך ${frames.length}`;
     };
-    prev.addEventListener("click", () => show(i - 1));
-    next.addEventListener("click", () => show(i + 1));
+    prev.addEventListener("click", () => show(i - 1, true));
+    next.addEventListener("click", () => show(i + 1, true));
     const link = document.createElement("button");
     link.type = "button";
     link.className = "stepper-btn stepper-link";
@@ -519,7 +546,7 @@
       if (!touch) return;
       const dx = e.clientX - touch[0], dy = e.clientY - touch[1];
       touch = null;
-      if (Math.abs(dx) > 40 && Math.abs(dx) > 2 * Math.abs(dy)) show(dx < 0 ? i + 1 : i - 1);
+      if (Math.abs(dx) > 40 && Math.abs(dx) > 2 * Math.abs(dy)) show(dx < 0 ? i + 1 : i - 1, true);
     }, { passive: true });
     box.openStep = (k) => {
       let el = box;
@@ -530,8 +557,8 @@
     };
     box.addEventListener("keydown", (e) => {
       // RTL page: the "forward" arrow key is the left one
-      if (e.key === "ArrowLeft" || e.key === " ") { e.preventDefault(); show(i + 1); }
-      if (e.key === "ArrowRight") { e.preventDefault(); show(i - 1); }
+      if (e.key === "ArrowLeft" || e.key === " ") { e.preventDefault(); show(i + 1, true); }
+      if (e.key === "ArrowRight") { e.preventDefault(); show(i - 1, true); }
       if (e.key === "Home") { e.preventDefault(); show(0); }
       if (e.key === "End") { e.preventDefault(); show(frames.length - 1); }
     });

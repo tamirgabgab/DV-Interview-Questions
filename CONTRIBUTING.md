@@ -759,6 +759,13 @@ shared defaults (`LABEL`, `arrow_marker()`, `legend()`):
   collisions found when it was written are listed in `collisions_known.txt` and warn).
 - **The legend goes under the figure**, as HTML (`legend()`, class `viz-legend`), never
   above it and never as SVG text: the Hebrew then wraps and reads right to left.
+- **Marks that move between stepper frames keep a key.** A mark drawn in two frames of a
+  stepper (a person, a pointer, a pancake) carries the same `data-k` in both; when the
+  reader steps to the next or previous frame, `question-tools.js` slides it from its old
+  place to its new one (the `translate` property, 300 ms; none under reduced motion, and
+  none on a jump or a deep link). Put the key on the group that holds the mark and its
+  label. Pilot: 0017 (the tortoise and the hare), 0031 (the people and the torch), 0090
+  (the pancakes).
 - **A caption only where the prose cites the figure from afar** ("כמו באיור 1", "הגיזום
   שבאיור 1"): a `<p class="fig-cap">` right under the figure (and its legend), outside the
   generated block. The hook numbers the captions in page order (`fig_numbers`, `data-n`) and

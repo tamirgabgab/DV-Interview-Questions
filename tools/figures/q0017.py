@@ -58,7 +58,8 @@ def edge(i, j, cls, uid):
 
 
 def rho_svg(uid, slow=None, fast=None, mark_entry=False, faded_other=True, hot=()):
-    """The graph i -> nums[i]. `slow` / `fast` get a ring; `hot` edges are drawn orange."""
+    """The graph i -> nums[i]. `slow` / `fast` get a ring; `hot` edges are drawn orange. The
+    rings carry a key (data-k), so a stepper moves them from frame to frame (round 21.4)."""
     heads = "".join(
         f'<marker id="{uid}-{c}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" '
         f'orient="auto-start-reverse"><path class="{c}-fill" d="M0,0 L10,5 L0,10 z"/></marker>' for c in ("ink", "s2"))
@@ -76,10 +77,10 @@ def rho_svg(uid, slow=None, fast=None, mark_entry=False, faded_other=True, hot=(
                  f'<text class="st-text" x="{x:.1f}" y="{y + 5:.1f}" text-anchor="middle">{node}</text></g>')
     if slow is not None:
         x, y = POS[slow]
-        p.append(f'<circle class="fl-slow" cx="{x:.1f}" cy="{y:.1f}" r="{R + 5}"/>')
+        p.append(f'<circle class="fl-slow" data-k="slow" cx="{x:.1f}" cy="{y:.1f}" r="{R + 5}"/>')
     if fast is not None:
         x, y = POS[fast]
-        p.append(f'<circle class="fl-fast" cx="{x:.1f}" cy="{y:.1f}" r="{R + 10}"/>')
+        p.append(f'<circle class="fl-fast" data-k="fast" cx="{x:.1f}" cy="{y:.1f}" r="{R + 10}"/>')
     p.append("</svg>")
     return "".join(p)
 
