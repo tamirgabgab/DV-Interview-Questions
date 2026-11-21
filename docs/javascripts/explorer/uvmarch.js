@@ -10,21 +10,21 @@
   // agree): id -> [label, x, y, w, h, container]; arrows [from, to, kind]; the path as the
   // arrows one transaction takes.
   const UV_LAYOUT = {
-    top: ["tb_top", 8, 8, 664, 504, true],
-    test: ["test", 18, 30, 644, 326, true],
-    sequence: ["sequence", 120, 40, 110, 30, false],
-    env: ["env", 28, 80, 624, 266, true],
-    agent_in: ["agent (active)", 38, 104, 252, 232, true],
-    sequencer: ["sequencer", 48, 132, 112, 44, false],
-    driver: ["driver", 48, 240, 100, 44, false],
-    monitor_in: ["monitor", 170, 240, 110, 44, false],
-    scoreboard: ["scoreboard", 304, 132, 150, 64, false],
-    coverage: ["coverage", 304, 240, 150, 44, false],
-    agent_out: ["agent (passive)", 470, 104, 172, 232, true],
-    monitor_out: ["monitor", 500, 240, 110, 44, false],
-    vif_in: ["interface in", 48, 384, 232, 36, false],
-    dut: ["DUT", 300, 376, 150, 120, false],
-    vif_out: ["interface out", 470, 384, 172, 36, false],
+    top: ["tb_top", 6, 8, 536, 504, true],
+    test: ["test", 14, 30, 520, 326, true],
+    sequence: ["sequence", 35, 40, 110, 30, false],
+    env: ["env", 22, 80, 504, 266, true],
+    agent_in: ["agent (active)", 30, 104, 210, 232, true],
+    sequencer: ["sequencer", 38, 132, 104, 44, false],
+    driver: ["driver", 38, 240, 92, 44, false],
+    monitor_in: ["monitor", 140, 240, 92, 44, false],
+    scoreboard: ["scoreboard", 250, 132, 118, 64, false],
+    coverage: ["coverage", 250, 240, 118, 44, false],
+    agent_out: ["agent (passive)", 378, 104, 140, 232, true],
+    monitor_out: ["monitor", 393, 240, 110, 44, false],
+    vif_in: ["interface in", 38, 384, 194, 36, false],
+    dut: ["DUT", 250, 376, 118, 120, false],
+    vif_out: ["interface out", 378, 384, 140, 36, false],
   };
   const UV_ARROWS = [["sequence", "sequencer", "tlm"], ["sequencer", "driver", "tlm"], ["driver", "vif_in", "pin"], ["vif_in", "dut", "pin"],
     ["vif_in", "monitor_in", "pin"], ["dut", "vif_out", "pin"], ["vif_out", "monitor_out", "pin"], ["monitor_in", "scoreboard", "tlm"],
@@ -103,13 +103,13 @@
       let stop = () => {};
       const svg = () => {
         const stage = st.quiz ? null : UV_STAGES[st.k - 1] || null, edge = stage && stage[0], lit = stage && stage[1];
-        let s = `<svg class="figure uv-live" viewBox="0 0 680 520" role="group" aria-label="סביבת UVM : לחיצה על רכיב מסבירה אותו">` +
+        let s = `<svg class="figure uv-live" viewBox="0 0 548 520" role="group" aria-label="סביבת UVM : לחיצה על רכיב מסבירה אותו">` +
           `<defs><marker id="uv-arrow-live" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 Z" class="fs-arrowhead"/></marker></defs>`;
         const box1 = (c, cont) => {
           const [label, x, y, w, h] = UV_LAYOUT[c], [cx, cy] = uvCenter(c);
           const cls = `uv-box${cont ? " is-cont" : ""} uv-${c}${st.sel === c && !st.quiz ? " is-sel" : ""}${lit === c ? " is-on" : ""}`;
           return `<g class="${cls}" data-c="${c}" tabindex="0" role="button" aria-label="${label}"><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${cont ? 8 : 6}"/>` +
-            (cont ? `<text x="${x + 8}" y="${y + 17}">${label}</text>` : `<text x="${f(cx)}" y="${f(cy + 5)}" text-anchor="middle">${label}</text>`) + `</g>`;
+            (cont ? (c === "agent_in" ? `<text x="${x + w - 8}" y="${y + 17}" text-anchor="end">${label}</text>` : `<text x="${x + 8}" y="${y + 17}">${label}</text>`) : `<text x="${f(cx)}" y="${f(cy + 5)}" text-anchor="middle">${label}</text>`) + `</g>`;
         };
         Object.keys(UV_LAYOUT).forEach((c) => { if (UV_LAYOUT[c][5]) s += box1(c, true); });
         UV_ARROWS.forEach(([a, b, kind]) => {

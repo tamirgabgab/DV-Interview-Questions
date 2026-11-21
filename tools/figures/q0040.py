@@ -146,8 +146,12 @@ def diagram(pattern=PATTERN):
                 p.append(f'<path class="{cls}" {key} d="M{x0 - 10:.1f},{Y - R + 4} C{x0 - 34:.1f},{Y - R - 44} {x0 + 34:.1f},{Y - R - 44} {x0 + 10:.1f},{Y - R + 2}" marker-end="url(#fs-arrow)"/>')
                 labels.append((f"{x0:.1f}", Y - R - 32, lab, found, key))
             else:                                                   # back (or far forward), below
-                depth = 34 + 22 * abs(s - target)
-                p.append(f'<path class="{cls}" {key} d="M{x0:.1f},{Y + R} Q{(x0 + x1) / 2:.1f},{Y + R + depth} {x1:.1f},{Y + R + 2}" marker-end="url(#fs-arrow)"/>')
+                # leave and reach a circle at its lower side (45 degrees), not its bottom, so
+                # the arc clears the state's meaning written under it
+                depth, way, c = 34 + 22 * abs(s - target), 1 if target > s else -1, 0.7071
+                sx, sy = x0 + way * R * c, Y + R * c
+                ex, ey = x1 - way * (R + 2) * c, Y + (R + 2) * c
+                p.append(f'<path class="{cls}" {key} d="M{sx:.1f},{sy:.1f} Q{(x0 + x1) / 2:.1f},{Y + R + depth} {ex:.1f},{ey:.1f}" marker-end="url(#fs-arrow)"/>')
                 labels.append((f"{(x0 + x1) / 2:.1f}", Y + R + depth / 2 + 16, lab, found, key))
     for s in range(L):
         p.append(f'<g class="fs-node{" is-start" if s == 0 else ""}" data-fig="n{s}"><circle cx="{xs[s]:.1f}" cy="{Y}" r="{R}"/>'

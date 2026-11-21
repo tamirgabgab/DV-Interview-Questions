@@ -102,6 +102,7 @@ python tools/checks/check_contrast.py        # the site's colour pairs, light an
 python tools/checks/check_404.py             # the 404 page under the site's path, both widths
 python tools/checks/check_keyboard.py        # a keyboard pass: tab order, focus rings, names, the components' keys
 python tools/checks/check_heights.py         # every box at 1920 x 1080: those taller than one screen (a warning)
+python tools/checks/check_collisions.py      # figure text crossed by a line (the known ones in collisions_known.txt warn)
 ```
 
 The linter checks RTL at every paragraph start (indented blocks and the steps timeline
@@ -117,7 +118,7 @@ fails if it is then wider than the screen; at both sizes a box's slider and its 
 sit on one row. Node runs the explorer
 tests (`docs/javascripts/*.js` against the Python reference).
 
-All thirteen run in CI on every push that touches the site (a push of only README, CONTRIBUTING,
+All fourteen run in CI on every push that touches the site (a push of only README, CONTRIBUTING,
 this file or files under `notes/` runs nothing, and `main` skips the checks for a commit that
 already passed on its branch); a failure blocks the deploy. A new colour pair (a text
 or a mark on a fill) goes into the `PAIRS` list of `tools/checks/check_contrast.py`. Verilator

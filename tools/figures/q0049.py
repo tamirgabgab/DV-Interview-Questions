@@ -14,25 +14,25 @@ connections and the table of the phases.
 """
 
 RLM = "‏"
-W, H = 680, 520
+W, H = 548, 520
 
 # id: (label, x, y, w, h, container?)
 LAYOUT = {
-    "top":         ("tb_top",            8,   8, 664, 504, True),
-    "test":        ("test",             18,  30, 644, 326, True),
-    "sequence":    ("sequence",        120,  40, 110,  30, False),
-    "env":         ("env",              28,  80, 624, 266, True),
-    "agent_in":    ("agent (active)",   38, 104, 252, 232, True),
-    "sequencer":   ("sequencer",        48, 132, 112,  44, False),
-    "driver":      ("driver",           48, 240, 100,  44, False),
-    "monitor_in":  ("monitor",         170, 240, 110,  44, False),
-    "scoreboard":  ("scoreboard",      304, 132, 150,  64, False),
-    "coverage":    ("coverage",        304, 240, 150,  44, False),
-    "agent_out":   ("agent (passive)", 470, 104, 172, 232, True),
-    "monitor_out": ("monitor",         500, 240, 110,  44, False),
-    "vif_in":      ("interface in",     48, 384, 232,  36, False),
-    "dut":         ("DUT",             300, 376, 150, 120, False),
-    "vif_out":     ("interface out",   470, 384, 172,  36, False),
+    "top":         ("tb_top",                6,   8, 536, 504, True),
+    "test":        ("test",               14,  30, 520, 326, True),
+    "sequence":    ("sequence",         35,  40, 110,  30, False),
+    "env":         ("env",                22,  80, 504, 266, True),
+    "agent_in":    ("agent (active)",    30, 104, 210, 232, True),
+    "sequencer":   ("sequencer",         38, 132, 104,  44, False),
+    "driver":      ("driver",            38, 240,  92,  44, False),
+    "monitor_in":  ("monitor",         140, 240,  92,  44, False),
+    "scoreboard":  ("scoreboard",      250, 132, 118,  64, False),
+    "coverage":    ("coverage",        250, 240, 118,  44, False),
+    "agent_out":   ("agent (passive)", 378, 104, 140, 232, True),
+    "monitor_out": ("monitor",         393, 240, 110,  44, False),
+    "vif_in":      ("interface in",      38, 384, 194,  36, False),
+    "dut":         ("DUT",             250, 376, 118, 120, False),
+    "vif_out":     ("interface out",   378, 384, 140,  36, False),
 }
 
 # (from, to, kind): kind is "tlm" (a TLM port) or "pin" (signals through the interface)
@@ -81,14 +81,16 @@ def arrow_line(a, b):
 
 
 def figure():
-    s = (f'<svg class="figure uv-fig" viewBox="0 0 {W} {H}" style="max-width:42rem" role="img" '
+    s = (f'<svg class="figure uv-fig" viewBox="0 0 {W} {H}" style="max-width:35rem" role="img" '
          'aria-label="סביבת UVM : test, env, שני agents, scoreboard ו-coverage מעל ה-DUT, עם ה-interfaces ביניהם">'
          '<defs><marker id="uv-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">'
          '<path d="M0,0 L10,5 L0,10 Z" class="fs-arrowhead"/></marker></defs>')
     for c, (label, x, y, w, h, cont) in LAYOUT.items():
         if cont:
+            # the active agent's name sits on the right, away from the arrow that enters it
+            at = f'x="{x + w - 8}" y="{y + 17}" text-anchor="end"' if c == "agent_in" else f'x="{x + 8}" y="{y + 17}"'
             s += (f'<g class="uv-box is-cont uv-{c}"><rect x="{x}" y="{y}" width="{w}" height="{h}" rx="8"/>'
-                  f'<text x="{x + 8}" y="{y + 17}">{label}</text></g>')
+                  f'<text {at}>{label}</text></g>')
     for a, b, kind in ARROWS:
         (x1, y1), (x2, y2) = arrow_line(a, b)
         s += f'<line class="uv-arrow uv-{kind}" x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" marker-end="url(#uv-arrow)"/>'

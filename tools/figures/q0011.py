@@ -131,7 +131,7 @@ def directions_legend():
 
 def blocks():
     """The generated blocks, in page order."""
-    return [numbering(), examples(), wrap_examples(), directions_legend() + "\n\n" + directions(), fifth()]
+    return [numbering(), examples(), wrap_examples(), directions() + "\n\n" + directions_legend(), fifth()]
 
 
 if __name__ == "__main__":

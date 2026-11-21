@@ -122,7 +122,7 @@
 .md-typeset svg .uv-arrow.uv-pin { stroke: var(--viz-ink); stroke-dasharray: 6 4; }
 .md-typeset .viz-legend .uv-key-tlm { background: var(--viz-s1); }
 .md-typeset .viz-legend .uv-key-pin { background: var(--viz-ink); }
-.md-typeset .explorer svg.uv-live { width: 100%; max-width: 42rem; display: block; margin-top: 0.4rem; }
+.md-typeset .explorer svg.uv-live { width: 100%; max-width: 35rem; display: block; margin-top: 0.4rem; }
 .md-typeset .explorer svg.uv-live [data-c] { cursor: pointer; }
 .md-typeset .explorer svg.uv-live [data-c]:focus-visible rect { outline: none; stroke: var(--site-focus-ring); stroke-width: 3.5; }
 .md-typeset .explorer svg.uv-live .uv-box.is-sel rect { stroke: var(--viz-s1); stroke-width: 3.5; }

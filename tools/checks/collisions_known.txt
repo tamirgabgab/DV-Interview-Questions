@@ -1,0 +1,178 @@
+# Figure text crossed by a line, found when check_collisions.py was written (round 21.5).
+# A collision listed here is a warning; a new one fails. Fix a figure, then delete its lines
+# (the check names the fixed ones). Written by check_collisions.py --write-known.
+questions/junior/0014-random-non-overlapping-shapes/ | "(10, 6)" crossed by <line class="gp-line"> in grid של 10 על 8 נקודות, ריבוע מ-(x1, y1) עד (x2, y
+questions/junior/0014-random-non-overlapping-shapes/ | "(7, 2)" crossed by <line class="gp-line"> in grid של 10 על 8 נקודות, ריבוע מ-(x1, y1) עד (x2, y
+questions/junior/0014-random-non-overlapping-shapes/ | "(x1, y1)" crossed by <line class="gp-line"> in grid של 10 על 8 נקודות, ריבוע מ-(x1, y1) עד (x2, y
+questions/junior/0014-random-non-overlapping-shapes/ | "(x2, y2)" crossed by <line class="gp-line"> in grid של 10 על 8 נקודות, ריבוע מ-(x1, y1) עד (x2, y
+questions/junior/0014-random-non-overlapping-shapes/ | "1" crossed by <line class="gp-line"> in שלוש הגרלות של מלבנים בלי חפיפה
+questions/junior/0014-random-non-overlapping-shapes/ | "1" crossed by <line class="gp-line"> in שלוש הגרלות של ריבועים בלי חפיפה
+questions/junior/0014-random-non-overlapping-shapes/ | "1" crossed by <line class="gp-line"> in שני מלבנים בצורת צלב חופפים בלי שאף פינה נמצאת בתו
+questions/junior/0014-random-non-overlapping-shapes/ | "2" crossed by <line class="gp-line"> in שלוש הגרלות של מלבנים בלי חפיפה
+questions/junior/0014-random-non-overlapping-shapes/ | "2" crossed by <line class="gp-line"> in שלוש הגרלות של ריבועים בלי חפיפה
+questions/junior/0014-random-non-overlapping-shapes/ | "3" crossed by <line class="gp-line"> in שלוש הגרלות של מלבנים בלי חפיפה
+questions/junior/0014-random-non-overlapping-shapes/ | "3" crossed by <line class="gp-line"> in שני מלבנים בצורת צלב חופפים בלי שאף פינה נמצאת בתו
+questions/junior/0014-random-non-overlapping-shapes/ | "4" crossed by <line class="gp-line"> in שלוש הגרלות של מלבנים בלי חפיפה
+questions/junior/0014-random-non-overlapping-shapes/ | "4" crossed by <line class="gp-line"> in שני מלבנים בצורת צלב חופפים בלי שאף פינה נמצאת בתו
+questions/junior/0014-random-non-overlapping-shapes/ | "5" crossed by <line class="gp-line"> in שלוש הגרלות של מלבנים בלי חפיפה
+questions/junior/0014-random-non-overlapping-shapes/ | "6" crossed by <line class="gp-line"> in שלוש הגרלות של מלבנים בלי חפיפה
+questions/junior/0014-random-non-overlapping-shapes/ | "מעל" crossed by <line class="gp-line"> in ארבעת האזורים סביב ריבוע i : משמאל, מימין, מתחת ומ
+questions/junior/0014-random-non-overlapping-shapes/ | "משמאל" crossed by <line class="gp-line"> in ארבעת האזורים סביב ריבוע i : משמאל, מימין, מתחת ומ
+questions/junior/0014-random-non-overlapping-shapes/ | "מתחת" crossed by <line class="gp-line"> in ארבעת האזורים סביב ריבוע i : משמאל, מימין, מתחת ומ
+questions/junior/0022-grid-paths-count/ | "1" crossed by <polyline class="gx-path"> in לוח הזיגזג : עמודה 1 פתוחה רק למטה ועמודה 3 רק למע
+questions/junior/0022-grid-paths-count/ | "3" crossed by <polyline class="gx-path"> in לוח הזיגזג : עמודה 1 פתוחה רק למטה ועמודה 3 רק למע
+questions/junior/0022-grid-paths-count/ | "9" crossed by <polyline class="gx-path"> in לוח הזיגזג : עמודה 1 פתוחה רק למטה ועמודה 3 רק למע
+questions/junior/0027-cake-arithmetic-fractions/ | "3" crossed by <line class="ink-line"> in הפונקציה p בריבוע חלקי 1 פחות p, מול הקו בגובה d =
+questions/junior/0030-spider-and-fly-on-a-box/ | "1" crossed by <line class="box-edge"> in קופסה באורך 30, רוחב 12 וגובה 12 : העכביש על הקיר 
+questions/junior/0030-spider-and-fly-on-a-box/ | "F" crossed by <line class="box-edge"> in קופסה באורך 30, רוחב 12 וגובה 12 : העכביש על הקיר 
+questions/junior/0030-spider-and-fly-on-a-box/ | "S" crossed by <line class="box-edge"> in קופסה באורך 30, רוחב 12 וגובה 12 : העכביש על הקיר 
+questions/junior/0030-spider-and-fly-on-a-box/ | "enda" crossed by <line class="ink-line"> in פריסה של חמש פאות במדרגות : הקיר של העכביש על התקר
+questions/junior/0030-spider-and-fly-on-a-box/ | "x" crossed by <line class="box-edge"> in קופסה באורך 30, רוחב 12 וגובה 12 : העכביש על הקיר 
+questions/junior/0030-spider-and-fly-on-a-box/ | "y" crossed by <line class="box-edge"> in קופסה באורך 30, רוחב 12 וגובה 12 : העכביש על הקיר 
+questions/junior/0030-spider-and-fly-on-a-box/ | "z" crossed by <line class="box-edge"> in קופסה באורך 30, רוחב 12 וגובה 12 : העכביש על הקיר 
+questions/junior/0041-coverage-random-tests/ | "95%" crossed by <polyline class="s1-line"> in הסיכוי שכל 16 ה-bins כוסו אחרי t טסטים, עם החציון 
+questions/junior/0042-camel-water-depots/ | "1.5 ליטר לק"מ" crossed by <polyline class="s1-line"> in המים בתנועה לאורך הדרך : מ-450 ליטר ב-0 ל-30 ב-400
+questions/junior/0042-camel-water-depots/ | "2.5 ליטר לק"מ" crossed by <polyline class="s1-line"> in המים בתנועה לאורך הדרך : מ-450 ליטר ב-0 ל-30 ב-400
+questions/junior/0042-camel-water-depots/ | "30 ליטר מגיעים ליעד" crossed by <polyline class="s1-line"> in המים בתנועה לאורך הדרך : מ-450 ליטר ב-0 ל-30 ב-400
+questions/junior/0044-kaprekar-after-n-steps/ | "D = 2" crossed by <polyline class="s1-line"> in הפער D_k אחרי k פעולות בבסיס 5, לכל פער התחלתי מ-1
+questions/junior/0044-kaprekar-after-n-steps/ | "D = 2" crossed by <polyline class="s2-line"> in הפער D_k אחרי k פעולות בבסיס 5, לכל פער התחלתי מ-1
+questions/junior/0055-divisible-by-m-fsm/ | "rst_n" crossed by <line class="ff-wire"> in המעגל של סעיף א : שני פליפ-פלופים מסוג D עם איפוס 
+questions/junior/0065-number-of-islands/ | "1" crossed by <line class="il-link"> in אותו לוח עם שמונה כיוונים : שני איים, הפינה בין (2
+questions/junior/0065-number-of-islands/ | "1" crossed by <line class="il-link"> in קו אלכסוני של יבשה על לוח 4 על 4 : עם שמונה כיווני
+questions/junior/0065-number-of-islands/ | "2" crossed by <line class="il-link"> in אותו לוח עם שמונה כיוונים : שני איים, הפינה בין (2
+questions/junior/0067-network-delay-time/ | "5" crossed by <line class=""> in הדוגמה עם משקלים : ליד כל צומת הזמן הקצר ביותר מהמ
+questions/junior/0067-network-delay-time/ | "5" crossed by <line class=""> in הדוגמה עם קשתות חד-כיווניות : הצומת 6 לא מושג, והצ
+questions/junior/0068-stream-median/ | "1" crossed by <line class="th-edge"> in ערימת מינימום של 1 3 2 7 4 9 5 : המערך עם האינדקסי
+questions/junior/0068-stream-median/ | "1" crossed by <line class="th-edge"> in שתי הערימות אחרי כל הזרם 5 15 1 3 8 7 9 10 20 2 : 
+questions/junior/0068-stream-median/ | "10" crossed by <line class="th-edge"> in שתי הערימות אחרי כל הזרם 5 15 1 3 8 7 9 10 20 2 : 
+questions/junior/0068-stream-median/ | "15" crossed by <line class="th-edge"> in שתי הערימות אחרי כל הזרם 5 15 1 3 8 7 9 10 20 2 : 
+questions/junior/0068-stream-median/ | "2" crossed by <line class="th-edge"> in ערימת מינימום של 1 3 2 7 4 9 5 : המערך עם האינדקסי
+questions/junior/0068-stream-median/ | "2" crossed by <line class="th-edge"> in שתי הערימות אחרי כל הזרם 5 15 1 3 8 7 9 10 20 2 : 
+questions/junior/0068-stream-median/ | "20" crossed by <line class="th-edge"> in שתי הערימות אחרי כל הזרם 5 15 1 3 8 7 9 10 20 2 : 
+questions/junior/0068-stream-median/ | "3" crossed by <line class="th-edge"> in ערימת מינימום של 1 3 2 7 4 9 5 : המערך עם האינדקסי
+questions/junior/0068-stream-median/ | "3" crossed by <line class="th-edge"> in שתי הערימות אחרי כל הזרם 5 15 1 3 8 7 9 10 20 2 : 
+questions/junior/0068-stream-median/ | "4" crossed by <line class="th-edge"> in ערימת מינימום של 1 3 2 7 4 9 5 : המערך עם האינדקסי
+questions/junior/0068-stream-median/ | "5" crossed by <line class="th-edge"> in ערימת מינימום של 1 3 2 7 4 9 5 : המערך עם האינדקסי
+questions/junior/0068-stream-median/ | "5" crossed by <line class="th-edge"> in שתי הערימות אחרי כל הזרם 5 15 1 3 8 7 9 10 20 2 : 
+questions/junior/0068-stream-median/ | "7" crossed by <line class="th-edge"> in ערימת מינימום של 1 3 2 7 4 9 5 : המערך עם האינדקסי
+questions/junior/0068-stream-median/ | "7" crossed by <line class="th-edge"> in שתי הערימות אחרי כל הזרם 5 15 1 3 8 7 9 10 20 2 : 
+questions/junior/0068-stream-median/ | "8" crossed by <line class="th-edge"> in שתי הערימות אחרי כל הזרם 5 15 1 3 8 7 9 10 20 2 : 
+questions/junior/0068-stream-median/ | "9" crossed by <line class="th-edge"> in ערימת מינימום של 1 3 2 7 4 9 5 : המערך עם האינדקסי
+questions/junior/0068-stream-median/ | "9" crossed by <line class="th-edge"> in שתי הערימות אחרי כל הזרם 5 15 1 3 8 7 9 10 20 2 : 
+questions/junior/0068-stream-median/ | "median = 7.5" crossed by <line class="th-mid"> in שתי הערימות אחרי כל הזרם 5 15 1 3 8 7 9 10 20 2 : 
+questions/junior/0070-grid-shortest-path/ | "0" crossed by <polyline class="gx-path is-ghost"> in השטח של סעיף ג : כביש מסביב, בוץ והר באמצע ; בכל ת
+questions/junior/0070-grid-shortest-path/ | "0" crossed by <polyline class="gx-path"> in אותו לוח עם שמונה כיוונים : המרחקים והמסלול הקצר, 
+questions/junior/0070-grid-shortest-path/ | "0" crossed by <polyline class="gx-path"> in הדוגמה : לוח 7 על 9 עם שלושה קירות, ההתחלה S משמאל
+questions/junior/0070-grid-shortest-path/ | "0" crossed by <polyline class="gx-path"> in השטח של סעיף ג : כביש מסביב, בוץ והר באמצע ; בכל ת
+questions/junior/0070-grid-shortest-path/ | "1" crossed by <polyline class="gx-path is-ghost"> in השטח של סעיף ג : כביש מסביב, בוץ והר באמצע ; בכל ת
+questions/junior/0070-grid-shortest-path/ | "1" crossed by <polyline class="gx-path"> in אותו לוח עם שמונה כיוונים : המרחקים והמסלול הקצר, 
+questions/junior/0070-grid-shortest-path/ | "1" crossed by <polyline class="gx-path"> in הדוגמה : לוח 7 על 9 עם שלושה קירות, ההתחלה S משמאל
+questions/junior/0070-grid-shortest-path/ | "1" crossed by <polyline class="gx-path"> in השטח של סעיף ג : כביש מסביב, בוץ והר באמצע ; בכל ת
+questions/junior/0070-grid-shortest-path/ | "10" crossed by <polyline class="gx-path"> in אותו לוח עם שמונה כיוונים : המרחקים והמסלול הקצר, 
+questions/junior/0070-grid-shortest-path/ | "10" crossed by <polyline class="gx-path"> in הדוגמה : לוח 7 על 9 עם שלושה קירות, ההתחלה S משמאל
+questions/junior/0070-grid-shortest-path/ | "10" crossed by <polyline class="gx-path"> in השטח של סעיף ג : כביש מסביב, בוץ והר באמצע ; בכל ת
+questions/junior/0070-grid-shortest-path/ | "11" crossed by <polyline class="gx-path is-ghost"> in השטח של סעיף ג : כביש מסביב, בוץ והר באמצע ; בכל ת
+questions/junior/0070-grid-shortest-path/ | "11" crossed by <polyline class="gx-path"> in אותו לוח עם שמונה כיוונים : המרחקים והמסלול הקצר, 
+questions/junior/0070-grid-shortest-path/ | "11" crossed by <polyline class="gx-path"> in הדוגמה : לוח 7 על 9 עם שלושה קירות, ההתחלה S משמאל
+questions/junior/0070-grid-shortest-path/ | "11" crossed by <polyline class="gx-path"> in השטח של סעיף ג : כביש מסביב, בוץ והר באמצע ; בכל ת
+questions/junior/0070-grid-shortest-path/ | "12" crossed by <polyline class="gx-path"> in אותו לוח עם שמונה כיוונים : המרחקים והמסלול הקצר, 
+questions/junior/0070-grid-shortest-path/ | "12" crossed by <polyline class="gx-path"> in הדוגמה : לוח 7 על 9 עם שלושה קירות, ההתחלה S משמאל
+questions/junior/0070-grid-shortest-path/ | "13" crossed by <polyline class="gx-path"> in אותו לוח עם שמונה כיוונים : המרחקים והמסלול הקצר, 
+questions/junior/0070-grid-shortest-path/ | "13" crossed by <polyline class="gx-path"> in הדוגמה : לוח 7 על 9 עם שלושה קירות, ההתחלה S משמאל
+questions/junior/0070-grid-shortest-path/ | "14" crossed by <polyline class="gx-path"> in אותו לוח עם שמונה כיוונים : המרחקים והמסלול הקצר, 
+questions/junior/0070-grid-shortest-path/ | "14" crossed by <polyline class="gx-path"> in הדוגמה : לוח 7 על 9 עם שלושה קירות, ההתחלה S משמאל
+questions/junior/0070-grid-shortest-path/ | "15" crossed by <polyline class="gx-path is-ghost"> in השטח של סעיף ג : כביש מסביב, בוץ והר באמצע ; בכל ת
+questions/junior/0070-grid-shortest-path/ | "15" crossed by <polyline class="gx-path"> in אותו לוח עם שמונה כיוונים : המרחקים והמסלול הקצר, 
+questions/junior/0070-grid-shortest-path/ | "15" crossed by <polyline class="gx-path"> in הדוגמה : לוח 7 על 9 עם שלושה קירות, ההתחלה S משמאל
+questions/junior/0070-grid-shortest-path/ | "16" crossed by <polyline class="gx-path"> in הדוגמה : לוח 7 על 9 עם שלושה קירות, ההתחלה S משמאל
+questions/junior/0070-grid-shortest-path/ | "17" crossed by <polyline class="gx-path"> in הדוגמה : לוח 7 על 9 עם שלושה קירות, ההתחלה S משמאל
+questions/junior/0070-grid-shortest-path/ | "18" crossed by <polyline class="gx-path"> in הדוגמה : לוח 7 על 9 עם שלושה קירות, ההתחלה S משמאל
+questions/junior/0070-grid-shortest-path/ | "19" crossed by <polyline class="gx-path"> in הדוגמה : לוח 7 על 9 עם שלושה קירות, ההתחלה S משמאל
+questions/junior/0070-grid-shortest-path/ | "2" crossed by <polyline class="gx-path"> in אותו לוח עם שמונה כיוונים : המרחקים והמסלול הקצר, 
+questions/junior/0070-grid-shortest-path/ | "2" crossed by <polyline class="gx-path"> in הדוגמה : לוח 7 על 9 עם שלושה קירות, ההתחלה S משמאל
+questions/junior/0070-grid-shortest-path/ | "2" crossed by <polyline class="gx-path"> in השטח של סעיף ג : כביש מסביב, בוץ והר באמצע ; בכל ת
+questions/junior/0070-grid-shortest-path/ | "20" crossed by <polyline class="gx-path"> in הדוגמה : לוח 7 על 9 עם שלושה קירות, ההתחלה S משמאל
+questions/junior/0070-grid-shortest-path/ | "3" crossed by <polyline class="gx-path"> in אותו לוח עם שמונה כיוונים : המרחקים והמסלול הקצר, 
+questions/junior/0070-grid-shortest-path/ | "3" crossed by <polyline class="gx-path"> in הדוגמה : לוח 7 על 9 עם שלושה קירות, ההתחלה S משמאל
+questions/junior/0070-grid-shortest-path/ | "3" crossed by <polyline class="gx-path"> in השטח של סעיף ג : כביש מסביב, בוץ והר באמצע ; בכל ת
+questions/junior/0070-grid-shortest-path/ | "4" crossed by <polyline class="gx-path"> in אותו לוח עם שמונה כיוונים : המרחקים והמסלול הקצר, 
+questions/junior/0070-grid-shortest-path/ | "4" crossed by <polyline class="gx-path"> in הדוגמה : לוח 7 על 9 עם שלושה קירות, ההתחלה S משמאל
+questions/junior/0070-grid-shortest-path/ | "4" crossed by <polyline class="gx-path"> in השטח של סעיף ג : כביש מסביב, בוץ והר באמצע ; בכל ת
+questions/junior/0070-grid-shortest-path/ | "5" crossed by <polyline class="gx-path"> in אותו לוח עם שמונה כיוונים : המרחקים והמסלול הקצר, 
+questions/junior/0070-grid-shortest-path/ | "5" crossed by <polyline class="gx-path"> in הדוגמה : לוח 7 על 9 עם שלושה קירות, ההתחלה S משמאל
+questions/junior/0070-grid-shortest-path/ | "5" crossed by <polyline class="gx-path"> in השטח של סעיף ג : כביש מסביב, בוץ והר באמצע ; בכל ת
+questions/junior/0070-grid-shortest-path/ | "6" crossed by <polyline class="gx-path is-ghost"> in השטח של סעיף ג : כביש מסביב, בוץ והר באמצע ; בכל ת
+questions/junior/0070-grid-shortest-path/ | "6" crossed by <polyline class="gx-path"> in אותו לוח עם שמונה כיוונים : המרחקים והמסלול הקצר, 
+questions/junior/0070-grid-shortest-path/ | "6" crossed by <polyline class="gx-path"> in הדוגמה : לוח 7 על 9 עם שלושה קירות, ההתחלה S משמאל
+questions/junior/0070-grid-shortest-path/ | "6" crossed by <polyline class="gx-path"> in השטח של סעיף ג : כביש מסביב, בוץ והר באמצע ; בכל ת
+questions/junior/0070-grid-shortest-path/ | "7" crossed by <polyline class="gx-path"> in אותו לוח עם שמונה כיוונים : המרחקים והמסלול הקצר, 
+questions/junior/0070-grid-shortest-path/ | "7" crossed by <polyline class="gx-path"> in הדוגמה : לוח 7 על 9 עם שלושה קירות, ההתחלה S משמאל
+questions/junior/0070-grid-shortest-path/ | "7" crossed by <polyline class="gx-path"> in השטח של סעיף ג : כביש מסביב, בוץ והר באמצע ; בכל ת
+questions/junior/0070-grid-shortest-path/ | "8" crossed by <polyline class="gx-path"> in אותו לוח עם שמונה כיוונים : המרחקים והמסלול הקצר, 
+questions/junior/0070-grid-shortest-path/ | "8" crossed by <polyline class="gx-path"> in הדוגמה : לוח 7 על 9 עם שלושה קירות, ההתחלה S משמאל
+questions/junior/0070-grid-shortest-path/ | "8" crossed by <polyline class="gx-path"> in השטח של סעיף ג : כביש מסביב, בוץ והר באמצע ; בכל ת
+questions/junior/0070-grid-shortest-path/ | "9" crossed by <polyline class="gx-path"> in אותו לוח עם שמונה כיוונים : המרחקים והמסלול הקצר, 
+questions/junior/0070-grid-shortest-path/ | "9" crossed by <polyline class="gx-path"> in הדוגמה : לוח 7 על 9 עם שלושה קירות, ההתחלה S משמאל
+questions/junior/0070-grid-shortest-path/ | "9" crossed by <polyline class="gx-path"> in השטח של סעיף ג : כביש מסביב, בוץ והר באמצע ; בכל ת
+questions/junior/0076-f-of-f-is-3n/ | "√3 · n" crossed by <line class="s3-line"> in סעיף ב : הגרף של f עד 27. מ-3 בחזקת k עד פעמיים 3 
+questions/junior/0088-ducci-differences/ | "11" crossed by <line class="du-chord"> in ארבעה מספרים על מעגל, בכיוון השעון מלמעלה : 2, 6, 
+questions/junior/0088-ducci-differences/ | "2" crossed by <line class="du-chord"> in ארבעה מספרים על מעגל, בכיוון השעון מלמעלה : 2, 6, 
+questions/junior/0088-ducci-differences/ | "4" crossed by <line class="du-chord"> in ארבעה מספרים על מעגל, בכיוון השעון מלמעלה : 2, 6, 
+questions/junior/0088-ducci-differences/ | "5" crossed by <line class="du-chord"> in ארבעה מספרים על מעגל, בכיוון השעון מלמעלה : 2, 6, 
+questions/junior/0088-ducci-differences/ | "6" crossed by <line class="du-chord"> in ארבעה מספרים על מעגל, בכיוון השעון מלמעלה : 2, 6, 
+questions/junior/0088-ducci-differences/ | "7" crossed by <line class="du-chord"> in ארבעה מספרים על מעגל, בכיוון השעון מלמעלה : 2, 6, 
+questions/junior/0094-credit-counter-random-walk/ | "k = 3" crossed by <polyline class="s1-line"> in שתי ריצות של המונה מ-3, עולה או יורד ב-1 בהסתברות 
+questions/junior/0096-kelly-criterion/ | "0.389" crossed by <polyline class="s1-line"> in קצב הגדילה לסיבוב g(f) במטבע של 0.6 עם תשלום 1:1, 
+questions/junior/0096-kelly-criterion/ | "749" crossed by <polyline class="ky-path"> in 12 מסלולים של ההון מ-100, ב-f = 0.2 לאורך 100 סיבו
+questions/junior/0104-gas-station-circle/ | "0" crossed by <line class="gs-lap"> in הרמות של הדוגמה לאורך שני סיבובים : 0, −2, −4, −6,
+questions/junior/0104-gas-station-circle/ | "3" crossed by <line class="gs-lap"> in הרמות של הטבעת עם הסכום 3 לאורך שני סיבובים : 0, −
+questions/junior/0109-car-fleet/ | "0" crossed by <line class="cf-free cf-c0"> in השרשרת של סעיף ב בלי יעד : מכוניות 0 עד 3 מהמקומות
+questions/junior/0109-car-fleet/ | "0" crossed by <polyline class="cf-path cf-c0"> in השרשרת של סעיף ב בלי יעד : מכוניות 0 עד 3 מהמקומות
+questions/junior/0109-car-fleet/ | "1" crossed by <line class="cf-free cf-c1"> in השרשרת של סעיף ב בלי יעד : מכוניות 0 עד 3 מהמקומות
+questions/junior/0109-car-fleet/ | "1" crossed by <polyline class="cf-path cf-c1"> in השרשרת של סעיף ב בלי יעד : מכוניות 0 עד 3 מהמקומות
+questions/junior/0109-car-fleet/ | "τ = 1/2" crossed by <line class="cf-free cf-c0"> in שתי מכוניות והיעד ב-10 : A מ-0 במהירות 3 ו-B מ-1 ב
+questions/junior/0109-car-fleet/ | "τ = 1/2" crossed by <polyline class="cf-path cf-c0"> in שתי מכוניות והיעד ב-10 : A מ-0 במהירות 3 ו-B מ-1 ב
+questions/junior/0113-phases-and-objections/ | "135" crossed by <line class="ink-line"> in 8 items: taken by the DUT at 25 to 95 ns, seen at 
+questions/junior/0113-phases-and-objections/ | "95" crossed by <line class="ink-line"> in 8 items: taken by the DUT at 25 to 95 ns, seen at 
+questions/senior/0020-pcie-completion-splits/ | "128" crossed by <line class="cs-rcb"> in אותם פיצולים כש-MPS = 128 : הפיצולים שיש בהם Compl
+questions/senior/0020-pcie-completion-splits/ | "128" crossed by <line class="cs-rcb"> in בקשת קריאה של 256 בתים מכתובת 0x1010 על רשת גבולות
+questions/senior/0020-pcie-completion-splits/ | "128" crossed by <line class="cs-rcb"> in כל הפיצולים החוקיים של הבקשה, שורה לכל פיצול, מקוב
+questions/senior/0020-pcie-completion-splits/ | "mid" crossed by <line class="cs-rcb"> in בקשת קריאה של 256 בתים מכתובת 0x1010 על רשת גבולות
+questions/senior/0020-pcie-completion-splits/ | "✕" crossed by <line class="cs-rcb"> in בקשת קריאה של 256 בתים מכתובת 0x1010 על רשת גבולות
+questions/senior/0021-pcie-completion-count/ | "128" crossed by <line class="cs-rcb"> in כל 16 הפיצולים החוקיים של בקשה של 256 בתים מכתובת 
+questions/senior/0021-pcie-completion-count/ | "128" crossed by <line class="cs-rcb"> in כל 8 הפיצולים החוקיים של בקשה של 256 בתים מכתובת 0
+questions/senior/0021-pcie-completion-count/ | "2" crossed by <line class="cs-rcb"> in הפיצול לפי מספר הבלוקים של ה-Completion הראשון : C
+questions/senior/0021-pcie-completion-count/ | "256" crossed by <line class="cs-rcb"> in כל 8 הפיצולים החוקיים של בקשה של 256 בתים מכתובת 0
+questions/senior/0021-pcie-completion-count/ | "4" crossed by <line class="cs-rcb"> in הפיצול לפי מספר הבלוקים של ה-Completion הראשון : C
+questions/senior/0021-pcie-completion-count/ | "C(4) = 8" crossed by <line class="cs-rcb"> in הפיצול לפי מספר הבלוקים של ה-Completion הראשון : C
+questions/senior/0021-pcie-completion-count/ | "C(5) = 15" crossed by <line class="cs-rcb"> in הפיצול לפי מספר הבלוקים של ה-Completion הראשון : C
+questions/senior/0021-pcie-completion-count/ | "C(6) = 29" crossed by <line class="cs-rcb"> in הפיצול לפי מספר הבלוקים של ה-Completion הראשון : C
+questions/senior/0021-pcie-completion-count/ | "C(7) = 56" crossed by <line class="cs-rcb"> in הפיצול לפי מספר הבלוקים של ה-Completion הראשון : C
+questions/senior/0023-pcie-endpoint-reference-model/ | "256 B · BC 256" crossed by <line class="cs-rcb"> in קריאה מיושרת של 256 בתים מכתובת 0x10000 : שני הבלו
+questions/senior/0023-pcie-endpoint-reference-model/ | "BC 256" crossed by <line class="cs-rcb"> in ארבעת הפיצולים החוקיים של קריאה של 256 בתים מכתובת
+questions/senior/0037-edit-distance-scoreboard/ | "0" crossed by <polyline class="ed-other"> in טבלת המרחקים של ABCDEF מול ABDXEF, ובפינה 2. שני מ
+questions/senior/0037-edit-distance-scoreboard/ | "1" crossed by <polyline class="ed-other"> in טבלת המרחקים של ABCDEF מול ABDXEF, ובפינה 2. שני מ
+questions/senior/0037-edit-distance-scoreboard/ | "2" crossed by <polyline class="ed-other"> in טבלת המרחקים של ABCDEF מול ABDXEF, ובפינה 2. שני מ
+questions/senior/0050-out-of-order-scoreboard/ | "A" crossed by <line class="sb-rail"> in תור לכל ID : הבקשות נכנסות לסוף התור של ה-ID שלהן,
+questions/senior/0050-out-of-order-scoreboard/ | "C" crossed by <line class="sb-rail"> in תור לכל ID : הבקשות נכנסות לסוף התור של ה-ID שלהן,
+questions/senior/0050-out-of-order-scoreboard/ | "D" crossed by <line class="sb-rail"> in תור לכל ID : הבקשות נכנסות לסוף התור של ה-ID שלהן,
+questions/senior/0050-out-of-order-scoreboard/ | "E" crossed by <line class="sb-rail"> in תור לכל ID : הבקשות נכנסות לסוף התור של ה-ID שלהן,
+questions/senior/0071-three-wizards-duel/ | "0.4" crossed by <line class="mk-hit"> in שרשרת מרקוב של סעיף א עם השרביט הטוב ביותר : אני ב
+questions/senior/0071-three-wizards-duel/ | "0.6" crossed by <line class="mk-hit"> in שרשרת מרקוב של סעיף א עם השרביט הטוב ביותר : אני ב
+questions/senior/0071-three-wizards-duel/ | "0.8" crossed by <line class="mk-hit"> in שרשרת מרקוב של סעיף א עם השרביט הטוב ביותר : אני ב
+questions/senior/0080-billiard-pocket/ | "2" crossed by <line class="bil-path"> in סעיף א : הכדור יוצא מ-(0, 0) לכיוון (240, 180). הו
+questions/senior/0080-billiard-pocket/ | "2" crossed by <line class="bil-path"> in סעיף א אחרי פתיחת השולחן : שישה עותקים של השולחן, 
+questions/senior/0080-billiard-pocket/ | "2" crossed by <line class="bil-path"> in סעיף ד : הכדור יוצא ממרכז השולחן (180, 90) בשיפוע 
+questions/senior/0080-billiard-pocket/ | "37°" crossed by <line class="bil-path"> in סעיף ג אחרי פתיחת השולחן : שישה עותקים, ונקודות הר
+questions/senior/0099-iban-check-digits/ | "d[3:0]" crossed by <path class="ih-wire"> in תרשים המלבנים של הבודק : שלושה רגיסטרים, h ו-r של 
+questions/senior/0099-iban-check-digits/ | "head" crossed by <path class="ih-wire"> in תרשים המלבנים של הבודק : שלושה רגיסטרים, h ו-r של 
+questions/senior/0103-longest-prefix-match/ | "A" crossed by <line class="lpm-edge is-on"> in עץ הביטים של הטבלה הקטנה, כתובות של 8 ביטים : הקיד
+questions/senior/0103-longest-prefix-match/ | "B" crossed by <line class="lpm-edge is-on"> in עץ הביטים של הטבלה הקטנה, כתובות של 8 ביטים : הקיד
+questions/senior/0103-longest-prefix-match/ | "C" crossed by <line class="lpm-edge"> in עץ הביטים של הטבלה הקטנה, כתובות של 8 ביטים : הקיד
+questions/senior/0103-longest-prefix-match/ | "D" crossed by <line class="lpm-edge is-on"> in עץ הביטים של הטבלה הקטנה, כתובות של 8 ביטים : הקיד
+questions/senior/0103-longest-prefix-match/ | "D" crossed by <line class="lpm-edge"> in עץ הביטים של הטבלה הקטנה, כתובות של 8 ביטים : הקיד
+questions/senior/0103-longest-prefix-match/ | "E" crossed by <line class="lpm-edge"> in עץ הביטים של הטבלה הקטנה, כתובות של 8 ביטים : הקיד
+questions/student/0048-farmer-food-and-water/ | "A" crossed by <line class="box-path"> in סעיף ג : קו המים אופקי, וקו האוכל עובר דרך (0, H) 
+questions/student/0048-farmer-food-and-water/ | "A" crossed by <line class="box-path"> in שני קווים אופקיים במרחק H זה מזה : קו האוכל למעלה 
+questions/student/0048-farmer-food-and-water/ | "H − a" crossed by <line class="box-path"> in סעיף א עם H = 3, a = 1, b = 2, L = 7 : הרצועה, השי
+questions/student/0048-farmer-food-and-water/ | "Q*" crossed by <line class="s1-line"> in סעיף ג עם L = 7, H = 3, a = 1, b = 2, θ = 15° : הש

@@ -84,6 +84,10 @@
 .md-typeset svg .s1-fill { fill: var(--viz-s1); }
 .md-typeset svg .s2-fill { fill: var(--viz-s2); }
 .md-typeset svg .s3-fill { fill: var(--viz-s3); }
+/* An arrowhead takes the colour of the line that carries it (round 21.1): a dark head on a
+   blue or orange arc read as a second mark. A browser without context-stroke drops this
+   declaration and keeps the head's own fill. */
+.md-typeset svg marker > path { fill: context-stroke !important; }
 .md-typeset .box-grid {
   display: grid;
   grid-template-columns: repeat(16, minmax(0, 1fr));

@@ -103,6 +103,7 @@ DV-Interview-Questions/
 │   │   ├── check_404.py        # The 404 page under the site's path, at both widths
 │   │   ├── check_keyboard.py   # A keyboard pass: tab order, focus rings, names, the components' keys
 │   │   ├── check_heights.py    # Every box at 1920 x 1080: the boxes taller than one screen (a warning)
+│   │   ├── check_collisions.py # Figure text crossed by a line of its figure (collisions_known.txt: the old ones, a warning)
 │   │   ├── check_explorers.py  # Every explorer box: each button clicked, its link and remembered state
 │   │   ├── check_jumps.py      # Every explorer box stepped: no figure moves while it steps
 │   │   ├── check_inputs.py     # Every number and text field of every box: typed, Enter / Tab, the box changes
@@ -739,6 +740,28 @@ All the motion stops under reduced motion and in an automated browser.
 
 Prefer text-based diagrams (Mermaid / WaveDrom) over images so they stay editable.
 
+#### Figure style
+
+The rules every generated figure follows (round 21); `tools/figures/charts.py` holds the
+shared defaults (`LABEL`, `arrow_marker()`, `legend()`):
+
+- **One label scale.** Labels are sized in viewBox units by kind (`LABEL`: a node 15, a
+  frame's name 13, an edge or a tick 12, a note 11), and a figure is drawn about 500 to 650
+  units wide at about 1 rem per 16 units (`max-width` in rem = width / 16). A wider drawing
+  shrinks its labels on a phone, so the same kind of figure on two pages is drawn at one
+  width (the testbenches of 0049 and 0114: 548 and 500 units, 35 and 32 rem).
+- **Arrowheads take their line's colour.** A marker's head is filled with `context-stroke`
+  (`03-runner-figures.css`), so one marker serves lines of every colour; its own class is
+  only the fallback of a browser without it. Do not draw a dark head on a coloured line.
+- **Text clears the lines.** An edge leaves and reaches a node where the node's own labels
+  are not (0040's back arcs leave a state at its lower side, so the state's meaning under
+  it stays readable); `check_collisions.py` fails on figure text crossed by a line (the
+  collisions found when it was written are listed in `collisions_known.txt` and warn).
+- **The legend goes under the figure**, as HTML (`legend()`, class `viz-legend`), never
+  above it and never as SVG text: the Hebrew then wraps and reads right to left.
+- **A caption** (`<figcaption>` in a `figure.fig`, numbered "איור N" by a CSS counter) only
+  where the prose refers to the figure.
+
 Inline SVG colours come from CSS variables in `docs/stylesheets/` (defined in `01-base.css`), so figures
 follow the light / dark switch automatically:
 
@@ -936,6 +959,7 @@ python tools/checks/check_contrast.py        # every colour pair, light and dark
 python tools/checks/check_404.py             # the 404 page as GitHub Pages serves it, at 390 and 1200 px
 python tools/checks/check_keyboard.py        # a keyboard pass over a few pages: tab order, focus, names, the components' keys
 python tools/checks/check_heights.py         # every box at 1920 x 1080, stepped to its end: those over 1000 px (a warning)
+python tools/checks/check_collisions.py      # figure text crossed by a line; a new collision fails, the known ones warn
 python tools/checks/check_videos.py          # the video fields of the pages (YouTube id, chapter starts)
 python tools/figures/fill.py --check 26     # generated blocks of a page are up to date
 ```

@@ -111,7 +111,7 @@ def cases_table():
 
 def blocks():
     """The generated blocks, in page order."""
-    return [legend(), fill_chart(), cases_table()]
+    return [fill_chart(), legend(), cases_table()]
 
 
 if __name__ == "__main__":

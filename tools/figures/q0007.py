@@ -110,7 +110,7 @@ def chart(m_max=40):
 
 def blocks():
     """The generated blocks, in page order."""
-    return [examples_figure(), half_figure(), legend(), chart()]
+    return [examples_figure(), half_figure(), chart(), legend()]
 
 
 if __name__ == "__main__":

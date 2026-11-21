@@ -446,13 +446,13 @@ def blocks():
     """The generated blocks, in page order."""
     return [
         # part a: L = 2
-        circle_stepper(20), rounds_table(20), survivors_table(), chart_legend(), chart(),
+        circle_stepper(20), rounds_table(20), survivors_table(), chart(), chart_legend(),
         relabel_svg(7), round_svg(8), bits_svg(),
         # part b: L = 3
-        circle_stepper(30, 3), rounds_table(30, 3), values3_table(), chart_legend(3),
-        chart(3, 60, 6), relabel_svg(8, 3), round_svg(9, 3), digits3_svg(),
+        circle_stepper(30, 3), rounds_table(30, 3), values3_table(), chart(3, 60, 6),
+        chart_legend(3), relabel_svg(8, 3), round_svg(9, 3), digits3_svg(),
         # the bonus part: any L
-        zeros_table(), values_table(4, L4_ROWS, with_residue=True), chart_legend(4), chart(4, 64, 8),
+        zeros_table(), values_table(4, L4_ROWS, with_residue=True), chart(4, 64, 8), chart_legend(4),
     ]
 
 

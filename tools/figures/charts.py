@@ -18,6 +18,27 @@ from __future__ import annotations
 
 import math
 
+# The figure style (round 21.1; "Figure style" in CONTRIBUTING.md). Label sizes in viewBox
+# units, one per kind of text, for a figure drawn about 640 units wide at about 40rem: a
+# figure much wider than that shrinks its labels on a phone, so draw it narrower instead.
+LABEL = {"node": 15, "frame": 13, "edge": 12, "tick": 12, "note": 11}
+NB = "\u00a0"   # before a colon in Hebrew text
+
+
+def arrow_marker(idn, cls="fs-arrowhead"):
+    """The site's arrowhead, for <defs>. Its fill follows the stroke of the line that
+    carries it (context-stroke, 03-runner-figures.css), so one marker serves every colour;
+    cls is the fallback colour of a browser without context-stroke."""
+    return (f'<marker id="{idn}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" '
+            f'orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" class="{cls}"/></marker>')
+
+
+def legend(items):
+    """A figure's legend as HTML, placed UNDER the figure: (class of the swatch, Hebrew
+    text) pairs. HTML rather than SVG text, so the Hebrew wraps and reads right to left."""
+    spans = "".join(f'<span><i class="{c}"></i>{t.replace(" :", NB + ":")}</span>' for c, t in items)
+    return f'<span class="viz-legend">{spans}</span>'
+
 
 class Chart:
     def __init__(self, label, *, w=640, h=250, x0=46, right=12, top=16, base=216,

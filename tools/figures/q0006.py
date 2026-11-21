@@ -67,7 +67,7 @@ def chart(prices=PRICES):
 
 def blocks():
     """The generated blocks, in page order."""
-    return [legend(), chart()]
+    return [chart(), legend()]
 
 
 if __name__ == "__main__":
