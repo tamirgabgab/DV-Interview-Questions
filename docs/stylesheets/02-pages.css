@@ -356,6 +356,11 @@
 .perf-chart .bar:hover { opacity: 0.8; }
 
 /* HTML legend for inline charts (keeps Hebrew bidi correct). */
+/* A figure's caption (round 21.2), only where the prose cites the figure: the hook numbers it
+   (data-n) and "איור N :" is written before it */
+.md-typeset .fig-cap { margin: 0.3rem auto 1rem; max-width: 36rem; text-align: center; font-size: 0.7rem; color: var(--viz-text); }
+.md-typeset .fig-cap::before { content: "איור " attr(data-n) "\a0: "; font-weight: 700; color: var(--viz-ink); }
+
 .md-typeset .viz-legend {
   display: flex;
   flex-wrap: wrap;

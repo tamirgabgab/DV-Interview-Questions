@@ -134,6 +134,22 @@ def lint_code_spaces(text: str) -> list[str]:
     return problems
 
 
+FIG_CITE = re.compile(r"(?<![\w\u0590-\u05ff])[ובלמהש]{0,3}איור (\d+)")
+
+
+def lint_fig_captions(text: str) -> list[str]:
+    """A figure caption (`<p class="fig-cap">`, numbered by the hook in page order) only where
+    the prose cites its figure: every "איור N" in the text names a caption, and every
+    caption is cited (CONTRIBUTING.md, "Figure style")."""
+    body = re.sub(r'aria-label="[^"]*"', "", text)
+    caps = len(re.findall(r'<p class="fig-cap">', body))
+    cited = {int(m.group(1)) for m in FIG_CITE.finditer(re.sub(r'<p class="fig-cap">.*?</p>', "", body))}
+    problems = [f"the text cites figure {n}, but the page has {caps} captions" for n in sorted(cited) if n > caps or n < 1]
+    problems += [f"caption {n} is not cited in the text (a caption only where the prose cites the figure)"
+                 for n in range(1, caps + 1) if n not in cited]
+    return problems
+
+
 TAB = re.compile(r'^(\s*)=== "([^"]+)"')
 
 
@@ -337,6 +353,7 @@ def lint(path: Path, warnings: list[str] | None = None) -> list[str]:
     problems.extend(lint_skeleton(text))
     problems.extend(lint_code_spaces(path.read_text(encoding="utf-8")))
     problems.extend(lint_tab_order(path.read_text(encoding="utf-8")))
+    problems.extend(lint_fig_captions(path.read_text(encoding="utf-8")))
     problems.extend(lint_colons(path.read_text(encoding="utf-8")))
     problems.extend(f"front matter: {p}" for p in video_problems(*split_front_matter(text)))
     return problems

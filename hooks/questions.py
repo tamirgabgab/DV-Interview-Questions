@@ -653,6 +653,23 @@ def _details_depth(output: str, start: int, end: int) -> int:
     return sum(-1 if m.group(1) else 1 for m in DETAILS_TAG.finditer(output, start, end))
 
 
+FIG_CAP = re.compile(r'<p class="fig-cap">')
+
+
+def fig_numbers(output: str) -> str:
+    """Number a page's figure captions in page order (round 21.2): the number goes in
+    data-n and the stylesheet writes "איור N" before the caption. Numbered here rather than
+    by a CSS counter, which skips the captions inside a closed fold, so the numbers would
+    change as folds open; the prose cites a figure as "איור N" (lint_pages.py checks N)."""
+    n = 0
+
+    def number(_m):
+        nonlocal n
+        n += 1
+        return f'<p class="fig-cap" data-n="{n}">'
+    return FIG_CAP.sub(number, output)
+
+
 def box_teaser(output: str) -> str:
     """The teaser row of a built question page (session 34): when the page's first explorer
     box sits inside a closed block (a solution, usually), a slim button right under the
@@ -2609,7 +2626,7 @@ def on_post_page(output, page, config, **kwargs):
         except Exception as e:                       # name the page, not only the TeX
             raise RuntimeError(f"{page.file.src_uri}: the search text of the statement failed: {e!r}") from e
         output = qp_parts(video_links(part_row(ltr_keep(output)), _questions[page.file.src_uri]))
-        output = box_teaser(solution_summaries(output))
+        output = fig_numbers(box_teaser(solution_summaries(output)))
         output = page_description(output, _description(_statements[page.url]))
         output = json_ld(output, _questions[page.file.src_uri], page, config)
     elif page.file.src_uri.endswith("/index.md") and page.file.src_uri.split("/")[-2] in LEVEL_DESC:

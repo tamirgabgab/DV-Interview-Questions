@@ -759,8 +759,13 @@ shared defaults (`LABEL`, `arrow_marker()`, `legend()`):
   collisions found when it was written are listed in `collisions_known.txt` and warn).
 - **The legend goes under the figure**, as HTML (`legend()`, class `viz-legend`), never
   above it and never as SVG text: the Hebrew then wraps and reads right to left.
-- **A caption** (`<figcaption>` in a `figure.fig`, numbered "איור N" by a CSS counter) only
-  where the prose refers to the figure.
+- **A caption only where the prose cites the figure from afar** ("כמו באיור 1", "הגיזום
+  שבאיור 1"): a `<p class="fig-cap">` right under the figure (and its legend), outside the
+  generated block. The hook numbers the captions in page order (`fig_numbers`, `data-n`) and
+  the stylesheet writes "איור N :" before each; a CSS counter would skip the captions in a
+  closed fold. `lint_pages.py` checks that every "איור N" names a caption and every caption
+  is cited. A figure described right above it ("באיור, ...") needs none (0003, 0018, 0030,
+  0103 have captions).
 
 Inline SVG colours come from CSS variables in `docs/stylesheets/` (defined in `01-base.css`), so figures
 follow the light / dark switch automatically:
